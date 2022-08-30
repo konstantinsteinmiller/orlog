@@ -1,0 +1,27 @@
+{
+  "name": "14-go-live",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "deploy": "vercel --prod"
+  },
+  "devDependencies": {
+    "path": "^0.12.7",
+    "sass": "^1.54.6",
+    "vercel": "^28.1.0",
+    "vite": "^3.0.7"
+  },
+  "dependencies": {
+    "cannon": "^0.6.2",
+    "cannon-es": "^0.20.0",
+    "gsap": "^3.10.4",
+    "lil-gui": "^0.17.0",
+    "stats.js": "^0.17.0",
+    "three": "^0.143.0",
+    "threejs-dice": "^1.1.0"
+  }
+}

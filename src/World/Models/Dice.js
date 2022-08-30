@@ -1,7 +1,6 @@
 import * as THREE from 'three'
 import Experience from '@/Experience.js'
-import * as CANNON from 'cannon'
-import { DiceManager } from '@/World/dice'
+import * as CANNON from 'cannon-es'
 
 export default class Dice {
   constructor(
@@ -12,6 +11,8 @@ export default class Dice {
   ) {
     this.experience = new Experience()
     this.scene = this.experience.scene
+    this.sounds = this.experience.sounds
+    this.physicsWorld = this.experience.world.physicsWorld
     this.resources = this.experience.resources
     this.scale = 0.2
     this.mass = 300
@@ -21,43 +22,59 @@ export default class Dice {
     this.modelNumber = model
     this.position = position
     this.rotation = rotation
-    // this.diceGroup.name = group
 
     this.resource = this.resources.items[`diceModel${this.modelNumber}`]
-    this.setModel()
+
+    this.setMesh()
+    this.setBody()
   }
 
-  setModel() {
-    this.model = this.resource.scene.clone(true)
+  setMesh() {
+    this.mesh = this.resource.scene.children[0].clone(true)
 
-    this.model.scale.set(this.scale, this.scale, this.scale)
-    this.model.position.set(this.position.x, this.position.y, this.position.z)
-    this.model.rotation.set(this.position.x, this.position.y, this.position.z)
+    this.mesh.scale.set(this.scale, this.scale, this.scale)
+    this.mesh.position.copy(this.position)
+
+    const randomRotationX = Math.random() * PI * 2
+    const randomRotationY = Math.random() * PI * 2
+    const randomRotationZ = Math.random() * PI * 2
+    this.rotation.x += randomRotationX
+    this.rotation.y += randomRotationY
+    this.rotation.z += randomRotationZ
+    // console.log('this.mesh.: ', JSON.parse(JSON.stringify(this.mesh.quaternion)))
+    this.mesh.rotation.set(this.rotation.x, this.rotation.y, this.rotation.z)
+    // console.log('this.mesh.: ', JSON.parse(JSON.stringify(this.mesh.quaternion)))
 
     if (this.group === null) {
-      this.scene.add(this.model)
+      this.scene.add(this.mesh)
     } else {
-      this.group.add(this.model)
+      this.group.add(this.mesh)
     }
 
-    this.model.traverse((child) => {
+    this.mesh.traverse((child) => {
       if (child instanceof THREE.Mesh) {
         child.castShadow = true
       }
     })
   }
 
-  setBody(group, position, rotation) {
-    // this.model.body = new CANNON.Body({
-    //   mass: this.mass,
-    //   shape: new CANNON.Box(new CANNON.Vec3(0.2)),
-    //   material: new CANNON.Material(),
-    // })
+  setBody() {
+    // Cannon body
+    const shape = new CANNON.Box(new CANNON.Vec3(1))
+    this.body = new CANNON.Body({
+      mass: 1,
+      position: new CANNON.Vec3(0, 3, 0),
+      shape,
+      material: new CANNON.Material('default'),
+    })
+    this.body.position.copy(this.mesh.position)
+    this.body.quaternion.copy(this.mesh.quaternion)
+    // console.log('this.body: ', this.body.quaternion)
+    this.body.addEventListener('collide', (event) => this.sounds.playHitSound(event))
+    this.physicsWorld.addBody(this.body)
     // this.model.body.linearDamping = 0.3
     // this.model.body.angularDamping = 0.3
     // this.model.body.position.set(position)
     // this.model.body.quaternion.setFromEuler(rotation)
-    //
-    // DiceManager.world.addBody(this.model.body)
   }
 }

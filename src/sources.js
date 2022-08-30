@@ -56,4 +56,9 @@ export default [
     type: 'gltfModel',
     path: 'models/Dices/dice6.glb',
   },
+  {
+    name: 'hitSound',
+    type: 'audio',
+    path: 'sounds/hit.mp3',
+  },
 ]

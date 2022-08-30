@@ -1,12 +1,12 @@
 import Experience from '@/Experience.js'
 import * as THREE from 'three'
-import * as CANNON from 'cannon'
-import { DiceManager } from '@/World/dice'
+import * as CANNON from 'cannon-es'
 
 export default class Floor {
   constructor() {
     this.experience = new Experience()
     this.scene = this.experience.scene
+    this.physicsWorld = this.experience.world.physicsWorld
     this.resources = this.experience.resources
 
     this.setGeometry()
@@ -39,25 +39,27 @@ export default class Floor {
     this.material = new THREE.MeshStandardMaterial({
       map: this.textures.color,
       normalMap: this.textures.normal,
+      envMap: this.resources.items.environmentMapTexture,
+      metalness: 0.3,
+      roughness: 0.4,
     })
   }
 
   setMesh() {
     this.mesh = new THREE.Mesh(this.geometry, this.material)
     this.mesh.rotation.x = -Math.PI * 0.5
-    this.mesh.position.y = -1
+    // this.mesh.position.y = -1
     this.mesh.receiveShadow = true
     this.scene.add(this.mesh)
   }
 
   setPhysicsBody() {
-    let floorBody = new CANNON.Body({
-      mass: 0,
-      shape: new CANNON.Plane(),
-      material: DiceManager.floorBodyMaterial,
-    })
-    // floorBody.position.set(new CANNON.Vec3(0, -1, 0))
-    floorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2)
-    this.experience.world.physicsWorld.addBody(floorBody)
+    const floorShape = new CANNON.Plane()
+    const floorBody = new CANNON.Body()
+    floorBody.mass = 0
+    floorBody.addShape(floorShape)
+    floorBody.position.copy(this.mesh.position)
+    floorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(-1, 0, 0), Math.PI * 0.5)
+    this.physicsWorld.addBody(floorBody)
   }
 }

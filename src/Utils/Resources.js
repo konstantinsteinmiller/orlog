@@ -42,6 +42,15 @@ export default class Resources extends EventEmitter {
         this.loaders.cubeTextureLoader.load(source.path, (file) => {
           this.sourceLoaded(source, file)
         })
+      } else if (source.type === 'audio') {
+        const audio = new Audio(source.path)
+        audio.addEventListener(
+          'canplaythrough',
+          (event) => {
+            this.sourceLoaded(source, event.path.pop())
+          },
+          false,
+        )
       }
     }
   }

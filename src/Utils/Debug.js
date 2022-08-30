@@ -1,8 +1,9 @@
-import * as dat from 'lil-gui'
+import * as gui from 'lil-gui'
 import Stats from 'stats.js'
 
 export default class Debug {
   constructor() {
+    this.experience = experience
     this.isActive = window.location.hash === '#debug'
 
     if (this.isActive) {
@@ -13,7 +14,16 @@ export default class Debug {
       document.body.appendChild(this.stats.dom)
       this.stats.begin()
 
-      this.ui = new dat.GUI()
+      this.ui = new gui.GUI()
+
+      window.onkeydown = (event) => {
+        if (event.key === 'h') {
+          this.ui._hidden ? this.ui.show() : this.ui.hide()
+        }
+        if (event.key === 'c') {
+          this.ui._closed ? this.ui.open() : this.ui.close()
+        }
+      }
     }
   }
 }

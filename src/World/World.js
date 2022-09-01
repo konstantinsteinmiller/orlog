@@ -1,8 +1,10 @@
 import Environment from '@/World/Environment.js'
 import Floor from '@/World/Models/Floor.js'
 import DicesHandler from '@/World/DicesHandler.js'
+import Bowl from '@/World/Models/Bowl.js'
 import * as THREE from 'three'
 import * as CANNON from 'cannon-es'
+import CannonDebugRenderer from '@/Utils/CannonDebug'
 
 export default class World {
   constructor() {
@@ -13,9 +15,10 @@ export default class World {
     this.resources = experience.resources
     this.diceHandler = null
     this.dices = []
-
+    this.bowls = []
     this.physicsWorld = new CANNON.World()
-    this.objectsToUpdateList = []
+
+    this.cannonDebugRenderer = new CannonDebugRenderer(this.scene, this.physicsWorld)
 
     // Wait for resources
     this.resources.on('ready', () => {
@@ -23,6 +26,7 @@ export default class World {
       this.floor = new Floor()
       this.dicesHandler = new DicesHandler()
       this.environment = new Environment()
+      this.bowls.push(new Bowl())
       this.setPhysicsWorld()
 
       // Debug
@@ -51,6 +55,7 @@ export default class World {
       this.physicsWorld.step(1 / 60, experience.time.delta, 3)
 
       this.dicesHandler && this.dicesHandler.update()
+      this.cannonDebugRenderer.update()
     }
   }
 }

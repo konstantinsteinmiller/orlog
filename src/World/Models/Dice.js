@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import Experience from '@/Experience.js'
 import * as CANNON from 'cannon-es'
+// import { CreateConvexPolyhedron } from '@/Utils/CannonUtils'
 
 export default class Dice {
   constructor(
@@ -60,11 +61,11 @@ export default class Dice {
 
   setBody() {
     // Cannon body
+    const diceShape = new CANNON.Box(new CANNON.Vec3(this.scale, this.scale, this.scale))
     const shape = new CANNON.Box(new CANNON.Vec3(1))
     this.body = new CANNON.Body({
       mass: 1,
-      position: new CANNON.Vec3(0, 3, 0),
-      shape,
+      shape: diceShape,
       material: new CANNON.Material('default'),
     })
     this.body.position.copy(this.mesh.position)

@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js'
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
 import EventEmitter from '@/Utils/EventEmitter.js'
 
@@ -20,6 +21,7 @@ export default class Resources extends EventEmitter {
   setLoaders() {
     this.loaders = {}
     this.loaders.gltfLoader = new GLTFLoader()
+    this.loaders.objLoader = new OBJLoader()
     const dracoLoader = new DRACOLoader()
     dracoLoader.setDecoderPath('/draco/')
     this.loaders.gltfLoader.setDRACOLoader(dracoLoader)
@@ -31,15 +33,26 @@ export default class Resources extends EventEmitter {
     // Load each source
     for (const source of this.sources) {
       if (source.type === 'gltfModel') {
-        this.loaders.gltfLoader.load(source.path, (file) => {
-          this.sourceLoaded(source, file)
-        })
+        this.loaders.gltfLoader.load(
+          source.path,
+          (file) => {
+            this.sourceLoaded(source, file)
+          },
+          () => {},
+          (e) => {
+            console.error('could not load: ', source.path)
+          },
+        )
       } else if (source.type === 'texture') {
         this.loaders.textureLoader.load(source.path, (file) => {
           this.sourceLoaded(source, file)
         })
       } else if (source.type === 'cubeTexture') {
         this.loaders.cubeTextureLoader.load(source.path, (file) => {
+          this.sourceLoaded(source, file)
+        })
+      } else if (source.type === 'objModel') {
+        this.loaders.objLoader.load(source.path, (file) => {
           this.sourceLoaded(source, file)
         })
       } else if (source.type === 'audio') {

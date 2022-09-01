@@ -55,11 +55,7 @@ export default class DicesHandler {
     this.scene.add(this.diceGroup)
   }
   update() {
-    // this.dicesList
-    //  this.dicesList.push({ mesh, body })
-
     this.dicesList.forEach((dice) => {
-      // console.log('dice: ', dice)
       dice.mesh.position.copy(dice.body.position)
       dice.mesh.quaternion.copy(dice.body.quaternion)
     })

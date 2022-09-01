@@ -16,12 +16,16 @@
     "vite": "^3.0.7"
   },
   "dependencies": {
+    "@enable3d/ammo-physics": "^0.25.2",
+    "@enable3d/three-graphics": "^0.25.2",
     "cannon": "^0.6.2",
     "cannon-es": "^0.20.0",
+    "enable3d": "^0.25.2",
     "gsap": "^3.10.4",
     "lil-gui": "^0.17.0",
     "stats.js": "^0.17.0",
     "three": "^0.143.0",
+    "three-to-cannon": "^4.2.0",
     "threejs-dice": "^1.1.0"
   }
 }

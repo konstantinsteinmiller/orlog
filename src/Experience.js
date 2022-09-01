@@ -9,6 +9,7 @@ import Camera from '@/Camera.js'
 import Renderer from '@/Renderer.js'
 import World from '@/World/World.js'
 // import * as CANNON from 'cannon';
+import { AmmoPhysics } from '@enable3d/ammo-physics'
 
 import sources from '@/sources.js'
 
@@ -40,6 +41,8 @@ export default class Experience {
     this.camera = new Camera()
     this.renderer = new Renderer()
     this.world = new World()
+    const physics = new AmmoPhysics(this.scene)
+    physics.debug.enable(true)
 
     // Resize event
     this.sizes.on('resize', () => {

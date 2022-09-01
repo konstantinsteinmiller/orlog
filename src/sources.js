@@ -29,36 +29,46 @@ export default [
   {
     name: 'diceModel1',
     type: 'gltfModel',
-    path: 'models/Dices/dice1.glb',
+    path: 'models/dices/dice1.glb',
   },
   {
     name: 'diceModel2',
     type: 'gltfModel',
-    path: 'models/Dices/dice2.glb',
+    path: 'models/dices/dice2.glb',
   },
   {
     name: 'diceModel3',
     type: 'gltfModel',
-    path: 'models/Dices/dice3.glb',
+    path: 'models/dices/dice3.glb',
   },
   {
     name: 'diceModel4',
     type: 'gltfModel',
-    path: 'models/Dices/dice4.glb',
+    path: 'models/dices/dice4.glb',
   },
   {
     name: 'diceModel5',
     type: 'gltfModel',
-    path: 'models/Dices/dice5.glb',
+    path: 'models/dices/dice5.glb',
   },
   {
     name: 'diceModel6',
     type: 'gltfModel',
-    path: 'models/Dices/dice6.glb',
+    path: 'models/dices/dice6.glb',
   },
   {
     name: 'hitSound',
     type: 'audio',
     path: 'sounds/hit.mp3',
   },
+  {
+    name: 'bowl',
+    type: 'gltfModel',
+    path: 'models/bowl/bowl.glb',
+  },
+  // {
+  //   name: 'bowl',
+  //   type: 'objModel',
+  //   path: 'models/bowl/bowl.obj',
+  // },
 ]

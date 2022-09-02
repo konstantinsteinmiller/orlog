@@ -8,7 +8,13 @@ export default class DicesHandler {
     this.mouse = experience.mouse
     this.camera = experience.camera.instance
     this.dicesList = []
+    this.diceMeshes = []
+    this.diceImage = null
 
+    this.rayCaster = new THREE.Raycaster()
+    this.currentIntersect = null
+
+    // init code
     this.createDices()
 
     // Debug
@@ -65,21 +71,25 @@ export default class DicesHandler {
     window.ondblclick = this.onDblClick
 
     this.onClick = () => {
-      console.log('this.mouse.x, this.mouse.y: ', this.mouse.x, this.mouse.y);
-      this.rayCaster.setFromCamera(new THREE.Vector2(this.mouse.x, this.mouse.y), this.camera)
-
-      const diceMeshes = this.dicesList.map(
-        (dice) =>
-          // console.log('dice.group.children[0]: ', dice.group.children[0])
-          dice.group.children[0],
-      )
-      console.log('diceMeshes: ', diceMeshes)
-      const intersections = this.rayCaster.intersectObjects(diceMeshes)
-      console.log('intersections: ', intersections)
+      // this.rayCaster.setFromCamera(new THREE.Vector2(this.mouse.x, this.mouse.y), this.camera)
+      // const intersections = this.rayCaster.intersectObjects(this.diceMeshes)
+      // if (intersections.length) {
+      if (this.currentIntersect) {
+        const diceHighlightMesh = this.currentIntersect.parent.getObjectByName('diceHighlight')
+        console.log('highlight: ', diceHighlightMesh)
+        diceHighlightMesh.isSelected = !diceHighlightMesh.isSelected
+        diceHighlightMesh.isHighlighted = true
+      } else {
+        /*} */
+        if (this.currentIntersect) {
+          // this.currentIntersect.parent.getObjectByName('diceHighlight').isHighlighted = false
+        }
+        this.currentIntersect = null
+      }
+      console.log('this.currentIntersect: ', this.currentIntersect)
     }
     window.onclick = this.onClick
 
-    this.createHoverRayCaster()
     // webgl.onclick = (dices) => this.randomDiceThrow(dices)
   }
   destructor() {
@@ -113,21 +123,52 @@ export default class DicesHandler {
     this.diceGroup.name = 'diceGroup'
     this.dicesList = [
       new Dice(this.diceGroup, 1, new THREE.Vector3(-0.5, 3, 0), new THREE.Vector3(0, 0, 1)),
-      // new Dice(this.diceGroup, 2, new THREE.Vector3(0, 3, 0), new THREE.Vector3(0, 0, PI * 0.5)),
+      new Dice(this.diceGroup, 2, new THREE.Vector3(0, 3, 0), new THREE.Vector3(0, 0, PI * 0.5)),
       // new Dice(this.diceGroup, 3, new THREE.Vector3(0.5, 3, 0), new THREE.Vector3(0, 0, PI)),
       // new Dice(this.diceGroup, 4, new THREE.Vector3(-0.5, 3, 0.6), new THREE.Vector3(0, 0, PI * 1.5)),
       // new Dice(this.diceGroup, 5, new THREE.Vector3(0, 3, 0.6), new THREE.Vector3(PI * 0.5, 0, 0)),
       // new Dice(this.diceGroup, 6, new THREE.Vector3(0.5, 3, 0.6), new THREE.Vector3(PI * 0.5, PI, PI * 1.5)),
     ]
+    this.diceMeshes = this.dicesList.map((dice) => dice.group.children[0])
     this.scene.add(this.diceGroup)
   }
-  createHoverRayCaster() {
-    this.rayCaster = new THREE.Raycaster()
+  handleDiceHover() {
+    this.rayCaster.setFromCamera(new THREE.Vector2(this.mouse.x, this.mouse.y), this.camera)
+
+    const intersections = this.rayCaster.intersectObjects(this.diceMeshes)
+
+    if (intersections.length) {
+      this.currentIntersect = intersections[0].object
+      this.diceMeshes.forEach((dice) => {
+        dice.parent.getObjectByName('diceHighlight').isHighlighted = this.currentIntersect.name === dice.name
+        if (this.currentIntersect.name === dice.name) {
+          // console.log('dice: ')
+        }
+        this.diceImage = this.currentIntersect.name === dice.name ? 'test' : null
+      })
+      // console.log('this.diceImage: ', this.diceImage)
+    } else {
+      if (this.currentIntersect) {
+        this.currentIntersect.parent.getObjectByName('diceHighlight').isHighlighted = false
+      }
+      this.diceImage = null
+      this.currentIntersect = null
+    }
   }
   update() {
-    /*this.dicesList.forEach((dice) => {
-      dice.mesh.position.copy(dice.body.position)
-      dice.mesh.quaternion.copy(dice.body.quaternion)
-    })*/
+    this.dicesList.forEach((dice) => {
+      const diceHighlightMesh = dice.group.getObjectByName('diceHighlight')
+
+      if (diceHighlightMesh.isHighlighted && !diceHighlightMesh.isSelected) {
+        diceHighlightMesh.material.color.set(0xffff00)
+        diceHighlightMesh.material.opacity = 0.2
+      } else if (diceHighlightMesh.isSelected) {
+        diceHighlightMesh.material.color.set(0x00ff00)
+        diceHighlightMesh.material.opacity = 0.3
+      } else {
+        diceHighlightMesh.material.opacity = 0
+      }
+    })
+    this.handleDiceHover()
   }
 }

@@ -116,18 +116,18 @@ export default class Dice {
     group.add(cubeSideFront)
     group.add(cubeSideRight)
 
-    const highlightColor = this.isSelected ? 0x00ff00 : 0xffff00
     /* opaque outline mesh to highlight selection */
     let outlineMesh = new THREE.Mesh(
       mesh.geometry,
       new THREE.MeshBasicMaterial({
-        color: highlightColor,
+        color: 0x00ff00,
         transparent: true,
-        opacity: this.isSelected ? 0.3 : this.isHighlighted ? 0.2 : 0,
+        opacity: 0,
       }),
     )
     outlineMesh.position.copy(mesh.position)
     outlineMesh.scale.multiplyScalar(1.1)
+    outlineMesh.name = 'diceHighlight'
     group.add(outlineMesh)
 
     return group

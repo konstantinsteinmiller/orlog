@@ -76,6 +76,9 @@ export default class Dice {
     this.mass = 300
     this.inertia = 13
 
+    this.isHighlighted = false
+    this.isSelected = false
+
     this.group = group
     this.modelNumber = model
     this.position = position
@@ -112,12 +115,28 @@ export default class Dice {
     group.add(cubeSideUp)
     group.add(cubeSideFront)
     group.add(cubeSideRight)
+
+    const highlightColor = this.isSelected ? 0x00ff00 : 0xffff00
+    /* opaque outline mesh to highlight selection */
+    let outlineMesh = new THREE.Mesh(
+      mesh.geometry,
+      new THREE.MeshBasicMaterial({
+        color: highlightColor,
+        transparent: true,
+        opacity: this.isSelected ? 0.3 : this.isHighlighted ? 0.2 : 0,
+      }),
+    )
+    outlineMesh.position.copy(mesh.position)
+    outlineMesh.scale.multiplyScalar(1.1)
+    group.add(outlineMesh)
+
     return group
   }
   setMesh() {
     this.mesh = this.resource.scene.children[0].clone(true)
     this.mesh.castShadow = true
     this.mesh.receiveShadow = true
+    this.mesh.name = `Dice${this.modelNumber}Mesh`
 
     const group = this.createSideDetectorCubes(this.mesh)
     this.group = group

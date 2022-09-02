@@ -5,6 +5,8 @@ export default class DicesHandler {
     this.scene = experience.scene
     this.physics = experience.physics
     this.debug = experience.debug
+    this.mouse = experience.mouse
+    this.camera = experience.camera.instance
     this.dicesList = []
 
     this.createDices()
@@ -62,10 +64,27 @@ export default class DicesHandler {
     }
     window.ondblclick = this.onDblClick
 
+    this.onClick = () => {
+      console.log('this.mouse.x, this.mouse.y: ', this.mouse.x, this.mouse.y);
+      this.rayCaster.setFromCamera(new THREE.Vector2(this.mouse.x, this.mouse.y), this.camera)
+
+      const diceMeshes = this.dicesList.map(
+        (dice) =>
+          // console.log('dice.group.children[0]: ', dice.group.children[0])
+          dice.group.children[0],
+      )
+      console.log('diceMeshes: ', diceMeshes)
+      const intersections = this.rayCaster.intersectObjects(diceMeshes)
+      console.log('intersections: ', intersections)
+    }
+    window.onclick = this.onClick
+
+    this.createHoverRayCaster()
     // webgl.onclick = (dices) => this.randomDiceThrow(dices)
   }
   destructor() {
     window.removeEventListener('dblclick', this.onDblClick)
+    window.removeEventListener('click', this.onClick)
   }
   /*randomDiceThrow() {
     var diceValues = []
@@ -102,10 +121,13 @@ export default class DicesHandler {
     ]
     this.scene.add(this.diceGroup)
   }
+  createHoverRayCaster() {
+    this.rayCaster = new THREE.Raycaster()
+  }
   update() {
-    this.dicesList.forEach((dice) => {
+    /*this.dicesList.forEach((dice) => {
       dice.mesh.position.copy(dice.body.position)
       dice.mesh.quaternion.copy(dice.body.quaternion)
-    })
+    })*/
   }
 }

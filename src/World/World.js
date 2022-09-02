@@ -34,10 +34,9 @@ export default class World {
   }
 
   update() {
-    if (this.physics) {
-      // this.physics.step(1 / 60, experience.time.delta, 3)
-      // this.dicesHandler && this.dicesHandler.update()
-    }
+    // console.log('this.physics: ', this.physics)
+    this.dicesHandler && this.dicesHandler.update()
+
     // const { factory } = this.physics
     // this.physics.add.box({ x: 0.05, y: 10, mass: 1 }, { lambert: { color: 0x2194ce } })
     //

@@ -3,6 +3,7 @@ import Debug from '@/Utils/Debug.js'
 import Sizes from '@/Utils/Sizes.js'
 import Time from '@/Utils/Time.js'
 import Sounds from '@/Utils/Sounds.js'
+import Mouse from '@/Utils/Mouse.js'
 import Resources from '@/Utils/Resources.js'
 import Camera from '@/Camera.js'
 import Renderer from '@/Renderer.js'
@@ -37,6 +38,7 @@ export default class Experience {
     this.scene = new THREE.Scene()
     this.resources = new Resources(sources)
     this.sounds = new Sounds()
+    this.mouse = new Mouse()
     this.camera = new Camera()
     this.renderer = new Renderer()
     this.world = new World()

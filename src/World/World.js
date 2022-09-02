@@ -2,9 +2,7 @@ import Environment from '@/World/Environment.js'
 import Floor from '@/World/Models/Floor.js'
 import DicesHandler from '@/World/DicesHandler.js'
 import Bowl from '@/World/Models/Bowl.js'
-import * as THREE from 'three'
-import * as CANNON from 'cannon-es'
-import CannonDebugRenderer from '@/Utils/CannonDebug'
+// import * as THREE from 'three'
 
 export default class World {
   constructor() {
@@ -14,11 +12,11 @@ export default class World {
     this.sounds = experience.sounds
     this.resources = experience.resources
     this.diceHandler = null
-    this.dices = []
     this.bowls = []
-    this.physicsWorld = new CANNON.World()
+    this.physics = experience.physics
 
-    this.cannonDebugRenderer = new CannonDebugRenderer(this.scene, this.physicsWorld)
+    // const axisHelper = new THREE.AxesHelper(3)
+    // this.scene.add(axisHelper)
 
     // Wait for resources
     this.resources.on('ready', () => {
@@ -27,7 +25,6 @@ export default class World {
       this.dicesHandler = new DicesHandler()
       this.environment = new Environment()
       this.bowls.push(new Bowl())
-      this.setPhysicsWorld()
 
       // Debug
       if (this.debug.isActive) {
@@ -36,26 +33,15 @@ export default class World {
     })
   }
 
-  setPhysicsWorld() {
-    this.physicsWorld.broadphase = new CANNON.SAPBroadphase(this.physicsWorld) // advanced collision detection, NAIVE is default
-    this.physicsWorld.allowSleep = true
-    this.physicsWorld.gravity.set(0, -9.82, 0)
-
-    const defaultMaterial = new CANNON.Material('default')
-    const defaultContactMaterial = new CANNON.ContactMaterial(defaultMaterial, defaultMaterial, {
-      friction: 0.1,
-      restitution: 0.7,
-    })
-    this.physicsWorld.addContactMaterial(defaultContactMaterial)
-    this.physicsWorld.defaultContactMaterial = defaultContactMaterial
-  }
-
   update() {
-    if (this.physicsWorld) {
-      this.physicsWorld.step(1 / 60, experience.time.delta, 3)
-
-      this.dicesHandler && this.dicesHandler.update()
-      this.cannonDebugRenderer.update()
+    if (this.physics) {
+      // this.physics.step(1 / 60, experience.time.delta, 3)
+      // this.dicesHandler && this.dicesHandler.update()
     }
+    // const { factory } = this.physics
+    // this.physics.add.box({ x: 0.05, y: 10, mass: 1 }, { lambert: { color: 0x2194ce } })
+    //
+    // // static ground
+    // let greenSphere = factory.addSphere({ y: 2, z: 5 }, { lambert: { color: 0x00ff00 } })
   }
 }

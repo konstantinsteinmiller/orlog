@@ -1,6 +1,6 @@
 'use strict'
 import * as CANNON from 'cannon'
-import * as THREE from 'three'
+// import * as THREE from 'three'
 
 class DiceManagerClass {
   constructor() {
@@ -187,20 +187,20 @@ class DiceObject {
     let vector = new THREE.Vector3(0, this.invertUpside ? -1 : 1)
     let closest_face
     let closest_angle = Math.PI * 2
-    // for (let i = 0; i < this.object.geometry.faces.length; ++i) {
-    //   let face = this.object.geometry.faces[i]
-    //   if (face.materialIndex === 0) {
-    //     continue
-    //   }
-    //
-    //   let angle = face.normal.clone().applyQuaternion(this.object.body.quaternion).angleTo(vector)
-    //   if (angle < closest_angle) {
-    //     closest_angle = angle
-    //     closest_face = face
-    //   }
-    // }
+    for (let i = 0; i < this.object.geometry.faces.length; ++i) {
+      let face = this.object.geometry.faces[i]
+      if (face.materialIndex === 0) {
+        continue
+      }
 
-    return 1 /*closest_face.materialIndex - 1*/
+      let angle = face.normal.clone().applyQuaternion(this.object.body.quaternion).angleTo(vector)
+      if (angle < closest_angle) {
+        closest_angle = angle
+        closest_face = face
+      }
+    }
+
+    return 1 closest_face.materialIndex - 1
   }
 
   getCurrentVectors() {

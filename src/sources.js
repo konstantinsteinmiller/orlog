@@ -66,9 +66,4 @@ export default [
     type: 'gltfModel',
     path: 'models/bowl/bowl.glb',
   },
-  // {
-  //   name: 'bowl',
-  //   type: 'objModel',
-  //   path: 'models/bowl/bowl.obj',
-  // },
 ]

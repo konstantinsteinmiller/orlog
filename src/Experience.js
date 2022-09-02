@@ -1,5 +1,4 @@
-import * as THREE from 'three'
-
+// import * as THREE from 'three'
 import Debug from '@/Utils/Debug.js'
 import Sizes from '@/Utils/Sizes.js'
 import Time from '@/Utils/Time.js'
@@ -8,8 +7,8 @@ import Resources from '@/Utils/Resources.js'
 import Camera from '@/Camera.js'
 import Renderer from '@/Renderer.js'
 import World from '@/World/World.js'
-// import * as CANNON from 'cannon';
 import { AmmoPhysics } from '@enable3d/ammo-physics'
+import { THREE } from 'enable3d/dist/index'
 
 import sources from '@/sources.js'
 
@@ -41,8 +40,8 @@ export default class Experience {
     this.camera = new Camera()
     this.renderer = new Renderer()
     this.world = new World()
-    const physics = new AmmoPhysics(this.scene)
-    physics.debug.enable(true)
+    this.physics = new AmmoPhysics(this.scene)
+    this.physics.debug.enable(true)
 
     // Resize event
     this.sizes.on('resize', () => {
@@ -63,6 +62,9 @@ export default class Experience {
   update() {
     this.camera.update()
     this.world.update()
+    this.physics.update(this.time.clockDelta * 1000)
+    this.physics.updateDebugger()
+
     this.renderer.update()
   }
 

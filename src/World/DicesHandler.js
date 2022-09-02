@@ -1,11 +1,9 @@
-import { DiceManager } from '@/World/dice'
-import * as THREE from 'three'
-import Dice from '@/World/Models/Dice.js'
-import * as CANNON from 'cannon-es'
+import Dice, { diceMap } from '@/World/Models/Dice.js'
 
 export default class DicesHandler {
   constructor() {
     this.scene = experience.scene
+    this.physics = experience.physics
     this.debug = experience.debug
     this.dicesList = []
 
@@ -17,7 +15,57 @@ export default class DicesHandler {
       this.debugFolder.add(this, 'createDices')
     }
 
+    this.onDblClick = () => {
+      this.dicesList.forEach((dice) => {
+        // const child = dice.group.children[0]
+        const childUp = dice.group.getObjectByName('upSideDetector')
+        const childFront = dice.group.getObjectByName('frontSideDetector')
+        const childRight = dice.group.getObjectByName('rightSideDetector')
+
+        /* to get the current world position of the dice, we need to detach from the parent group */
+        this.scene.attach(childUp) // detach from parent and add to scene
+        this.scene.attach(childFront)
+        this.scene.attach(childRight)
+        dice.group.attach(childUp) // reattach to original parent
+        dice.group.attach(childFront)
+        dice.group.attach(childRight)
+
+        var worldPosUp = new THREE.Vector3().applyMatrix4(childUp.matrixWorld)
+        var worldPosFront = new THREE.Vector3().applyMatrix4(childFront.matrixWorld)
+        var worldPosRight = new THREE.Vector3().applyMatrix4(childRight.matrixWorld)
+
+        const Uy = worldPosUp.y.toFixed(2)
+        const Fy = worldPosFront.y.toFixed(2)
+        const Ry = worldPosRight.y.toFixed(2)
+        // console.log('Uy, Fy, Ry: ', Uy, Fy, Ry)
+        if (Uy > Fy && Uy > Ry) {
+          console.error(`Y Top // ${diceMap[1].top.symbol} ${diceMap[1].top.isGolden ? 'Golden' : ''}`)
+        }
+        if (Uy < Fy && Uy < Ry) {
+          console.error(
+            `-Y Bottom // ${diceMap[1].bottom.symbol} ${diceMap[1].bottom.isGolden ? 'Golden' : ''}`,
+          )
+        }
+        if (Fy > Uy && Fy > Ry) {
+          console.error(`Z Front // ${diceMap[1].front.symbol} ${diceMap[1].front.isGolden ? 'Golden' : ''}`)
+        }
+        if (Fy < Uy && Fy < Ry) {
+          console.error(`-Z Back // ${diceMap[1].back.symbol} ${diceMap[1].back.isGolden ? 'Golden' : ''}`)
+        }
+        if (Ry > Uy && Ry > Fy) {
+          console.error(`X Right // ${diceMap[1].right.symbol} ${diceMap[1].right.isGolden ? 'Golden' : ''}`)
+        }
+        if (Ry < Uy && Ry < Fy) {
+          console.error(`-X Left // ${diceMap[1].left.symbol} ${diceMap[1].left.isGolden ? 'Golden' : ''}`)
+        }
+      })
+    }
+    window.ondblclick = this.onDblClick
+
     // webgl.onclick = (dices) => this.randomDiceThrow(dices)
+  }
+  destructor() {
+    window.removeEventListener('dblclick', this.onDblClick)
   }
   /*randomDiceThrow() {
     var diceValues = []
@@ -46,11 +94,11 @@ export default class DicesHandler {
     this.diceGroup.name = 'diceGroup'
     this.dicesList = [
       new Dice(this.diceGroup, 1, new THREE.Vector3(-0.5, 3, 0), new THREE.Vector3(0, 0, 1)),
-      new Dice(this.diceGroup, 2, new THREE.Vector3(0, 3, 0), new THREE.Vector3(0, 0, PI * 0.5)),
-      new Dice(this.diceGroup, 3, new THREE.Vector3(0.5, 3, 0), new THREE.Vector3(0, 0, PI)),
-      new Dice(this.diceGroup, 4, new THREE.Vector3(-0.5, 3, 0.6), new THREE.Vector3(0, 0, PI * 1.5)),
-      new Dice(this.diceGroup, 5, new THREE.Vector3(0, 3, 0.6), new THREE.Vector3(PI * 0.5, 0, 0)),
-      new Dice(this.diceGroup, 6, new THREE.Vector3(0.5, 3, 0.6), new THREE.Vector3(PI * 0.5, PI, PI * 1.5)),
+      // new Dice(this.diceGroup, 2, new THREE.Vector3(0, 3, 0), new THREE.Vector3(0, 0, PI * 0.5)),
+      // new Dice(this.diceGroup, 3, new THREE.Vector3(0.5, 3, 0), new THREE.Vector3(0, 0, PI)),
+      // new Dice(this.diceGroup, 4, new THREE.Vector3(-0.5, 3, 0.6), new THREE.Vector3(0, 0, PI * 1.5)),
+      // new Dice(this.diceGroup, 5, new THREE.Vector3(0, 3, 0.6), new THREE.Vector3(PI * 0.5, 0, 0)),
+      // new Dice(this.diceGroup, 6, new THREE.Vector3(0.5, 3, 0.6), new THREE.Vector3(PI * 0.5, PI, PI * 1.5)),
     ]
     this.scene.add(this.diceGroup)
   }

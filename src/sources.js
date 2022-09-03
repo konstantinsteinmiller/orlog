@@ -62,6 +62,26 @@ export default [
     path: 'sounds/hit.mp3',
   },
   {
+    name: 'diceShake',
+    type: 'audio',
+    path: 'sounds/dice_shake.wav',
+  },
+  {
+    name: 'diceHit1',
+    type: 'audio',
+    path: 'sounds/ground_hit_1.mp3',
+  },
+  {
+    name: 'diceHit2',
+    type: 'audio',
+    path: 'sounds/ground_hit_2.mp3',
+  },
+  {
+    name: 'diceHit3',
+    type: 'audio',
+    path: 'sounds/ground_hit_3.mp3',
+  },
+  {
     name: 'bowl',
     type: 'gltfModel',
     path: 'models/bowl/bowl.glb',

@@ -1,4 +1,5 @@
-import Dice, { diceMap } from '@/World/Models/Dice.js'
+import Dice from '@/World/Models/Dice.js'
+import { HIGHLIGHT_POSITION_MAP, DICE_FACES_MAP } from '@/Utils/constants'
 
 export default class DicesHandler {
   constructor() {
@@ -6,120 +7,97 @@ export default class DicesHandler {
     this.physics = experience.physics
     this.debug = experience.debug
     this.mouse = experience.mouse
+    this.sounds = experience.sounds
     this.camera = experience.camera.instance
     this.dicesList = []
     this.diceMeshes = []
-    this.diceImage = null
+    this.availableThrows = 3
+    this.isThrowing = false
 
     this.rayCaster = new THREE.Raycaster()
     this.currentIntersect = null
+    this.previousIntersect = null
 
     // init code
     this.createDices()
 
     // Debug
     if (this.debug.isActive) {
-      this.debugFolder = this.debug.ui.addFolder('meshes')
+      this.debugFolder = this.debug.ui.addFolder('dices')
       this.debugFolder.add(this, 'createDices')
+      this.debugFolder.add(this, 'availableThrows', 1, 10, 1)
     }
 
-    this.onDblClick = () => {
-      this.dicesList.forEach((dice) => {
-        // const child = dice.group.children[0]
-        const childUp = dice.group.getObjectByName('upSideDetector')
-        const childFront = dice.group.getObjectByName('frontSideDetector')
-        const childRight = dice.group.getObjectByName('rightSideDetector')
-
-        /* to get the current world position of the dice, we need to detach from the parent group */
-        this.scene.attach(childUp) // detach from parent and add to scene
-        this.scene.attach(childFront)
-        this.scene.attach(childRight)
-        dice.group.attach(childUp) // reattach to original parent
-        dice.group.attach(childFront)
-        dice.group.attach(childRight)
-
-        var worldPosUp = new THREE.Vector3().applyMatrix4(childUp.matrixWorld)
-        var worldPosFront = new THREE.Vector3().applyMatrix4(childFront.matrixWorld)
-        var worldPosRight = new THREE.Vector3().applyMatrix4(childRight.matrixWorld)
-
-        const Uy = worldPosUp.y.toFixed(2)
-        const Fy = worldPosFront.y.toFixed(2)
-        const Ry = worldPosRight.y.toFixed(2)
-        // console.log('Uy, Fy, Ry: ', Uy, Fy, Ry)
-        if (Uy > Fy && Uy > Ry) {
-          console.error(`Y Top // ${diceMap[1].top.symbol} ${diceMap[1].top.isGolden ? 'Golden' : ''}`)
-        }
-        if (Uy < Fy && Uy < Ry) {
-          console.error(
-            `-Y Bottom // ${diceMap[1].bottom.symbol} ${diceMap[1].bottom.isGolden ? 'Golden' : ''}`,
-          )
-        }
-        if (Fy > Uy && Fy > Ry) {
-          console.error(`Z Front // ${diceMap[1].front.symbol} ${diceMap[1].front.isGolden ? 'Golden' : ''}`)
-        }
-        if (Fy < Uy && Fy < Ry) {
-          console.error(`-Z Back // ${diceMap[1].back.symbol} ${diceMap[1].back.isGolden ? 'Golden' : ''}`)
-        }
-        if (Ry > Uy && Ry > Fy) {
-          console.error(`X Right // ${diceMap[1].right.symbol} ${diceMap[1].right.isGolden ? 'Golden' : ''}`)
-        }
-        if (Ry < Uy && Ry < Fy) {
-          console.error(`-X Left // ${diceMap[1].left.symbol} ${diceMap[1].left.isGolden ? 'Golden' : ''}`)
-        }
-      })
+    window.onkeydown = (e) => {
+      e.code === 'Space' && this.evaluateTopFace()
     }
-    window.ondblclick = this.onDblClick
-
-    this.onClick = () => {
-      if (this.currentIntersect) {
-        const diceHighlightMesh = this.currentIntersect.parent.getObjectByName('diceHighlight')
-        diceHighlightMesh.isSelected = !diceHighlightMesh.isSelected
-        diceHighlightMesh.isHighlighted = true
-      }
-    }
-    window.onclick = this.onClick
+    window.ondblclick = () => this.randomDiceThrow()
+    window.onclick = this.toggleDiceSelection
 
     // webgl.onclick = (dices) => this.randomDiceThrow(dices)
   }
   destructor() {
-    window.removeEventListener('dblclick', this.onDblClick)
-    window.removeEventListener('click', this.onClick)
+    window.removeEventListener('dblclick', this.evaluateTopFace)
+    window.removeEventListener('click', this.toggleDiceSelection)
+    window.removeEventListener('keydown', (e) => {
+      e.code === 'Space' && this.evaluateTopFace()
+    })
   }
-  /*randomDiceThrow() {
-    var diceValues = []
-    console.log('randomDiceThrow: ', this.dices)
-    for (var i = 0; i < this.dices.length; i++) {
-      let yRand = Math.random() * 20 + 2
-      this.dices[i].getObject().position.x = -15 - (i % 3) * 1.5
-      this.dices[i].getObject().position.y = 2 + Math.floor(i / 3) * 1.5
-      this.dices[i].getObject().position.z = -15 + (i % 3) * 1.5
-      this.dices[i].getObject().quaternion.x = ((Math.random() * 90 - 45) * Math.PI) / 180
-      this.dices[i].getObject().quaternion.z = ((Math.random() * 90 - 45) * Math.PI) / 180
-      this.dices[i].updateBodyFromMesh()
-      let rand = Math.random() * 5
-      this.dices[i].getObject().body.velocity.set(25 + rand, 40 + yRand, 15 + rand)
-      this.dices[i]
-        .getObject()
-        .body.angularVelocity.set(20 * Math.random() - 10, 20 * Math.random() - 10, 20 * Math.random() - 10)
-
-      diceValues.push({ dice: this.dices[i], value: i + 1 })
+  randomDiceThrow(rethrowDicesList = []) {
+    if ((this.availableThrows <= 0 && !rethrowDicesList.length) || this.isThrowing) {
+      return
     }
 
-    DiceManager.prepareValues(diceValues)
-  }*/
+    this.isThrowing = true
+    this.sounds.playDiceShakeSound()
+    // rethrowDicesList einbauen
+    setTimeout(() => {
+      this.dicesList.forEach((dice) => {
+        if (!dice?.group.getObjectByName('diceHighlight')?.isSelected) {
+          const body = dice.group?.body
+
+          // set the new position
+          if (body) {
+            body.setVelocity(0, 0, 0)
+            body.setAngularVelocity(0, 0, 0)
+            body.setCollisionFlags(2)
+
+            dice.group.position.set(...dice.position)
+            body.needUpdate = true
+
+            // this will run only on the next update if body.needUpdate = true
+            body.once.update(() => {
+              // set body back to dynamic
+              body.setCollisionFlags(0)
+
+              // if you do not reset the velocity and angularVelocity, the object will keep it
+              body.setVelocity(0.3, -0.2, -1.2)
+              body.setAngularVelocity(-7, -7, 6)
+            })
+          } else {
+            body.setVelocity(0.3, -0.2, -1.2)
+            body.setAngularVelocity(-7, -7, 6)
+          }
+        }
+      })
+      /*!this.debug.isActive &&*/ this.availableThrows--
+      this.isThrowing = false
+    }, 500)
+  }
   createDices() {
     this.diceGroup = new THREE.Group({ name: 'diceGroup' })
     this.diceGroup.name = 'diceGroup'
     this.dicesList = [
-      new Dice(this.diceGroup, 1, new THREE.Vector3(-0.5, 3, 0), new THREE.Vector3(0, 0, 1)),
-      new Dice(this.diceGroup, 2, new THREE.Vector3(0, 3, 0), new THREE.Vector3(0, 0, PI * 0.5)),
-      // new Dice(this.diceGroup, 3, new THREE.Vector3(0.5, 3, 0), new THREE.Vector3(0, 0, PI)),
-      // new Dice(this.diceGroup, 4, new THREE.Vector3(-0.5, 3, 0.6), new THREE.Vector3(0, 0, PI * 1.5)),
-      // new Dice(this.diceGroup, 5, new THREE.Vector3(0, 3, 0.6), new THREE.Vector3(PI * 0.5, 0, 0)),
-      // new Dice(this.diceGroup, 6, new THREE.Vector3(0.5, 3, 0.6), new THREE.Vector3(PI * 0.5, PI, PI * 1.5)),
+      new Dice(this.diceGroup, 1, new THREE.Vector3(-0.5, 3, 1), new THREE.Vector3(0, 0, 1)),
+      new Dice(this.diceGroup, 2, new THREE.Vector3(0, 3, 1), new THREE.Vector3(0, 0, PI * 0.5)),
+      new Dice(this.diceGroup, 3, new THREE.Vector3(0.5, 3, 1), new THREE.Vector3(0, 0, PI)),
+      new Dice(this.diceGroup, 4, new THREE.Vector3(-0.5, 3, 1.6), new THREE.Vector3(0, 0, PI * 1.5)),
+      new Dice(this.diceGroup, 5, new THREE.Vector3(0, 3, 1.6), new THREE.Vector3(PI * 0.5, 0, 0)),
+      new Dice(this.diceGroup, 6, new THREE.Vector3(0.5, 3, 1.6), new THREE.Vector3(PI * 0.5, PI, PI * 1.5)),
     ]
     this.diceMeshes = this.dicesList.map((dice) => dice.group.children[0])
     this.scene.add(this.diceGroup)
+    this.randomDiceThrow()
   }
   handleDiceHover() {
     this.rayCaster.setFromCamera(new THREE.Vector2(this.mouse.x, this.mouse.y), this.camera)
@@ -130,20 +108,102 @@ export default class DicesHandler {
       this.currentIntersect = intersections[0].object
       this.diceMeshes.forEach((dice) => {
         dice.parent.getObjectByName('diceHighlight').isHighlighted = this.currentIntersect.name === dice.name
-        if (this.currentIntersect.name === dice.name) {
-          // console.log('dice: ')
-        }
-        this.diceImage = this.currentIntersect.name === dice.name ? 'test' : null
       })
-      // console.log('this.diceImage: ', this.diceImage)
+      this.setDiceTopFaceHighlighter()
     } else {
       if (this.currentIntersect) {
+        if (this.previousIntersect?.name !== this.currentIntersect?.name) {
+          console.log('NEW Intersect: ', this.currentIntersect)
+        }
         this.currentIntersect.parent.getObjectByName('diceHighlight').isHighlighted = false
       }
-      this.diceImage = null
+      this.previousIntersect = { name: this.currentIntersect?.name }
       this.currentIntersect = null
+      diceFacesLayout.style.opacity = 0
     }
   }
+
+  setDiceTopFaceHighlighter() {
+    if (this.currentIntersect.name.substring(0, 4) === 'Dice') {
+      const diceModelNumber = this.currentIntersect.name.substring(4, 5)
+      diceFacesLayout.style.opacity = 0.8
+      const upwardFace = this.currentIntersect?.userData?.upwardFace
+      if (upwardFace) {
+        faceHighlight.style.top = HIGHLIGHT_POSITION_MAP?.[upwardFace].top
+        faceHighlight.style.right = HIGHLIGHT_POSITION_MAP?.[upwardFace].right
+      }
+      diceFaces.src = `./public/textures/dices/dice${diceModelNumber}.jpg`
+    } else {
+      console.error('wrong intersection')
+    }
+  }
+
+  evaluateTopFace = () => {
+    this.dicesList.forEach((dice, index) => {
+      const dI = index + 1
+      const childMesh = dice.group.children[0]
+      const childUp = dice.group.getObjectByName('upSideDetector')
+      const childFront = dice.group.getObjectByName('frontSideDetector')
+      const childRight = dice.group.getObjectByName('rightSideDetector')
+
+      /* to get the current world position of the dice, we need to detach from the parent group */
+      this.scene.attach(childUp) // detach from parent and add to scene
+      this.scene.attach(childFront)
+      this.scene.attach(childRight)
+      dice.group.attach(childUp) // reattach to original parent
+      dice.group.attach(childFront)
+      dice.group.attach(childRight)
+
+      var worldPosUp = new THREE.Vector3().applyMatrix4(childUp.matrixWorld)
+      var worldPosFront = new THREE.Vector3().applyMatrix4(childFront.matrixWorld)
+      var worldPosRight = new THREE.Vector3().applyMatrix4(childRight.matrixWorld)
+
+      const Uy = worldPosUp.y.toFixed(2)
+      const Fy = worldPosFront.y.toFixed(2)
+      const Ry = worldPosRight.y.toFixed(2)
+      // console.log('Uy, Fy, Ry: ', Uy, Fy, Ry)
+
+      this.setUpwardFace = (face, axis) => {
+        childMesh.userData.upwardFace = face
+        childMesh.userData.upwardSymbol = DICE_FACES_MAP[dI]?.[face].symbol
+        childMesh.userData.isGoldenSymbol = DICE_FACES_MAP[dI]?.[face].isGolden
+        this.debug?.isActive &&
+          console.error(
+            `${axis} ${face[0].toUpperCase()}${face.substring(1)} // ${DICE_FACES_MAP[dI]?.[face].symbol} ${
+              DICE_FACES_MAP[dI]?.[face].isGolden ? 'Golden' : ''
+            }`,
+          )
+      }
+
+      if (Uy > Fy && Uy > Ry) {
+        this.setUpwardFace('top', 'Y')
+      }
+      if (Uy < Fy && Uy < Ry) {
+        this.setUpwardFace('bottom', '-Y')
+      }
+      if (Fy > Uy && Fy > Ry) {
+        this.setUpwardFace('front', 'Z')
+      }
+      if (Fy < Uy && Fy < Ry) {
+        this.setUpwardFace('back', '-Z')
+      }
+      if (Ry > Uy && Ry > Fy) {
+        this.setUpwardFace('right', 'X')
+      }
+      if (Ry < Uy && Ry < Fy) {
+        this.setUpwardFace('left', '-X')
+      }
+    })
+  }
+
+  toggleDiceSelection = () => {
+    if (this.currentIntersect) {
+      const diceHighlightMesh = this.currentIntersect.parent.getObjectByName('diceHighlight')
+      diceHighlightMesh.isSelected = !diceHighlightMesh.isSelected
+      diceHighlightMesh.isHighlighted = true
+    }
+  }
+
   update() {
     this.dicesList.forEach((dice) => {
       const diceHighlightMesh = dice.group.getObjectByName('diceHighlight')
@@ -158,6 +218,17 @@ export default class DicesHandler {
         diceHighlightMesh.material.opacity = 0
       }
     })
-    this.handleDiceHover()
+
+    this.diceMeshes.every((dice, index) => {
+      const t = null
+      // dice?.userData?.upwardFace &&
+      //   console.log(
+      //     `${index}dice:
+      //    ${dice?.userData?.upwardFace}
+      //    ${dice?.userData?.upwardSymbol}
+      //    ${dice?.userData?.isGoldenSymbol ? 'Golden' : ''}`,
+      //   )
+      return dice?.userData?.upwardFace !== undefined
+    }) && this.handleDiceHover()
   }
 }

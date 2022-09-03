@@ -26,7 +26,6 @@ export default class Renderer {
     this.instance.shadowMap.type = THREE.PCFSoftShadowMap
     this.instance.setClearColor('#211d20')
     this.instance.setSize(this.canvas.clientWidth, this.canvas.clientHeight)
-    // this.canvas.style.replace()
   }
 
   resize() {

@@ -32,7 +32,7 @@ export default class Time extends EventEmitter {
       this.tick()
     })
 
-    if (this.experience.debug.isActive) {
+    if (this.experience.debug?.isActive) {
       this.experience.debug.stats.end()
     }
   }

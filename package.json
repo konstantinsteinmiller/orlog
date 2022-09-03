@@ -23,6 +23,7 @@
     "lil-gui": "^0.17.0",
     "stats.js": "^0.17.0",
     "three": "^0.143.0",
+    "three-screen-quad": "^0.2.1",
     "three-to-cannon": "^4.2.0",
     "threejs-dice": "^1.1.0"
   }

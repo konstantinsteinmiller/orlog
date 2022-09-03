@@ -36,7 +36,6 @@ export default class Camera {
     const height = (this.canvas.clientHeight * pixelRatio) | 0
     const needResize = this.canvas.width !== width || this.canvas.height !== height
 
-    console.log('this.canvas.width: ', this.canvas.width,this.canvas.clientWidth * pixelRatio, this.canvas.clientWidth, needResize)
     if (needResize) {
       this.renderer.instance.setSize(width, height, false)
     }

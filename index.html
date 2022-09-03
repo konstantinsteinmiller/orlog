@@ -8,7 +8,23 @@
     <title>Orlog</title>
 </head>
 <body>
-    <canvas id="webgl"></canvas>
+    <div class="ogame">
+        <canvas id="webgl"></canvas>
+        <div class="dice-layout" id="diceFacesLayout">
+            <img class=" selection--disabled"
+                 id="diceFaces"
+                 src="./public/textures/dices/dice1.jpg"
+                 loading="lazy" alt="Dice 1 layout"
+                 draggable="false"
+            >
+            <img class="dice-top-layer-highlight selection--disabled"
+                 id="faceHighlight"
+                 src="./public/textures/dices/top-highlighter2.png"
+                 loading="lazy" alt="dice top face highlighter"
+                 draggable="false"
+            >
+        </div>
+    </div>
     <script type="module" src="./src/main.js"></script>
 </body>
 </html>

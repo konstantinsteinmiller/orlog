@@ -32,6 +32,9 @@ body,
     > img#diceFaces {
         height: 100%;
     }
+    > img.selection--disabled:not(img#diceFaces) {
+        display: block
+    }
 }
 
 .dice-top-layer-highlight {

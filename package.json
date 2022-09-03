@@ -7,9 +7,15 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "deploy": "vercel --prod"
+    "deploy": "surge --project C:/Users/konst/game/orlog/dist --domain orlog-game.surge.sh"
+  },
+  "git": {
+    "scripts": {
+      "pre-push": "surge --project ./dist --domain orlog-game.surge.sh"
+    }
   },
   "devDependencies": {
+    "git-scripts": "^0.6.4",
     "path": "^0.12.7",
     "sass": "^1.54.6",
     "vercel": "^28.1.0",

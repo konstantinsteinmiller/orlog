@@ -71,22 +71,11 @@ export default class DicesHandler {
     window.ondblclick = this.onDblClick
 
     this.onClick = () => {
-      // this.rayCaster.setFromCamera(new THREE.Vector2(this.mouse.x, this.mouse.y), this.camera)
-      // const intersections = this.rayCaster.intersectObjects(this.diceMeshes)
-      // if (intersections.length) {
       if (this.currentIntersect) {
         const diceHighlightMesh = this.currentIntersect.parent.getObjectByName('diceHighlight')
-        console.log('highlight: ', diceHighlightMesh)
         diceHighlightMesh.isSelected = !diceHighlightMesh.isSelected
         diceHighlightMesh.isHighlighted = true
-      } else {
-        /*} */
-        if (this.currentIntersect) {
-          // this.currentIntersect.parent.getObjectByName('diceHighlight').isHighlighted = false
-        }
-        this.currentIntersect = null
       }
-      console.log('this.currentIntersect: ', this.currentIntersect)
     }
     window.onclick = this.onClick
 

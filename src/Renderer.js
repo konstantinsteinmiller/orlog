@@ -8,6 +8,7 @@ export default class Renderer {
     this.sizes = this.experience.sizes
     this.scene = this.experience.scene
     this.camera = this.experience.camera
+    this.instance = null // actual THREE Renderer
 
     this.setInstance()
   }
@@ -24,13 +25,12 @@ export default class Renderer {
     this.instance.shadowMap.enabled = true
     this.instance.shadowMap.type = THREE.PCFSoftShadowMap
     this.instance.setClearColor('#211d20')
-    this.instance.setSize(this.sizes.width, this.sizes.height)
-    this.instance.setPixelRatio(Math.min(this.sizes.pixelRatio, 2))
+    this.instance.setSize(this.canvas.clientWidth, this.canvas.clientHeight)
+    // this.canvas.style.replace()
   }
 
   resize() {
-    this.instance.setSize(this.sizes.width, this.sizes.height)
-    this.instance.setPixelRatio(Math.min(this.sizes.pixelRatio, 2))
+    this.instance.setSize(this.canvas.clientWidth, this.canvas.clientHeight)
   }
 
   update() {

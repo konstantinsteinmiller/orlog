@@ -43,8 +43,10 @@ export default class Experience {
     this.renderer = new Renderer()
     this.world = new World()
     this.physics = new AmmoPhysics(this.scene)
-    this.physics.debug.enable(true)
+    this.physics.debug.enable()
 
+    // Debug
+    // if (this.debug.isActive) {}
     // Resize event
     this.sizes.on('resize', () => {
       this.resize()

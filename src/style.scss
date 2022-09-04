@@ -26,14 +26,10 @@ body,
     height: 30%;
     opacity: 0;
     position: fixed;
-    //display: block;
     transform: translateY(-50%);
 
     > img#diceFaces {
         height: 100%;
-    }
-    > img.selection--disabled:not(img#diceFaces) {
-        display: block
     }
 }
 

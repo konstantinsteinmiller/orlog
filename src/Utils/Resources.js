@@ -57,7 +57,6 @@ export default class Resources extends EventEmitter {
         })
       } else if (source.type === 'audioLoader') {
         this.loaders.audioLoader.load(source.path, (audioBuffer) => {
-          console.log('audioBuffer: ', audioBuffer)
           this.sourceLoaded(source, audioBuffer)
         })
       } else if (source.type === 'audio') {

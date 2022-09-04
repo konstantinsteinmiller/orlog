@@ -52,10 +52,12 @@ export default class DicesHandler {
       return
     }
 
+    this.dicesList.forEach((dice) => (dice.mesh.userData.isMoving = false))
     this.disableDiceCollisonSound = false
     this.isThrowing = true
     this.sounds.playDiceShakeSound()
     setTimeout(() => {
+      /* pickup all not selected dices to rethrow them */
       this.dicesList.forEach((dice) => {
         if (!dice?.group.getObjectByName('diceHighlight')?.isSelected) {
           const body = dice.group?.body
@@ -84,12 +86,14 @@ export default class DicesHandler {
           }
         }
       })
-      /*!this.debug.isActive &&*/ this.availableThrows--
+      this.availableThrows--
       setTimeout(() => {
-        this.isThrowing = false
         this.didAllDicesStopMoving = false
       }, 500)
-    }, 500)
+      setTimeout(() => {
+        this.isThrowing = false
+      }, 1200)
+    }, 400)
   }
   createDices() {
     this.diceGroup = new THREE.Group({ name: 'diceGroup' })
@@ -111,10 +115,11 @@ export default class DicesHandler {
 
     const intersections = this.rayCaster.intersectObjects(this.diceMeshes)
 
-    if (intersections.length) {
+    if (intersections.length && !this.isThrowing) {
       this.currentIntersect = intersections[0].object
       this.dicesList.forEach((dice) => {
-        dice.group.getObjectByName('diceHighlight').isHighlighted = this.currentIntersect.name === dice.name
+        dice.group.getObjectByName('diceHighlight').isHighlighted =
+          this.currentIntersect.name === dice.mesh.name
       })
       this.setDiceTopFaceHighlighter()
     } else {
@@ -204,7 +209,7 @@ export default class DicesHandler {
   }
 
   toggleDiceSelection = () => {
-    if (this.currentIntersect) {
+    if (this.currentIntersect && !this.isThrowing) {
       const diceHighlightMesh = this.currentIntersect.parent.getObjectByName('diceHighlight')
       diceHighlightMesh.isSelected = !diceHighlightMesh.isSelected
       diceHighlightMesh.isHighlighted = true
@@ -263,19 +268,21 @@ export default class DicesHandler {
       console.log('ALL Dices stopped moving!!!!!!!!!!!!!')
       this.didAllDicesStopMoving = true
       this.disableDiceCollisonSound = true
-      this.evaluateTopFace()
+      setTimeout(() => {
+        this.evaluateTopFace()
+      }, 700)
     }
 
-    this.dicesList.every((dice, index) => {
-      const childMesh = dice.group.children[0]
-      // dice?.userData?.upwardFace &&
-      //   console.log(
-      //     `${index}dice:
-      //    ${dice?.userData?.upwardFace}
-      //    ${dice?.userData?.upwardSymbol}
-      //    ${dice?.userData?.isGoldenSymbol ? 'Golden' : ''}`,
-      //   )
-      return childMesh?.userData?.upwardFace !== undefined
-    }) && this.handleDiceHover()
+    this.dicesList.every(
+      (dice, index) =>
+        // dice?.userData?.upwardFace &&
+        //   console.log(
+        //     `${index}dice:
+        //    ${dice?.userData?.upwardFace}
+        //    ${dice?.userData?.upwardSymbol}
+        //    ${dice?.userData?.isGoldenSymbol ? 'Golden' : ''}`,
+        //   )
+        dice.mesh?.userData?.upwardFace !== undefined,
+    ) && this.handleDiceHover()
   }
 }

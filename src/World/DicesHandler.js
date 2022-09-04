@@ -47,22 +47,20 @@ export default class DicesHandler {
     })
   }
 
-  randomDiceThrow(rethrowDicesList = []) {
+  randomDiceThrow() {
     if ((this.availableThrows <= 0 && !rethrowDicesList.length) || this.isThrowing) {
       return
     }
 
-    this.isPlayingCollisionSound = false
     this.disableDiceCollisonSound = false
     this.isThrowing = true
     this.sounds.playDiceShakeSound()
-    // rethrowDicesList einbauen
     setTimeout(() => {
       this.dicesList.forEach((dice) => {
         if (!dice?.group.getObjectByName('diceHighlight')?.isSelected) {
           const body = dice.group?.body
 
-          // set the new position
+          // set the new position // TELEPORT dynamic ammo body
           if (body) {
             body.setVelocity(0, 0, 0)
             body.setAngularVelocity(0, 0, 0)

@@ -66,21 +66,21 @@ export default [
     type: 'audio',
     path: 'sounds/dice_shake.mp3',
   },
-  // {
-  //   name: 'diceHit1',
-  //   type: 'audio',
-  //   path: 'sounds/ground_hit_1.mp3',
-  // },
-  // {
-  //   name: 'diceHit2',
-  //   type: 'audio',
-  //   path: 'sounds/ground_hit_2.mp3',
-  // },
-  // {
-  //   name: 'diceHit3',
-  //   type: 'audio',
-  //   path: 'sounds/ground_hit_3.mp3',
-  // },
+  {
+    name: 'diceHit1',
+    type: 'audioLoader',
+    path: 'sounds/ground_hit_1.wav',
+  },
+  {
+    name: 'diceHit2',
+    type: 'audioLoader',
+    path: 'sounds/ground_hit_2.wav',
+  },
+  {
+    name: 'diceHit3',
+    type: 'audioLoader',
+    path: 'sounds/ground_hit_3.wav',
+  },
   {
     name: 'bowl',
     type: 'gltfModel',

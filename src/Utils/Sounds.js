@@ -5,6 +5,11 @@ export default class Sounds {
     this.hitSound = null
     this.diceShakeSound = null
     this.diceHitSounds = []
+    // create an audio context
+    this.audioCtx = new AudioContext()
+    this.audioListener = new THREE.AudioListener()
+    this.diceHit1Sound = new THREE.Audio(this.audioListener)
+    experience.scene.add(this.diceHit1Sound)
 
     // Wait for resources
     this.resources.on('ready', () => {
@@ -16,6 +21,41 @@ export default class Sounds {
         experience.resources.items.diceHit3,
       ]
     })
+  }
+
+  async playSound(sounds, randomVolume = false, randomVolumeOffset = 0.2, maxVolume = 1) {
+    // const resp = await fetch('https://upload.wikimedia.org/wikipedia/commons/6/68/Crash.ogg')
+    // const arrayBuffer = await resp.arrayBuffer()
+    const soundName =
+      sounds instanceof Array
+        ? sounds[Math.max(Math.floor(Math.random() * sounds.length), sounds.length - 1)]
+        : sounds
+
+    // const audioBuffer = await this.audioCtx.decodeAudioData(arrayBuffer)
+    const audioBuffer = experience.resources.items?.[soundName]
+    const source = this.audioCtx.createBufferSource()
+    source.buffer = audioBuffer
+
+    if (randomVolume) {
+      var gainNode = this.audioCtx.createGain()
+      gainNode.gain.value = Math.random() * maxVolume + randomVolumeOffset
+      gainNode.connect(this.audioCtx.destination)
+
+      // now instead of connecting to aCtx.destination, connect to the gainNode
+      source.connect(gainNode)
+    } else {
+      source.connect(this.audioCtx.destination)
+    }
+
+    // start playback
+    source.start()
+
+    /* pause audio for ui menus or settings */
+    /*setTimeout(() => {
+      this.audioCtx.suspend()
+      alert()
+      setTimeout(() => this.audioCtx.resume(), 100)
+    }, 200)*/
   }
 
   playHitSound(collision) {
@@ -30,8 +70,9 @@ export default class Sounds {
   }
 
   playDiceShakeSound() {
+    // this.playSound('diceShake', true)
     if (this.diceShakeSound) {
-      this.diceShakeSound.volume = Math.random()
+      this.diceShakeSound.volume = Math.random() * 0.5 + 0.5
       this.diceShakeSound.currentTime = 0
       try {
         this.diceShakeSound.play()
@@ -40,12 +81,14 @@ export default class Sounds {
   }
 
   playDiceHitSound() {
-    if (this.diceHitSounds) {
-      this.diceHitSounds.volume = Math.random()
-      this.diceHitSounds.currentTime = 0
-      try {
-        this.diceHitSounds.play()
-      } catch (e) {}
-    }
+    // if (this.diceHitSounds) {
+    //   const randSound = Math.max(Math.floor(Math.random() * 3), 2)
+    //   const soundInstance = JSON.parse(JSON.stringify(this.diceHitSounds[randSound]))
+    //   soundInstance.volume = Math.random() * 0.7
+    //   soundInstance.currentTime = 0
+    //   try {
+    //     soundInstance.play()
+    //   } catch (e) {}
+    // }
   }
 }

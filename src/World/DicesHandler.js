@@ -1,18 +1,21 @@
 import Dice from '@/World/Models/Dice.js'
 import { HIGHLIGHT_POSITION_MAP, DICE_FACES_MAP } from '@/Utils/constants'
+import { isWithinRange } from '@/Utils/math'
 
 export default class DicesHandler {
   constructor() {
     this.scene = experience.scene
     this.physics = experience.physics
     this.debug = experience.debug
-    this.mouse = experience.mouse
+    this.input = experience.input
     this.sounds = experience.sounds
     this.camera = experience.camera.instance
     this.dicesList = []
     this.diceMeshes = []
     this.availableThrows = 3
     this.isThrowing = false
+    this.didAllDicesStopMoving = false
+    this.disableDiceCollisonSound = false
 
     this.rayCaster = new THREE.Raycaster()
     this.currentIntersect = null
@@ -43,11 +46,14 @@ export default class DicesHandler {
       e.code === 'Space' && this.evaluateTopFace()
     })
   }
+
   randomDiceThrow(rethrowDicesList = []) {
     if ((this.availableThrows <= 0 && !rethrowDicesList.length) || this.isThrowing) {
       return
     }
 
+    this.isPlayingCollisionSound = false
+    this.disableDiceCollisonSound = false
     this.isThrowing = true
     this.sounds.playDiceShakeSound()
     // rethrowDicesList einbauen
@@ -81,7 +87,10 @@ export default class DicesHandler {
         }
       })
       /*!this.debug.isActive &&*/ this.availableThrows--
-      this.isThrowing = false
+      setTimeout(() => {
+        this.isThrowing = false
+        this.didAllDicesStopMoving = false
+      }, 500)
     }, 500)
   }
   createDices() {
@@ -100,14 +109,14 @@ export default class DicesHandler {
     this.randomDiceThrow()
   }
   handleDiceHover() {
-    this.rayCaster.setFromCamera(new THREE.Vector2(this.mouse.x, this.mouse.y), this.camera)
+    this.rayCaster.setFromCamera(new THREE.Vector2(this.input.x, this.input.y), this.camera)
 
     const intersections = this.rayCaster.intersectObjects(this.diceMeshes)
 
     if (intersections.length) {
       this.currentIntersect = intersections[0].object
-      this.diceMeshes.forEach((dice) => {
-        dice.parent.getObjectByName('diceHighlight').isHighlighted = this.currentIntersect.name === dice.name
+      this.dicesList.forEach((dice) => {
+        dice.group.getObjectByName('diceHighlight').isHighlighted = this.currentIntersect.name === dice.name
       })
       this.setDiceTopFaceHighlighter()
     } else {
@@ -217,10 +226,50 @@ export default class DicesHandler {
       } else {
         diceHighlightMesh.material.opacity = 0
       }
+
+      if (this.debug.isPhysicsDebugActive) {
+      }
     })
 
-    this.diceMeshes.every((dice, index) => {
-      const t = null
+    /* checks if dices stopped moving and write into dice data */
+    this.debug.isPhysicsDebugActive &&
+      this.dicesList.forEach((dice) => {
+        const body = dice.group.body
+        // const mainMesh = dice.mesh
+        const angularVelocity = new THREE.Vector3(1, 1, 1).dot(
+          new THREE.Vector3(
+            Math.abs(body.angularVelocity.x),
+            Math.abs(body.angularVelocity.y),
+            Math.abs(body.angularVelocity.z),
+          ),
+        )
+        const velocity = new THREE.Vector3(1, 1, 1).dot(
+          new THREE.Vector3(Math.abs(body.velocity.x), Math.abs(body.velocity.y), Math.abs(body.velocity.z)),
+        )
+
+        const didDiceStoppedMoving =
+          isWithinRange(angularVelocity, -0.1, 0.1) && isWithinRange(velocity, -0.1, 0.1) && velocity !== 0
+        if (didDiceStoppedMoving) {
+          dice.mesh.userData.isMoving = !didDiceStoppedMoving
+        }
+        return didDiceStoppedMoving
+      })
+
+    if (
+      this.debug.isPhysicsDebugActive &&
+      !this.didAllDicesStopMoving &&
+      !this.isThrowing &&
+      this.dicesList.every((dice) => dice.mesh.userData.isMoving === false)
+    ) {
+      // alert('all dices stopped moving')
+      console.log('ALL Dices stopped moving!!!!!!!!!!!!!')
+      this.didAllDicesStopMoving = true
+      this.disableDiceCollisonSound = true
+      this.evaluateTopFace()
+    }
+
+    this.dicesList.every((dice, index) => {
+      const childMesh = dice.group.children[0]
       // dice?.userData?.upwardFace &&
       //   console.log(
       //     `${index}dice:
@@ -228,7 +277,7 @@ export default class DicesHandler {
       //    ${dice?.userData?.upwardSymbol}
       //    ${dice?.userData?.isGoldenSymbol ? 'Golden' : ''}`,
       //   )
-      return dice?.userData?.upwardFace !== undefined
+      return childMesh?.userData?.upwardFace !== undefined
     }) && this.handleDiceHover()
   }
 }

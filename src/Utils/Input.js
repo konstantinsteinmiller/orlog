@@ -1,4 +1,4 @@
-export default class Mouse {
+export default class Input {
   constructor() {
     this.x = 0
     this.y = 0

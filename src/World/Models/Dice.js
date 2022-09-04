@@ -1,4 +1,5 @@
 import Experience from '@/Experience'
+import { isWithinRange } from '@/Utils/math.js'
 
 export default class Dice {
   constructor(
@@ -16,9 +17,10 @@ export default class Dice {
     this.scale = 0.3
     this.mass = 300
     this.inertia = 13
+    this.isPlayingCollisionSound = false
 
-    this.isHighlighted = false
-    this.isSelected = false
+    // this.isHighlighted = false
+    // this.isSelected = false
 
     this.group = group
     this.modelNumber = model
@@ -29,6 +31,7 @@ export default class Dice {
 
     this.setMesh()
     this.setBody()
+    this.setCollisionHandler()
   }
 
   /* to find the face showing up after throw, we add helper cubes */
@@ -78,6 +81,7 @@ export default class Dice {
     this.mesh.castShadow = true
     this.mesh.receiveShadow = true
     this.mesh.name = `Dice${this.modelNumber}Mesh`
+    this.mesh.identifier = 'mainMesh'
 
     const group = this.createSideDetectorCubes(this.mesh)
     this.group = group
@@ -103,6 +107,39 @@ export default class Dice {
       width: 2,
       height: 2,
       depth: 2,
+    })
+  }
+
+  setCollisionHandler() {
+    this.group.body.on.collision((otherObject, event) => {
+      if (
+        this.experience.world?.dicesHandler?.disableDiceCollisonSound === false &&
+        otherObject.name === 'bowl2'
+      ) {
+        if (!this.isPlayingCollisionSound) {
+          this.sounds.playSound(['diceHit1', 'diceHit2', 'diceHit3'], true, 0.2, 0.5)
+          this.isPlayingCollisionSound = true
+          setTimeout(() => {
+            const angularVelocity = new THREE.Vector3(1, 1, 1).dot(
+              new THREE.Vector3(
+                Math.abs(this.group.body.angularVelocity.x),
+                Math.abs(this.group.body.angularVelocity.y),
+                Math.abs(this.group.body.angularVelocity.z),
+              ),
+            )
+            const velocity = new THREE.Vector3(1, 1, 1).dot(
+              new THREE.Vector3(
+                Math.abs(this.group.body.velocity.x),
+                Math.abs(this.group.body.velocity.y),
+                Math.abs(this.group.body.velocity.z),
+              ),
+            )
+            if (!isWithinRange(angularVelocity, -0.1, 0.1) && !isWithinRange(velocity, -0.1, 0.1)) {
+              this.isPlayingCollisionSound = false
+            }
+          }, 300)
+        }
+      }
     })
   }
 }

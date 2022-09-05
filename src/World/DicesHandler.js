@@ -1,6 +1,7 @@
 import Dice from '@/World/Models/Dice.js'
 import { HIGHLIGHT_POSITION_MAP, DICE_FACES_MAP } from '@/Utils/constants'
 import { isWithinRange } from '@/Utils/math'
+import { gsap as g } from 'gsap'
 
 export default class DicesHandler {
   constructor() {
@@ -39,6 +40,7 @@ export default class DicesHandler {
 
     // webgl.onclick = (dices) => this.randomDiceThrow(dices)
   }
+
   destructor() {
     window.removeEventListener('dblclick', this.evaluateTopFace)
     window.removeEventListener('click', this.toggleDiceSelection)
@@ -47,19 +49,78 @@ export default class DicesHandler {
     })
   }
 
+  moveSelectedDicesToEnemy() {
+    this.dicesList.forEach((dice) => {
+      const highlightMesh = dice.group.getObjectByName('diceHighlight')
+
+      if (highlightMesh.isSelected && !highlightMesh.isPlaced) {
+        this.physics.destroy(dice.group.body)
+        highlightMesh.isPlaced = true
+        this.hasDestroyedBodies = true
+        const offsetX = dice.modelNumber * 1.4 - 4.2
+        const offsetHalfX = offsetX / 2
+        g.to(dice.group.position, {
+          y: 2.5,
+          x: offsetHalfX,
+          z: -3,
+          duration: 2,
+          ease: 'sine.out',
+          delay: 0,
+        })
+        setTimeout(() => {
+          g.to(dice.group.position, {
+            x: offsetX,
+            y: dice.scale,
+            z: -5,
+            duration: 2,
+            delay: 0,
+            ease: 'sine.out',
+          })
+        }, 2000)
+      }
+      dice.mesh.userData.isMoving = false
+    })
+  }
+
+  resetThrow() {
+    this.moveSelectedDicesToEnemy()
+
+    /* for some weird reason ammo breaks when even one body is destroyed,
+     * so we have to destroy each other dice and recreate them.
+     * This might cause memory leaks!!!!!!!!!!! */
+    this.hasDestroyedBodies &&
+      this.dicesList.forEach((dice) => {
+        const highlightMesh = dice.group.getObjectByName('diceHighlight')
+        if (!highlightMesh.isSelected) {
+          this.physics.destroy(dice.group.body)
+          dice.group.clear()
+          this.scene.remove(dice.group)
+          setTimeout(() => {
+            dice.setMesh()
+            dice.setBody()
+            dice.setCollisionHandler()
+            this.diceMeshes = this.dicesList.map((dice) => dice.group.children[0])
+            dice.group.body.setVelocity(0.3, -0.2, -1.2)
+            dice.group.body.setAngularVelocity(-7, -7, 6)
+          }, 500)
+        }
+      })
+  }
+
   randomDiceThrow() {
-    if ((this.availableThrows <= 0 && !rethrowDicesList.length) || this.isThrowing) {
+    if (this.availableThrows <= 0 || this.isThrowing) {
       return
     }
 
-    this.dicesList.forEach((dice) => (dice.mesh.userData.isMoving = false))
-    this.disableDiceCollisonSound = false
+    this.resetThrow()
     this.isThrowing = true
+    this.disableDiceCollisonSound = false
     this.sounds.playDiceShakeSound()
     setTimeout(() => {
       /* pickup all not selected dices to rethrow them */
       this.dicesList.forEach((dice) => {
-        if (!dice?.group.getObjectByName('diceHighlight')?.isSelected) {
+        const diceHighlight = dice?.group.getObjectByName('diceHighlight')
+        if (!diceHighlight?.isSelected && !diceHighlight?.isPlaced) {
           const body = dice.group?.body
 
           // set the new position // TELEPORT dynamic ammo body
@@ -80,9 +141,6 @@ export default class DicesHandler {
               body.setVelocity(0.3, -0.2, -1.2)
               body.setAngularVelocity(-7, -7, 6)
             })
-          } else {
-            body.setVelocity(0.3, -0.2, -1.2)
-            body.setAngularVelocity(-7, -7, 6)
           }
         }
       })
@@ -95,6 +153,7 @@ export default class DicesHandler {
       }, 1200)
     }, 400)
   }
+
   createDices() {
     this.diceGroup = new THREE.Group({ name: 'diceGroup' })
     this.diceGroup.name = 'diceGroup'
@@ -110,6 +169,7 @@ export default class DicesHandler {
     this.scene.add(this.diceGroup)
     this.randomDiceThrow()
   }
+
   handleDiceHover() {
     this.rayCaster.setFromCamera(new THREE.Vector2(this.input.x, this.input.y), this.camera)
 
@@ -125,9 +185,11 @@ export default class DicesHandler {
     } else {
       if (this.currentIntersect) {
         if (this.previousIntersect?.name !== this.currentIntersect?.name) {
-          console.log('NEW Intersect: ', this.currentIntersect)
+          this.debug.isActive && console.log('NEW Intersect: ', this.currentIntersect)
         }
-        this.currentIntersect.parent.getObjectByName('diceHighlight').isHighlighted = false
+        if (this.currentIntersect.parent) {
+          this.currentIntersect.parent.getObjectByName('diceHighlight').isHighlighted = false
+        }
       }
       this.previousIntersect = { name: this.currentIntersect?.name }
       this.currentIntersect = null
@@ -173,18 +235,17 @@ export default class DicesHandler {
       const Uy = worldPosUp.y.toFixed(2)
       const Fy = worldPosFront.y.toFixed(2)
       const Ry = worldPosRight.y.toFixed(2)
-      // console.log('Uy, Fy, Ry: ', Uy, Fy, Ry)
 
       this.setUpwardFace = (face, axis) => {
         childMesh.userData.upwardFace = face
         childMesh.userData.upwardSymbol = DICE_FACES_MAP[dI]?.[face].symbol
         childMesh.userData.isGoldenSymbol = DICE_FACES_MAP[dI]?.[face].isGolden
-        this.debug?.isActive &&
+        /*this.debug?.isActive &&
           console.error(
             `${axis} ${face[0].toUpperCase()}${face.substring(1)} // ${DICE_FACES_MAP[dI]?.[face].symbol} ${
               DICE_FACES_MAP[dI]?.[face].isGolden ? 'Golden' : ''
             }`,
-          )
+          )*/
       }
 
       if (Uy > Fy && Uy > Ry) {
@@ -211,8 +272,10 @@ export default class DicesHandler {
   toggleDiceSelection = () => {
     if (this.currentIntersect && !this.isThrowing) {
       const diceHighlightMesh = this.currentIntersect.parent.getObjectByName('diceHighlight')
-      diceHighlightMesh.isSelected = !diceHighlightMesh.isSelected
-      diceHighlightMesh.isHighlighted = true
+      if (!diceHighlightMesh?.isPlaced) {
+        diceHighlightMesh.isSelected = !diceHighlightMesh.isSelected
+        diceHighlightMesh.isHighlighted = true
+      }
     }
   }
 
@@ -220,6 +283,9 @@ export default class DicesHandler {
     this.dicesList.forEach((dice) => {
       const diceHighlightMesh = dice.group.getObjectByName('diceHighlight')
 
+      if (!diceHighlightMesh) {
+        return
+      }
       if (diceHighlightMesh.isHighlighted && !diceHighlightMesh.isSelected) {
         diceHighlightMesh.material.color.set(0xffff00)
         diceHighlightMesh.material.opacity = 0.2
@@ -238,7 +304,9 @@ export default class DicesHandler {
     this.debug.isPhysicsDebugActive &&
       this.dicesList.forEach((dice) => {
         const body = dice.group.body
-        // const mainMesh = dice.mesh
+        if (!body) {
+          return
+        }
         const angularVelocity = new THREE.Vector3(1, 1, 1).dot(
           new THREE.Vector3(
             Math.abs(body.angularVelocity.x),
@@ -270,19 +338,19 @@ export default class DicesHandler {
       this.disableDiceCollisonSound = true
       setTimeout(() => {
         this.evaluateTopFace()
+        if (this.availableThrows === 0) {
+          this.dicesList.forEach((dice) => {
+            const diceHighlightMesh = dice.group.getObjectByName('diceHighlight')
+            if (!diceHighlightMesh.isSelected && !diceHighlightMesh.isPlaced) {
+              diceHighlightMesh.isSelected = true
+            }
+          })
+          this.moveSelectedDicesToEnemy()
+        }
       }, 700)
     }
 
-    this.dicesList.every(
-      (dice, index) =>
-        // dice?.userData?.upwardFace &&
-        //   console.log(
-        //     `${index}dice:
-        //    ${dice?.userData?.upwardFace}
-        //    ${dice?.userData?.upwardSymbol}
-        //    ${dice?.userData?.isGoldenSymbol ? 'Golden' : ''}`,
-        //   )
-        dice.mesh?.userData?.upwardFace !== undefined,
-    ) && this.handleDiceHover()
+    this.dicesList.every((dice, index) => dice.mesh?.userData?.upwardFace !== undefined) &&
+      this.handleDiceHover()
   }
 }

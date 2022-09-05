@@ -39,8 +39,8 @@ export default class Dice {
     const geometry = new THREE.BoxGeometry(this.scale, this.scale, this.scale)
     const material = new THREE.MeshBasicMaterial({
       color: 0x00ff00,
-      // transparent: this.debug.isPhysicsDebugActive,
-      // opacity: this.debug.isPhysicsDebugActive ? 1 : 0,
+      transparent: true,
+      opacity: 0,
     })
 
     const cubeSideUp = new THREE.Mesh(geometry, material)
@@ -122,16 +122,16 @@ export default class Dice {
           setTimeout(() => {
             const angularVelocity = new THREE.Vector3(1, 1, 1).dot(
               new THREE.Vector3(
-                Math.abs(this.group.body.angularVelocity.x),
-                Math.abs(this.group.body.angularVelocity.y),
-                Math.abs(this.group.body.angularVelocity.z),
+                Math.abs(this.group.body?.angularVelocity.x),
+                Math.abs(this.group.body?.angularVelocity.y),
+                Math.abs(this.group.body?.angularVelocity.z),
               ),
             )
             const velocity = new THREE.Vector3(1, 1, 1).dot(
               new THREE.Vector3(
-                Math.abs(this.group.body.velocity.x),
-                Math.abs(this.group.body.velocity.y),
-                Math.abs(this.group.body.velocity.z),
+                Math.abs(this.group.body?.velocity.x),
+                Math.abs(this.group.body?.velocity.y),
+                Math.abs(this.group.body?.velocity.z),
               ),
             )
             if (!isWithinRange(angularVelocity, -0.1, 0.1) && !isWithinRange(velocity, -0.1, 0.1)) {

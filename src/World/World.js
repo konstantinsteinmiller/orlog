@@ -39,9 +39,20 @@ export default class World {
       // Debug
       if (this.debug.isActive) {
         this.debugFolder = this.debug.ui.addFolder('world')
-        this.debugFolder.addColor(this.lifeStones[0].highlightMesh.material, 'color').onChange((color) => {
-          this.lifeStones[0].highlightMesh.material.color = color
-        })
+        this.debugFolder
+          .addColor(this.lifeStones[0].highlightMesh.material, 'color')
+          .name('color of the lifeStone highlight')
+          .onChange((color) => {
+            this.lifeStones.forEach((stone) => {
+              stone.highlightMesh.material.color = color
+            })
+          })
+        this.debug.faithTokenAmount = 3
+        this.debug.lifeStoneAmount = 2
+        this.debugFolder.add(this, 'destroyLifeStones')
+        this.debugFolder.add(this.debug, 'lifeStoneAmount', 1, 20, 1)
+        this.debugFolder.add(this, 'destroyFaithTokens')
+        this.debugFolder.add(this.debug, 'faithTokenAmount', 1, 20, 1)
       }
 
       setTimeout(() => {
@@ -60,17 +71,17 @@ export default class World {
   }
 
   destroyLifeStones(amount) {
-    ;[...Array(amount).keys()].forEach((stone, index) => {
+    ;[...Array(amount || this.debug.lifeStoneAmount).keys()].forEach((stone, index) => {
       let lifeStone = this.lifeStones.pop()
-      lifeStone.destroyLifeStone(1000 + 200 * index)
+      lifeStone?.destroyLifeStone(1000 + 200 * index)
       lifeStone = null
     })
   }
 
   destroyFaithTokens(amount) {
-    ;[...Array(amount).keys()].forEach((token, index) => {
+    ;[...Array(amount || this.debug.faithTokenAmount).keys()].forEach((token, index) => {
       let faithToken = this.faithTokens.pop()
-      faithToken.destroyFaithToken(200 * index)
+      faithToken?.destroyFaithToken(200 * index)
       faithToken = null
     })
   }

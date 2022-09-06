@@ -15,7 +15,7 @@ export default class Floor {
   }
 
   setGeometry() {
-    this.geometry = new THREE.PlaneGeometry(32, 32, 1, 1)
+    this.geometry = new THREE.PlaneGeometry(64, 64, 1, 1)
   }
 
   setTextures() {

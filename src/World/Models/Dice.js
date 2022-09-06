@@ -14,6 +14,8 @@ export default class Dice {
     this.scene = this.experience.scene
     this.sounds = this.experience.sounds
     this.resources = this.experience.resources
+    this.midZOffset = this.experience.world.midZOffset
+    this.offsetDirection = this.experience.world.offsetDirection
     this.scale = 0.3
     this.mass = 300
     this.inertia = 13
@@ -24,7 +26,12 @@ export default class Dice {
 
     this.group = group
     this.modelNumber = model
-    this.position = position
+
+    this.position = new THREE.Vector3(
+      position.x,
+      position.y,
+      this.offsetDirection * (this.midZOffset - 1) + position.z,
+    )
     this.rotation = rotation
 
     this.resource = this.resources.items[`diceModel${this.modelNumber}`]

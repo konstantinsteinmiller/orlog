@@ -6,10 +6,13 @@ export default class Bowl {
     this.physics = experience.physics
     this.scene = this.experience.scene
     this.resources = this.experience.resources
+    this.midZOffset = this.experience.world.midZOffset
+    this.offsetDirection = this.experience.world.offsetDirection
 
     this.position = position
     this.rotation = rotation
     this.scale = 1
+    console.log('this.position: ', this.position)
 
     this.setMesh()
     this.setBody()
@@ -20,7 +23,7 @@ export default class Bowl {
     this.mesh = this.resources.items['bowl'].scene.children[0].clone(true)
 
     this.mesh.scale.set(this.scale, this.scale, this.scale)
-    // this.position.y += 0.5
+    this.position.z += this.offsetDirection * (this.midZOffset - 1)
     this.mesh.position.copy(this.position)
     this.mesh.rotation.set(this.rotation.x, this.rotation.y, this.rotation.z)
 

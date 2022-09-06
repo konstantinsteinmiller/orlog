@@ -6,12 +6,17 @@
     <link rel="shortcut icon" href="./public/favicon.ico" media="(prefers-color-scheme: light)" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Orlog</title>
+    <style>
+        .dice-layout {
+            opacity: 0;
+        }
+    </style>
 </head>
 <body>
     <div class="ogame">
         <canvas id="webgl"></canvas>
         <div class="dice-layout" id="diceFacesLayout">
-            <img class=" selection--disabled"
+            <img class="selection--disabled"
                  id="diceFaces"
                  src="./public/textures/dices/dice1.jpg"
                  loading="lazy" alt="Dice 1 layout"

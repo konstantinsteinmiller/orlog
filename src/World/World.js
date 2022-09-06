@@ -16,6 +16,11 @@ export default class World {
     this.lifeStones = []
     this.bowls = []
     this.physics = experience.physics
+    this.isPlayer = true
+
+    const direction = this.isPlayer ? 1 : -1
+    this.midZOffset = 5
+    this.offsetDirection = direction
 
     // const axisHelper = new THREE.AxesHelper(3)
     // this.scene.add(axisHelper)
@@ -31,19 +36,32 @@ export default class World {
 
       // Debug
       if (this.debug.isActive) {
-        this.debugFolder = this.debug.ui.addFolder('meshes')
+        this.debugFolder = this.debug.ui.addFolder('world')
+        this.debugFolder.addColor(this.lifeStones[0].highlightMesh.material, 'color').onChange((color) => {
+          this.lifeStones[0].highlightMesh.material.color = color
+        })
       }
+
+      setTimeout(() => {
+        this.destroyLifeStones(4)
+      }, 1500)
+      // setTimeout(() => this.lifeStones.pop().toggleHighlight(), 3000)
+      // setTimeout(() => {
+      //   this.lifeStones[0].toggleHighlight()
+      //   setTimeout(() => this.lifeStones[0].toggleHighlight(), 1000)
+      // }, 4000)
+    })
+  }
+
+  destroyLifeStones(amount) {
+    ;[...Array(amount).keys()].forEach((stone, index) => {
+      let lifeStone = this.lifeStones.pop()
+      lifeStone.destroyLifeStone(1000 + 200 * index)
+      lifeStone = null
     })
   }
 
   update() {
-    // console.log('this.physics: ', this.physics)
     this.dicesHandler && this.dicesHandler.update()
-
-    // const { factory } = this.physics
-    // this.physics.add.box({ x: 0.05, y: 10, mass: 1 }, { lambert: { color: 0x2194ce } })
-    //
-    // // static ground
-    // let greenSphere = factory.addSphere({ y: 2, z: 5 }, { lambert: { color: 0x00ff00 } })
   }
 }

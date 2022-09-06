@@ -1,18 +1,19 @@
 import Dice from '@/World/Models/Dice.js'
 import { HIGHLIGHT_POSITION_MAP, DICE_FACES_MAP, ROTATION_FACE_MAP } from '@/Utils/constants'
 import { isWithinRange } from '@/Utils/math'
-import { rotateAroundWorldAxis } from '@/Utils/ThreeHelpers.js'
 import { gsap as g } from 'gsap'
-import { vec2 } from 'three/examples/jsm/nodes/shadernode/ShaderNodeBaseElements.js'
 
 export default class DicesHandler {
   constructor() {
+    this.experience = experience
     this.scene = experience.scene
     this.physics = experience.physics
     this.debug = experience.debug
     this.input = experience.input
     this.sounds = experience.sounds
     this.camera = experience.camera.instance
+    this.midZOffset = this.experience.world.midZOffset
+    this.offsetDirection = this.experience.world.offsetDirection
     this.dicesList = []
     this.diceMeshes = []
     this.availableThrows = 3
@@ -23,7 +24,7 @@ export default class DicesHandler {
     this.rayCaster = new THREE.Raycaster()
     this.currentIntersect = null
     this.previousIntersect = null
-
+    // this.offsetDirection * this.midZOffset
     // init code
     this.createDices()
 
@@ -69,6 +70,7 @@ export default class DicesHandler {
         dice.group.rotation.set(rotationProps.x, rotationProps.y, rotationProps.z)
 
         const toRotation = dice.group.rotation
+
         g.fromTo(
           dice.group.rotation,
           {
@@ -91,7 +93,7 @@ export default class DicesHandler {
         g.to(dice.group.position, {
           y: 2.5,
           x: offsetHalfX,
-          z: -1.8,
+          z: this.offsetDirection * (this.midZOffset - 1) + -1.8,
           duration: 2,
           ease: 'sine.out',
           delay: 0,
@@ -99,7 +101,7 @@ export default class DicesHandler {
           g.to(dice.group.position, {
             x: offsetX,
             y: dice.scale,
-            z: -5,
+            z: this.offsetDirection * (this.midZOffset - 1) + -5,
             duration: 2,
             delay: 0,
             ease: 'sine.out',
@@ -380,7 +382,6 @@ export default class DicesHandler {
       }, 700)
     }
 
-    this.dicesList.every((dice) => dice.mesh?.userData?.upwardFace !== undefined) &&
-      this.handleDiceHover()
+    this.dicesList.every((dice) => dice.mesh?.userData?.upwardFace !== undefined) && this.handleDiceHover()
   }
 }

@@ -210,6 +210,7 @@ export default class DicesHandler {
         dice.group.getObjectByName('diceHighlight').isHighlighted =
           this.currentIntersect.name === dice.mesh.name
       })
+      this.evaluateTopFace()
       this.setDiceTopFaceHighlighter()
     } else {
       if (this.currentIntersect) {
@@ -379,7 +380,7 @@ export default class DicesHandler {
       }, 700)
     }
 
-    this.dicesList.every((dice, index) => dice.mesh?.userData?.upwardFace !== undefined) &&
+    this.dicesList.every((dice) => dice.mesh?.userData?.upwardFace !== undefined) &&
       this.handleDiceHover()
   }
 }

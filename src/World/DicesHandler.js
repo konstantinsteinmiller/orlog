@@ -2,6 +2,13 @@ import Dice from '@/World/Models/Dice.js'
 import { HIGHLIGHT_POSITION_MAP, DICE_FACES_MAP, ROTATION_FACE_MAP } from '@/Utils/constants'
 import { isWithinRange } from '@/Utils/math'
 import { gsap as g } from 'gsap'
+import dice1Img from '/public/textures/dices/dice1.jpg'
+import dice2Img from '/public/textures/dices/dice2.jpg'
+import dice3Img from '/public/textures/dices/dice3.jpg'
+import dice4Img from '/public/textures/dices/dice4.jpg'
+import dice5Img from '/public/textures/dices/dice5.jpg'
+import dice6Img from '/public/textures/dices/dice6.jpg'
+const images = [dice1Img, dice2Img, dice3Img, dice4Img, dice5Img, dice6Img]
 
 export default class DicesHandler {
   constructor() {
@@ -238,7 +245,7 @@ export default class DicesHandler {
         faceHighlight.style.top = HIGHLIGHT_POSITION_MAP?.[upwardFace].top
         faceHighlight.style.right = HIGHLIGHT_POSITION_MAP?.[upwardFace].right
       }
-      diceFaces.src = `./public/textures/dices/dice${diceModelNumber}.jpg`
+      diceFaces.src = images[diceModelNumber - 1]
     } else {
       console.error('wrong intersection')
     }

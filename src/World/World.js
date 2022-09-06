@@ -3,6 +3,7 @@ import Floor from '@/World/Models/Floor.js'
 import DicesHandler from '@/World/DicesHandler.js'
 import Bowl from '@/World/Models/Bowl.js'
 import LifeStone from '@/World/Models/LifeStone.js'
+import FaithToken from '@/World/Models/FaithToken.js'
 // import * as THREE from 'three'
 
 export default class World {
@@ -32,7 +33,8 @@ export default class World {
       this.dicesHandler = new DicesHandler()
       this.environment = new Environment()
       this.bowls.push(new Bowl())
-      this.lifeStones = [...Array(15).keys()].map((id) => new LifeStone(id))
+      this.lifeStones = [...Array(15).keys()].map((id) => new LifeStone(id, id * 0.1))
+      this.faithTokens = [...Array(22).keys()].map((id) => new FaithToken(id, id * 0.2))
 
       // Debug
       if (this.debug.isActive) {
@@ -45,6 +47,10 @@ export default class World {
       setTimeout(() => {
         this.destroyLifeStones(4)
       }, 1500)
+
+      setTimeout(() => {
+        this.destroyFaithTokens(12)
+      }, 5700)
       // setTimeout(() => this.lifeStones.pop().toggleHighlight(), 3000)
       // setTimeout(() => {
       //   this.lifeStones[0].toggleHighlight()
@@ -58,6 +64,14 @@ export default class World {
       let lifeStone = this.lifeStones.pop()
       lifeStone.destroyLifeStone(1000 + 200 * index)
       lifeStone = null
+    })
+  }
+
+  destroyFaithTokens(amount) {
+    ;[...Array(amount).keys()].forEach((token, index) => {
+      let faithToken = this.faithTokens.pop()
+      faithToken.destroyFaithToken(200 * index)
+      faithToken = null
     })
   }
 

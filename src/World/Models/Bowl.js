@@ -12,7 +12,6 @@ export default class Bowl {
     this.position = position
     this.rotation = rotation
     this.scale = 1
-    console.log('this.position: ', this.position)
 
     this.setMesh()
     this.setBody()

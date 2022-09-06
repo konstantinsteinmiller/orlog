@@ -91,4 +91,9 @@ export default [
     type: 'gltfModel',
     path: 'models/stones/life_stones.glb',
   },
+  {
+    name: 'faithToken',
+    type: 'gltfModel',
+    path: 'models/faith-token/faith_token.glb',
+  },
 ]

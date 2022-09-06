@@ -2,7 +2,7 @@ import { disposeMeshAndRemoveFromScene } from '@/Utils/ThreeHelpers.js'
 import { gsap as g } from 'gsap'
 
 export default class LifeStone {
-  constructor(id = 0) {
+  constructor(id = 0, timeoutInMs = 0) {
     this.experience = experience
     this.physics = experience.physics
     this.scene = this.experience.scene
@@ -14,33 +14,61 @@ export default class LifeStone {
     this.modelNumber = Math.floor(Math.random() * 4)
     this.scale = 0.25
 
-    const zPosition = this.midZOffset + 1.5 - Math.floor(this.id / 5)
     const xPosition = -6 + (this.id % 5) * 0.7
+    const zPosition = this.midZOffset + 1.5 - Math.floor(this.id / 5)
+
     this.position = new THREE.Vector3(this.offsetDirection * xPosition, 0, this.offsetDirection * zPosition)
     this.rotation = new THREE.Vector3(0, 0, 0)
 
     this.setMesh()
+
+    this.moveLifeStoneToField(timeoutInMs)
   }
 
-  destroyLifeStone(timeout) {
+  destroyLifeStone(timeoutInMs) {
+    const timeout = timeoutInMs * 0.001
     this.toggleHighlight()
-    setTimeout(() => {
-      g.to(this.mesh.position, {
-        x: this.offsetDirection * (-6 + 2.1),
-        y: 2.5,
-        z: this.offsetDirection * this.midZOffset + this.mesh.position.z + this.offsetDirection * 12,
-        duration: 1.8,
-      }).then(() => {
-        this.mesh.remove(this.highlightMesh)
+    g.to(this.mesh.position, {
+      x: this.offsetDirection * (-6 + 2.1),
+      y: 2.5,
+      z: this.offsetDirection * this.midZOffset + this.mesh.position.z + this.offsetDirection * 12,
+      duration: 1.8,
+      delay: timeout,
+    }).then(() => {
+      this.mesh.remove(this.highlightMesh)
 
-        disposeMeshAndRemoveFromScene(this.highlightMesh, this.mesh)
-        disposeMeshAndRemoveFromScene(this.mesh, this.scene)
-      })
-    }, timeout)
+      disposeMeshAndRemoveFromScene(this.highlightMesh, this.mesh)
+      disposeMeshAndRemoveFromScene(this.mesh, this.scene)
+    })
+  }
+
+  moveLifeStoneToField(timeoutInMs) {
+    g.fromTo(
+      this.mesh.position,
+      {
+        x: this.offsetDirection * (-8 + (this.id % 5) * 0.7),
+        y: 0.05 + Math.floor(this.id % 5) * 0.15,
+        z: this.offsetDirection * 10,
+        duration: 0.5,
+      },
+      {
+        x: this.offsetDirection * (this.offsetDirection * (-7 + (this.id % 5) * 0.7)),
+        y: 0.05 + Math.floor(this.id % 5) * 0.15,
+        z: this.mesh.position.z + this.offsetDirection * 0.5,
+        duration: 0.5,
+        delay: timeoutInMs,
+      },
+    ).then(() =>
+      g.to(this.mesh.position, {
+        x: this.offsetDirection * (-6 + (this.id % 5) * 0.7),
+        y: 0.05 + Math.floor(this.id % 5) * 0.15,
+        z: this.offsetDirection * (this.midZOffset + 1.5 - Math.floor(this.id / 5)),
+        duration: 1.0,
+      }),
+    )
   }
 
   toggleHighlight() {
-    // this.highlightMesh.material.color = color
     this.highlightMesh.material.transparent = this.highlightMesh.material.opacity === 0.8
     this.highlightMesh.material.opacity = this.highlightMesh.material.opacity === 0 ? 0.8 : 0
   }
@@ -68,13 +96,6 @@ export default class LifeStone {
 
     this.mesh.castShadow = true
     this.mesh.receiveShadow = true
-
-    this.mesh.traverse((child) => {
-      if (child instanceof THREE.Mesh) {
-        child.castShadow = true
-        child.receiveShadow = true
-      }
-    })
   }
 
   update() {}

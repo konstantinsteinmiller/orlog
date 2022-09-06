@@ -1,7 +1,9 @@
 import Dice from '@/World/Models/Dice.js'
-import { HIGHLIGHT_POSITION_MAP, DICE_FACES_MAP } from '@/Utils/constants'
+import { HIGHLIGHT_POSITION_MAP, DICE_FACES_MAP, ROTATION_FACE_MAP } from '@/Utils/constants'
 import { isWithinRange } from '@/Utils/math'
+import { rotateAroundWorldAxis } from '@/Utils/ThreeHelpers.js'
 import { gsap as g } from 'gsap'
+import { vec2 } from 'three/examples/jsm/nodes/shadernode/ShaderNodeBaseElements.js'
 
 export default class DicesHandler {
   constructor() {
@@ -59,15 +61,41 @@ export default class DicesHandler {
         this.hasDestroyedBodies = true
         const offsetX = dice.modelNumber * 1.4 - 4.2
         const offsetHalfX = offsetX / 2
+        const upwardFace = dice.mesh.userData.upwardFace
+
+        const fromRotation = new THREE.Vector3().copy(dice.group.rotation)
+        const rotationProps = ROTATION_FACE_MAP[upwardFace]
+        dice.group.rotation.set(0, 0, 0)
+        dice.group.rotation.set(rotationProps.x, rotationProps.y, rotationProps.z)
+
+        const toRotation = dice.group.rotation
+        g.fromTo(
+          dice.group.rotation,
+          {
+            x: fromRotation.x,
+            y: fromRotation.y,
+            z: fromRotation.z,
+            duration: 2,
+            ease: 'sine.out',
+            delay: 0,
+          },
+          {
+            x: toRotation.x,
+            y: toRotation.y,
+            z: toRotation.z,
+            duration: 2,
+            ease: 'sine.out',
+            delay: 0,
+          },
+        )
         g.to(dice.group.position, {
           y: 2.5,
           x: offsetHalfX,
-          z: -3,
+          z: -1.8,
           duration: 2,
           ease: 'sine.out',
           delay: 0,
-        })
-        setTimeout(() => {
+        }).then(() => {
           g.to(dice.group.position, {
             x: offsetX,
             y: dice.scale,
@@ -76,7 +104,7 @@ export default class DicesHandler {
             delay: 0,
             ease: 'sine.out',
           })
-        }, 2000)
+        })
       }
       dice.mesh.userData.isMoving = false
     })
@@ -100,8 +128,8 @@ export default class DicesHandler {
             dice.setBody()
             dice.setCollisionHandler()
             this.diceMeshes = this.dicesList.map((dice) => dice.group.children[0])
-            dice.group.body.setVelocity(0.3, -0.2, -1.2)
-            dice.group.body.setAngularVelocity(-7, -7, 6)
+            dice.group.body.setVelocity(Math.PI * 0.3 - 0.6, Math.PI * -0.2 - 0.3, Math.PI * -0.9 + 0.4)
+            dice.group.body.setAngularVelocity(Math.PI * -4 + 4, Math.PI * -4 + 2, Math.PI * 3 - 2)
           }, 500)
         }
       })
@@ -127,6 +155,7 @@ export default class DicesHandler {
           if (body) {
             body.setVelocity(0, 0, 0)
             body.setAngularVelocity(0, 0, 0)
+            /* only kinematic bodies can be repositioned 2=kinematic 0=dynamic*/
             body.setCollisionFlags(2)
 
             dice.group.position.set(...dice.position)
@@ -138,8 +167,8 @@ export default class DicesHandler {
               body.setCollisionFlags(0)
 
               // if you do not reset the velocity and angularVelocity, the object will keep it
-              body.setVelocity(0.3, -0.2, -1.2)
-              body.setAngularVelocity(-7, -7, 6)
+              body.setVelocity(Math.PI * 0.3 - 0.6, Math.PI * -0.2 - 0.3, Math.PI * -0.9 + 0.4)
+              body.setAngularVelocity(Math.PI * -4 + 4, Math.PI * -4 + 2, Math.PI * 3 - 2)
             })
           }
         }

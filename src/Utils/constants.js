@@ -1,3 +1,5 @@
+// import * as THREE from 'three'
+
 export const HIGHLIGHT_POSITION_MAP = {
   top: {
     top: '12.25%',
@@ -83,4 +85,14 @@ export const DICE_FACES_MAP = {
     right: { symbol: ORLOG_SYMBOLS.AXE, isGolden: false },
     left: { symbol: ORLOG_SYMBOLS.SHIELD, isGolden: true },
   },
+}
+
+const PI_HALF = Math.PI * 0.5
+export const ROTATION_FACE_MAP = {
+  top: { x: 0, y: -PI_HALF, z: 0 },
+  bottom: { x: -Math.PI, y: PI_HALF, z: 0 },
+  front: { x: -PI_HALF, y: 0, z: 0 },
+  back: { x: PI_HALF, y: 0, z: Math.PI },
+  right: { x: 0, y: -PI_HALF, z: PI_HALF },
+  left: { x: 0, y: PI_HALF, z: -PI_HALF },
 }

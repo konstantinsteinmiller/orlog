@@ -86,4 +86,9 @@ export default [
     type: 'gltfModel',
     path: 'models/bowl/bowl.glb',
   },
+  {
+    name: 'lifeStones',
+    type: 'gltfModel',
+    path: 'models/stones/life_stones.glb',
+  },
 ]

@@ -5,7 +5,6 @@ export default class Bowl {
     this.experience = experience
     this.physics = experience.physics
     this.scene = this.experience.scene
-    this.physicsWorld = this.experience.world.physicsWorld
     this.resources = this.experience.resources
 
     this.position = position

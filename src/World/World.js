@@ -2,6 +2,7 @@ import Environment from '@/World/Environment.js'
 import Floor from '@/World/Models/Floor.js'
 import DicesHandler from '@/World/DicesHandler.js'
 import Bowl from '@/World/Models/Bowl.js'
+import LifeStone from '@/World/Models/LifeStone.js'
 // import * as THREE from 'three'
 
 export default class World {
@@ -12,6 +13,7 @@ export default class World {
     this.sounds = experience.sounds
     this.resources = experience.resources
     this.diceHandler = null
+    this.lifeStones = []
     this.bowls = []
     this.physics = experience.physics
 
@@ -25,6 +27,7 @@ export default class World {
       this.dicesHandler = new DicesHandler()
       this.environment = new Environment()
       this.bowls.push(new Bowl())
+      this.lifeStones = [...Array(15).keys()].map((id) => new LifeStone(id))
 
       // Debug
       if (this.debug.isActive) {

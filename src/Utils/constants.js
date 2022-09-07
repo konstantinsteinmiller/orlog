@@ -96,3 +96,15 @@ export const ROTATION_FACE_MAP = {
   right: { x: 0, y: -PI_HALF, z: PI_HALF },
   left: { x: 0, y: PI_HALF, z: -PI_HALF },
 }
+
+export const KEYBOARD_STATE_MODIFIERS = ['shift', 'ctrl', 'alt', 'meta']
+export const KEYBOARD_STATE_ALIAS = {
+  left: 37,
+  up: 38,
+  right: 39,
+  down: 40,
+  space: 32,
+  pageup: 33,
+  pagedown: 34,
+  tab: 9,
+}

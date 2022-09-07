@@ -63,6 +63,7 @@ export default class Experience {
   }
 
   update() {
+    this.debug.update()
     this.camera.update()
     this.world.update()
     this.physics.update(this.time.clockDelta * 1000)
@@ -101,25 +102,3 @@ export default class Experience {
     }
   }
 }
-
-/*
-dice.mesh.geometry.dispose()
-          dice.group.children[1].geometry.dispose()
-          // Loop through the material properties
-          for (const key in dice.mesh.material) {
-            const value = dice.mesh.material[key]
-
-            // Test if there is a dispose function
-            if (value && typeof value.dispose === 'function') {
-              value.dispose()
-            }
-          }
-          // Loop through the material properties
-          for (const key in dice.group.children[1].material) {
-            const value = dice.group.children[1].material[key]
-
-            // Test if there is a dispose function
-            if (value && typeof value.dispose === 'function') {
-              value.dispose()
-            }
-          }*/

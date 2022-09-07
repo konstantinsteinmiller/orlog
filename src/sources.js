@@ -96,4 +96,34 @@ export default [
     type: 'gltfModel',
     path: 'models/faith-token/faith_token.glb',
   },
+  {
+    name: 'xposDebugCube',
+    type: 'texture',
+    path: 'textures/debug/xpos.png',
+  },
+  {
+    name: 'xnegDebugCube',
+    type: 'texture',
+    path: 'textures/debug/xneg.png',
+  },
+  {
+    name: 'yposDebugCube',
+    type: 'texture',
+    path: 'textures/debug/ypos.png',
+  },
+  {
+    name: 'ynegDebugCube',
+    type: 'texture',
+    path: 'textures/debug/yneg.png',
+  },
+  {
+    name: 'zposDebugCube',
+    type: 'texture',
+    path: 'textures/debug/zpos.png',
+  },
+  {
+    name: 'znegDebugCube',
+    type: 'texture',
+    path: 'textures/debug/zneg.png',
+  },
 ]

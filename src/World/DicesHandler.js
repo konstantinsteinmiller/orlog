@@ -31,7 +31,7 @@ export default class DicesHandler {
     this.rayCaster = new THREE.Raycaster()
     this.currentIntersect = null
     this.previousIntersect = null
-    // this.offsetDirection * this.midZOffset
+
     // init code
     this.createDices()
 
@@ -42,21 +42,13 @@ export default class DicesHandler {
       this.debugFolder.add(this, 'availableThrows', 1, 10, 1)
     }
 
-    window.onkeydown = (e) => {
-      e.code === 'Space' && this.evaluateTopFace()
-    }
-    window.ondblclick = () => this.randomDiceThrow()
-    window.onclick = this.toggleDiceSelection
-
-    // webgl.onclick = (dices) => this.randomDiceThrow(dices)
+    this.input.on('dblclick', () => this.randomDiceThrow())
+    this.input.on('click', () => this.toggleDiceSelection())
   }
 
-  destructor() {
-    window.removeEventListener('dblclick', this.evaluateTopFace)
-    window.removeEventListener('click', this.toggleDiceSelection)
-    window.removeEventListener('keydown', (e) => {
-      e.code === 'Space' && this.evaluateTopFace()
-    })
+  destroy() {
+    this.input.off('dblclick', () => this.randomDiceThrow())
+    this.input.off('click', () => this.toggleDiceSelection())
   }
 
   moveSelectedDicesToEnemy() {
@@ -308,7 +300,7 @@ export default class DicesHandler {
     })
   }
 
-  toggleDiceSelection = () => {
+  toggleDiceSelection() {
     if (this.currentIntersect && !this.isThrowing) {
       const diceHighlightMesh = this.currentIntersect.parent.getObjectByName('diceHighlight')
       if (!diceHighlightMesh?.isPlaced) {

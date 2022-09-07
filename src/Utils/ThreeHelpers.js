@@ -29,4 +29,5 @@ export const disposeMeshAndRemoveFromScene = (mesh, scene) => {
     }
   }
   scene.remove(mesh)
+  mesh = null
 }

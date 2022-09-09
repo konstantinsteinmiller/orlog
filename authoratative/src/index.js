@@ -7,16 +7,16 @@ import express from 'express'
 import cors from 'cors'
 
 const port = Number(process.env.port) || 3789
-
-console.log('cors', cors)
 const app = express({ port })
 app.use(express.json())
-app.use(
-  cors({
-    // origin: 'http://127.0.0.1',
-    // optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
-  }),
-)
+if (process.env.NODE_ENV !== 'production') {
+  app.use(
+    cors({
+      // origin: 'http://127.0.0.1',
+      // optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+    }),
+  )
+}
 
 const gameServer = new Server({
   port,

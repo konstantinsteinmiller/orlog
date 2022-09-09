@@ -1,0 +1,29 @@
+{
+  "name": "trial-of-faith-server",
+  "version": "0.0.1",
+  "description": "multiplayer server",
+  "main": "./src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "nodemon ./src/index.js",
+    "dev": "nodemon ./src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npm run clean && node node_modules/copyfiles/copyfiles -u 1 -a './src/**/*.js' ./src/**/*.js ./upload && node node_modules/copyfiles/copyfiles package.json ./upload && node node_modules/copyfiles/copyfiles .env ./dist",
+    "clean": "node node_modules/rimraf/bin ./dist"
+  },
+  "author": "Konstantin Steinmiller",
+  "license": "MIT",
+  "dependencies": {
+    "@colyseus/command": "^0.2.1",
+    "colyseus.js": "^0.14.13",
+    "express": "^4.18.1",
+    "express-basic-auth": "^1.2.1",
+    "http": "^0.0.1-security",
+    "live-server": "^1.2.2"
+  },
+  "devDependencies": {
+    "@colyseus/monitor": "^0.14.22",
+    "@colyseus/ws-transport": "^0.14.21",
+    "dotenv": "^16.0.2"
+  }
+}

@@ -17,6 +17,16 @@ export default class Resources extends EventEmitter {
     this.startLoading()
   }
 
+  destroy() {
+    alert('destroy Ressources')
+    this.items.keys().forEach((items) => {
+      console.log('items instanceof: ', items);
+      if (items instanceof THREE.Texture) {
+        // image.dispose()
+      }
+    })
+  }
+
   setLoaders() {
     this.loaders = {}
     this.loaders.gltfLoader = new GLTFLoader()

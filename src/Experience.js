@@ -8,6 +8,7 @@ import Resources from '@/Utils/Resources.js'
 import Camera from '@/Camera.js'
 import Renderer from '@/Renderer.js'
 import World from '@/World/World.js'
+import Client from '@/Match/Client.js'
 import { AmmoPhysics } from '@enable3d/ammo-physics'
 import { THREE } from 'enable3d/dist/index'
 
@@ -45,8 +46,8 @@ export default class Experience {
     this.physics = new AmmoPhysics(this.scene)
     this.physics.debug.enable()
 
-    // Debug
-    // if (this.debug.isActive) {}
+    this.client = new Client()
+
     // Resize event
     this.sizes.on('resize', () => {
       this.resize()

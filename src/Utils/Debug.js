@@ -152,7 +152,6 @@ export default class Debug {
       }
 
       // rotate left/right/up/down
-      // var rotation_matrix = new THREE.Matrix4().identity()
       if (this.input.isKeyPressed('A')) {
         this.debugCubeOptions.debugCube.rotateOnAxis(new THREE.Vector3(0, 1, 0), rotateAngle)
       }

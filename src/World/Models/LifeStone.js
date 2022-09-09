@@ -61,7 +61,7 @@ export default class LifeStone {
     ).then(() =>
       g.to(this.mesh.position, {
         x: this.offsetDirection * (-6 + (this.id % 5) * 0.7),
-        y: 0.05 + Math.floor(this.id % 5) * 0.15,
+        y: 0,
         z: this.offsetDirection * (this.midZOffset + 1.5 - Math.floor(this.id / 5)),
         duration: 1.0,
       }),

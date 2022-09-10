@@ -22,7 +22,7 @@ export const defineRoutes = (app) => {
    * Bind your custom express routes here:
    */
   app.get('/', (req, res) => {
-    res.send('"It\'s time to kick ass and chew bubblegum!"')
+    res.send('It\'s time to kick ass and chew bubblegum!')
   })
 
   /**
@@ -32,7 +32,7 @@ export const defineRoutes = (app) => {
    */
   app.use(
     '/colyseus',
-    basicAuthMiddleware,
+    // basicAuthMiddleware,
     monitor({
       columns: [
         'roomId',

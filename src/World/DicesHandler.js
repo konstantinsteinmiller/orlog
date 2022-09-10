@@ -364,7 +364,7 @@ export default class DicesHandler {
       this.dicesList.every((dice) => dice.mesh.userData.isMoving === false)
     ) {
       // alert('all dices stopped moving')
-      console.log('ALL Dices stopped moving!!!!!!!!!!!!!')
+      // console.log('ALL Dices stopped moving!!!!!!!!!!!!!')
       this.didAllDicesStopMoving = true
       this.disableDiceCollisonSound = true
       setTimeout(() => {

@@ -17,17 +17,16 @@ if (process.env.NODE_ENV !== 'production') {
     }),
   )
 }
+app.listen(3788, () => {
+  console.log(`Example app listening on port ${3788}`)
+})
 
 const gameServer = new Server({
   port,
   server: createServer(app),
   // presence: new RedisPresence(),
   presence: new LocalPresence(),
-  transport: new WebSocketTransport({}),
-})
-
-app.get('/', (req, res) => {
-  res.send('"It\'s time to kick ass and chew bubblegum!"')
+  transport: new WebSocketTransport(/*{}*/),
 })
 
 defineRooms(gameServer)

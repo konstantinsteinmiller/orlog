@@ -1,4 +1,4 @@
-export const ORLOG_SYMBOLS = {
+export const GAME_SYMBOLS = {
   AXE: 'AXE',
   HELM: 'HELM',
   ARROW: 'ARROW',

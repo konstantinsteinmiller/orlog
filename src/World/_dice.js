@@ -200,7 +200,7 @@ class DiceObject {
       }
     }
 
-    return 1 closest_face.materialIndex - 1
+    return closest_face.materialIndex - 1
   }
 
   getCurrentVectors() {
@@ -344,7 +344,7 @@ export class DiceD6 extends DiceObject {
   }
 }
 
-export class DiceOrlog extends DiceObject {
+export class DiceTrials extends DiceObject {
   constructor(options) {
     super(options)
 
@@ -411,19 +411,19 @@ if (typeof define === 'function' && define.amd) {
     return {
       DiceManager: DiceManager,
       DiceD6: DiceD6,
-      DiceOrlog: DiceOrlog,
+      DiceTrials: DiceTrials,
     }
   })
 } else if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
   module.exports = {
     DiceManager: DiceManager,
     DiceD6: DiceD6,
-    DiceOrlog: DiceOrlog,
+    DiceTrials: DiceTrials,
   }
 } else {
   window.Dice = {
     DiceManager: DiceManager,
     DiceD6: DiceD6,
-    DiceOrlog: DiceOrlog,
+    DiceTrials: DiceTrials,
   }
 }

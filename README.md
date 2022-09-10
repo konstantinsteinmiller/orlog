@@ -1,8 +1,8 @@
-# Örlög
-a reimplementation of the AC Valhalla mini-game
+# Trials of Faith
+A dice mini-game with physics in three.js
 
-playable demo on https://orlog-game.surge.sh
-or https://orlog-game.surge.sh/#debug to have some debugging options
+playable demo on https://trials-of-faith.steinmiller.org
+or https://trials-of-faith.steinmiller.org/#debug to have some debugging options
 
 ## Setup
 Download [Node.js](https://nodejs.org/en/download/).
@@ -21,4 +21,9 @@ npm run build
 # publish production build in dist/ to surge.sh (need to adjust domain in script)
 npm run deploy
 ```
-"# orlog" 
+
+
+## Powered by
+- three.js
+- colyseus
+- express

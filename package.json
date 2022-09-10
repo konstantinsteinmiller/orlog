@@ -1,17 +1,17 @@
 {
-  "name": "14-go-live",
+  "name": "trials-of-faith",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "deploy": "surge --project C:/Users/konst/game/orlog/dist --domain orlog-game.surge.sh"
+    "deploy": "surge ./dist http://trials-of-faith.steinmiller.org"
   },
   "git": {
     "scripts": {
-      "pre-push": "surge --project ./dist --domain orlog-game.surge.sh"
+      "pre-push": "surge --project ./dist http://trials-of-faith.steinmiller.org"
     }
   },
   "devDependencies": {

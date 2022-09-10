@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <link rel="shortcut icon" href="./public/favicon-trials-of-faith_128_128_dark.ico" media="(prefers-color-scheme: dark)"/>
     <link rel="shortcut icon" href="./public/favicon-trials-of-faith_128_128.ico" media="(prefers-color-scheme: light)" />
+    <link rel="stylesheet" href="./src/Menus/main-menu.scss">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trials of Faith</title>
     <style>
@@ -31,13 +32,14 @@
         </div>
         <div id="mainMenuId" class="menu-wrapper">
             <div class="menu">
+                <div id="loadingTriangleId"></div>
                 <ul class="menu-list" data-offset="10">
-                    <li class="menu-list-item" data-offset="20" onclick>
+                    <li class="menu-list-item selection--disabled" data-offset="20" onclick>
                         Start Game
                         <span class="Mask"><span>Start Game</span></span>
                         <span class="Mask"><span>Start Game</span></span>
                     </li>
-                    <li class="menu-list-item" data-offset="16" onclick>
+                    <li class="menu-list-item selection--disabled" data-offset="16" onclick>
                         Join Multiplayer game
                         <span class="Mask"><span>Join Multiplayer game</span></span>
                         <span class="Mask"><span>Join Multiplayer game</span></span>

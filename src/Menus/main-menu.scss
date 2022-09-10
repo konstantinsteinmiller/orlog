@@ -1,0 +1,301 @@
+// === Variables =====
+$perspective:     60rem;
+$font-size:       3rem;
+$split-position:  51%;
+$split-thickness: 4px;
+$split-color: #aeaf14;
+//$hover-color: #159b5f; //other green tone
+$hover-color: #13be64;
+$hover-color-2: #168352; //other green tone
+$mask-color-1: #378ab4;
+$mask-color-2: #5dabcd;
+$mask-color-3: #F61234EA;
+$mask-color-4: #CD5D5DED;
+
+@font-face {
+  font-family: 'Bangers';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/bangers/v20/FeVQS0BTqb0h60ACH5FQ2Ixi.woff2) format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Bangers';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/bangers/v20/FeVQS0BTqb0h60ACH5BQ2Ixi.woff2) format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Bangers';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/bangers/v20/FeVQS0BTqb0h60ACH55Q2A.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+// === Settings =====
+%font-settings {
+  font-family: 'Bangers', cursive;
+  font-style: normal;
+  font-weight: normal;
+  -webkit-font-smoothing: antialiased;
+  -webkit-font-kerning: normal;
+  -webkit-text-size-adjust: 100%;
+}
+
+%text-shadow-2 {
+  text-shadow:
+  0 1px 0px $mask-color-3,
+  1px 0 0px $mask-color-4,
+  1px 2px 1px $mask-color-3,
+  2px 1px 1px $mask-color-4,
+  2px 3px 2px $mask-color-3,
+  3px 2px 2px $mask-color-4,
+  3px 4px 2px $mask-color-3,
+  4px 3px 3px $mask-color-4,
+  4px 5px 3px $mask-color-3,
+  5px 4px 2px $mask-color-4,
+  5px 6px 2px $mask-color-3,
+  6px 5px 2px $mask-color-4,
+  6px 7px 1px $mask-color-3,
+  7px 6px 1px $mask-color-4,
+  7px 8px 0px $mask-color-3,
+  8px 7px 0px $mask-color-4;
+}
+
+%text-shadow-3 {
+  text-shadow:
+  0 1px 0px $mask-color-3,
+  1px 0 0px $mask-color-4,
+  1px 2px 1px $mask-color-3,
+  2px 1px 1px $mask-color-4,
+}
+
+// === Codepen Setup =====
+
+#mainMenuId.menu-wrapper {
+  overflow: hidden;
+  height: 100%;
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+
+  @extend %font-settings;
+  background: radial-gradient(circle, rgba(19,190,100,1) 0%, rgba(93,171,205,1) 90%);
+  transform-style: preserve-3d;
+  transform: perspective($perspective);
+  position: fixed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .menu {
+    height: 100%;
+    width: 100%;
+    position: relative;
+  }
+
+  // === menu <ul> =====
+  .menu-list {
+    position: absolute;
+    width: 100%;
+    top: 50%;
+    left: 50%;
+    //transform: translate(-50%, -50%);
+    font-size: $font-size;
+    line-height: 1.2;
+    text-transform: uppercase;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transform: translate(-50%, -50%) rotateX(-10deg) rotateY(20deg); // overwritten by JS
+  }
+
+  // === menu item =====
+  .menu-list-item {
+    position: relative;
+    color: transparent;
+    cursor: pointer;
+
+    padding: 0 1rem;
+
+    > span.Mask {
+      //color: #bc2e1e;
+      //background: #edde9c;
+      padding-right: 1rem;
+
+      text-shadow:
+        0 1px 0px $mask-color-1,
+        1px 0 0px $mask-color-2,
+        1px 2px 1px $mask-color-1,
+        2px 1px 1px $mask-color-2,
+        2px 3px 2px $mask-color-1,
+        3px 2px 2px $mask-color-2,
+        3px 4px 2px $mask-color-1,
+        4px 3px 3px $mask-color-2,
+        4px 5px 3px $mask-color-1,
+        5px 4px 2px $mask-color-2,
+        5px 6px 2px $mask-color-1,
+        6px 5px 2px $mask-color-2,
+        6px 7px 1px $mask-color-1,
+        7px 6px 1px $mask-color-2,
+        7px 8px 0px $mask-color-1,
+        8px 7px 0px $mask-color-2;
+    }
+
+    // === Split Line =====
+    &::before {
+      content: '';
+      display: block;
+      position: absolute;
+      top: $split-position;
+      left: -10%;
+      right: -10%;
+      height: $split-thickness;
+      border-radius: $split-thickness;
+      margin-top: calc($split-thickness / 2 * -1);
+      background: $split-color;
+      transform: scale(0);
+      transition: transform .8s cubic-bezier(.16,1.08,.38,.98);
+      z-index: 1;
+    }
+  }
+
+  // === Top/bottom mask =====
+  .Mask {
+    display: block;
+    position: absolute;
+    overflow: hidden;
+    color: $split-color;
+    top: 0;
+    height: $split-position;
+    transition: all .8s cubic-bezier(.16,1.08,.38,.98);
+
+    span { display: block; }
+  }
+
+  // === Bottom mask specific =====
+  .Mask + .Mask {
+    top: $split-position - 0.1;
+    height: 100 - $split-position + 0.1;
+
+    span {
+      transform: translateY(-$split-position);
+    }
+  }
+
+  // === Where the fun stuff happens =====
+  .menu-list-item:hover,
+  .menu-list-item:active {
+    .Mask {
+      color: $hover-color-2; transform: skewX(12deg) translateX(5px);
+
+      @extend %text-shadow-2
+    }
+    .Mask + .Mask {
+      transform: skewX(12deg) translateX(-5px);
+    }
+    &::before {
+      transform: scale(1);
+    }
+  }
+
+
+  @keyframes rotate {
+    0%   {transform: rotate(0deg);}
+    100% {transform: rotate(360deg);}
+  }
+
+  #loadingTriangleId {
+
+    .loading-text {
+      color: $hover-color-2;
+      font-size: 24px;
+      //background: white;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, 150px);
+      @extend %text-shadow-3;
+
+      &__component-name {
+        margin-right: 0.25rem;
+        opacity: 0.7;
+        animation-name: appear-text;
+        animation-duration: 1.8s;
+        animation-iteration-count: infinite;
+      }
+
+      @keyframes appear {
+        from {opacity: 1;}
+        to {opacity: 0;}
+      }
+      @keyframes appear-text {
+        from {opacity: 1;}
+        to {opacity: 0.7;}
+      }
+
+      .dot {
+        opacity: 0;
+        animation-name: appear;
+        animation-duration: 1.8s;
+        animation-iteration-count: infinite;
+      }
+      .dot:nth-child(3) {
+        animation-delay: 0.3s;
+      }
+      .dot:nth-child(4) {
+        animation-delay: 0.6s;
+      }
+    }
+    .triangle {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(0px, -20px);
+    }
+
+    .square {
+      position: absolute;
+      top: 0;
+      width: 38px;
+      height: 38px;
+      border: 1px solid #fa0;
+
+      @for $i from 1 through 40 {
+        &:nth-child(#{$i}) {
+          left: ($i * 6px) - 142px; // a lotta magic numbers here :/
+          top: 100px;
+        }
+      }
+      @for $i from 41 through 80 {
+        &:nth-child(#{$i}) {
+          left: ($i * -3px) + 220px;
+          top: ($i * -5px) + 305px;
+        }
+      }
+      @for $i from 81 through 120 {
+        &:nth-child(#{$i}) {
+          right: ($i * 3px) - 260px;
+          top: ($i * 5px) - 500px;
+        }
+      }
+      @for $i from 0 through 120 {
+        &:nth-child(#{$i}) {
+          animation: 20s linear $i*0.5s infinite rotate;
+          animation-delay: -0.3s * $i;
+          filter: hue-rotate(3deg * $i);
+        }
+      }
+    }
+  }
+}
+

@@ -27,47 +27,58 @@ export default class World {
     // this.scene.add(axisHelper)
 
     // Wait for resources
-    this.resources.on('ready', () => {
-      // Setup
-      this.floor = new Floor()
-      this.dicesHandler = new DicesHandler()
-      this.environment = new Environment()
-      this.bowls.push(new Bowl())
-      this.lifeStones = [...Array(15).keys()].map((id) => new LifeStone(id, id * 0.1))
-      this.faithTokens = [...Array(22).keys()].map((id) => new FaithToken(id, id * 0.2))
+    if (this.resources.isReady) {
+      setTimeout(() => {
+        this.setupWorld()
+      })
+    } else {
+      this.resources.on('ready', () => {
+        this.setupWorld()
+      })
+    }
+  }
 
-      // Debug
-      if (this.debug.isActive) {
-        this.debugFolder = this.debug.ui.addFolder('world')
-        this.debugFolder
-          .addColor(this.lifeStones[0].highlightMesh.material, 'color')
-          .name('color of the lifeStone highlight')
-          .onChange((color) => {
-            this.lifeStones.forEach((stone) => {
-              stone.highlightMesh.material.color = color
-            })
+  setupWorld() {
+    // Setup
+    console.log(' BUILD world: ')
+    this.floor = new Floor()
+    this.dicesHandler = new DicesHandler()
+    this.environment = new Environment()
+    this.bowls.push(new Bowl())
+    this.lifeStones = [...Array(15).keys()].map((id) => new LifeStone(id, id * 0.1))
+    this.faithTokens = [...Array(22).keys()].map((id) => new FaithToken(id, id * 0.2))
+
+    // Debug
+    if (this.debug.isActive) {
+      this.debugFolder = this.debug.ui.addFolder('world')
+      this.debugFolder
+        .addColor(this.lifeStones[0].highlightMesh.material, 'color')
+        .name('color of the lifeStone highlight')
+        .onChange((color) => {
+          this.lifeStones.forEach((stone) => {
+            stone.highlightMesh.material.color = color
           })
-        this.debug.faithTokenAmount = 3
-        this.debug.lifeStoneAmount = 2
-        this.debugFolder.add(this, 'destroyLifeStones')
-        this.debugFolder.add(this.debug, 'lifeStoneAmount', 1, 20, 1)
-        this.debugFolder.add(this, 'destroyFaithTokens')
-        this.debugFolder.add(this.debug, 'faithTokenAmount', 1, 20, 1)
-      }
+        })
+      this.debug.faithTokenAmount = 3
+      this.debug.lifeStoneAmount = 2
+      this.debugFolder.add(this, 'destroyLifeStones')
+      this.debugFolder.add(this.debug, 'lifeStoneAmount', 1, 20, 1)
+      this.debugFolder.add(this, 'destroyFaithTokens')
+      this.debugFolder.add(this.debug, 'faithTokenAmount', 1, 20, 1)
+    }
 
-      setTimeout(() => {
-        this.destroyLifeStones(4)
-      }, 1500)
+    setTimeout(() => {
+      this.destroyLifeStones(4)
+    }, 1500)
 
-      setTimeout(() => {
-        this.destroyFaithTokens(12)
-      }, 5700)
-      // setTimeout(() => this.lifeStones.pop().toggleHighlight(), 3000)
-      // setTimeout(() => {
-      //   this.lifeStones[0].toggleHighlight()
-      //   setTimeout(() => this.lifeStones[0].toggleHighlight(), 1000)
-      // }, 4000)
-    })
+    setTimeout(() => {
+      this.destroyFaithTokens(12)
+    }, 5700)
+    // setTimeout(() => this.lifeStones.pop().toggleHighlight(), 3000)
+    // setTimeout(() => {
+    //   this.lifeStones[0].toggleHighlight()
+    //   setTimeout(() => this.lifeStones[0].toggleHighlight(), 1000)
+    // }, 4000)
   }
 
   destroyLifeStones(amount) {

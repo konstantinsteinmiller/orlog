@@ -1,7 +1,7 @@
 import EventEmitter from '@/Utils/EventEmitter.js'
 
 export default class MainMenu extends EventEmitter {
-  constructor() {
+  constructor(isLoadingPhysics) {
     super()
     this.menuWrapper = document.querySelector('.menu-wrapper')
     this.menu = document.querySelector('.menu-list')
@@ -11,6 +11,9 @@ export default class MainMenu extends EventEmitter {
     this.w = document.querySelector('.ogame').clientWidth //window width
     this.h = document.querySelector('.ogame').clientHeight //window height
     this.offsetX = 0
+    this.$componentName = null
+
+    this.addLoader(isLoadingPhysics)
 
     this.menuWrapper.addEventListener('mousemove', (e) => this.onMouseMove(e))
     this.$startButton.addEventListener('click', (e) => this.onStartClick(e))
@@ -41,10 +44,46 @@ export default class MainMenu extends EventEmitter {
     Array.prototype.forEach.call(this.items, (node) => {
       const offsetLayer = node.dataset.offset || 0
       const transformLayer = `translate3d(${offsetX * offsetLayer}px, ${offsetY * offsetLayer}px, 20px)`
-
       node.style.transform = transformLayer
-      // node.css('transform', transformLayer)
     })
+  }
+
+  addLoader(isLoadingPhysics) {
+    const triangle = document.createElement('div')
+    triangle.classList.add('triangle')
+    const square = document.createElement('div')
+    square.classList.add('square')
+    for (let i = 1; i < 121; i++) {
+      triangle.appendChild(square.cloneNode())
+    }
+
+    const loadingText = document.createElement('div')
+    loadingText.appendChild(document.createTextNode('Loading '))
+    const componentName = document.createElement('span')
+    componentName.appendChild(document.createTextNode('physics'))
+    componentName.classList.add('loading-text__component-name')
+    const dot = document.createElement('span')
+    dot.appendChild(document.createTextNode('.'))
+    dot.classList.add('dot')
+    loadingText.appendChild(componentName)
+    loadingText.appendChild(dot.cloneNode(true))
+    loadingText.appendChild(dot.cloneNode(true))
+    loadingText.appendChild(dot.cloneNode(true))
+    loadingText.classList.add('loading-text')
+    loadingText.classList.add('selection--disabled')
+
+    loadingTriangleId.appendChild(triangle)
+    loadingTriangleId.appendChild(loadingText)
+    this.loadingText = loadingText
+  }
+
+  updateLoaderComponentName(name) {
+    this.$componentName = document.querySelector('.loading-text__component-name')
+    this.$componentName.innerText = name
+  }
+
+  removeLoader() {
+    this.loadingText.innerText = ''
   }
 
   onStartClick() {

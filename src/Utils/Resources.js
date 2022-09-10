@@ -2,29 +2,31 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js'
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
 import EventEmitter from '@/Utils/EventEmitter.js'
+import sources from '@/sources.js'
+import { Texture, TextureLoader, CubeTextureLoader, AudioLoader } from 'three'
+let instance = null
 
 export default class Resources extends EventEmitter {
-  constructor(sources) {
+  constructor() {
     super()
+    // Singleton
+    if (instance) {
+      setTimeout(() => {
+        this.checkIfIsReady()
+      })
+      return instance
+    }
+    instance = this
 
     this.sources = sources
 
     this.items = {}
     this.toLoad = this.sources.length
     this.loaded = 0
+    this.isReady = false
 
     this.setLoaders()
     this.startLoading()
-  }
-
-  destroy() {
-    alert('destroy Ressources')
-    this.items.keys().forEach((items) => {
-      console.log('items instanceof: ', items);
-      if (items instanceof THREE.Texture) {
-        // image.dispose()
-      }
-    })
   }
 
   setLoaders() {
@@ -34,9 +36,9 @@ export default class Resources extends EventEmitter {
     const dracoLoader = new DRACOLoader()
     dracoLoader.setDecoderPath('/draco/')
     this.loaders.gltfLoader.setDRACOLoader(dracoLoader)
-    this.loaders.textureLoader = new THREE.TextureLoader()
-    this.loaders.cubeTextureLoader = new THREE.CubeTextureLoader()
-    this.loaders.audioLoader = new THREE.AudioLoader()
+    this.loaders.textureLoader = new TextureLoader()
+    this.loaders.cubeTextureLoader = new CubeTextureLoader()
+    this.loaders.audioLoader = new AudioLoader()
   }
 
   startLoading() {
@@ -84,10 +86,14 @@ export default class Resources extends EventEmitter {
 
   sourceLoaded(source, file) {
     this.items[source.name] = file
-
     this.loaded++
+    this.trigger('loaded-source', [this.loaded, this.toLoad, source.name])
 
+    this.checkIfIsReady()
+  }
+  checkIfIsReady() {
     if (this.loaded === this.toLoad) {
+      this.isReady = true
       this.trigger('ready')
     }
   }

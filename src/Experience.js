@@ -12,13 +12,11 @@ import Client from '@/Match/Client.js'
 import { AmmoPhysics } from '@enable3d/ammo-physics'
 import { THREE } from 'enable3d/dist/index'
 
-import sources from '@/sources.js'
-
 let instance = null
 window.PI = Math.PI
 
 export default class Experience {
-  constructor() {
+  constructor(mainMenu) {
     // Singleton
     if (instance) {
       return instance
@@ -33,11 +31,12 @@ export default class Experience {
     this.canvas = webgl
 
     // Setup
+    this.mainMenu = mainMenu
     this.debug = new Debug()
     this.sizes = new Sizes()
     this.time = new Time()
     this.scene = new THREE.Scene()
-    this.resources = new Resources(sources)
+    this.resources = new Resources()
     this.sounds = new Sounds()
     this.input = new Input()
     this.camera = new Camera()
@@ -46,7 +45,7 @@ export default class Experience {
     this.physics = new AmmoPhysics(this.scene)
     this.physics.debug.enable()
 
-    this.client = new Client()
+    // this.client = new Client()
 
     // Resize event
     this.sizes.on('resize', () => {

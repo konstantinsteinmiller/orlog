@@ -6,7 +6,9 @@ const GAME_ROOM_ID = 'TRIALS_OF_FAITH_ROOM_ID'
 
 export default class Client {
   constructor() {
-    this.client = new Colyseus.Client('ws://127.0.0.1:3789')
+    this.client = new Colyseus.Client(
+      `${isDev ? 'ws://127.0.0.1' : 'ws:' + import.meta.env.VITE_SERVER_HOST}:${import.meta.env.VITE_PORT}`,
+    )
 
     this.joinOrCreateGame()
   }

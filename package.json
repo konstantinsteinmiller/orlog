@@ -7,15 +7,17 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "deploy": "surge ./dist http://trials-of-faith.steinmiller.org"
+    "deploy": "env-cmd -f ./.env cross-env-shell \"surge ./dist $REMOTE_URL\""
   },
   "git": {
     "scripts": {
-      "pre-push": "surge --project ./dist http://trials-of-faith.steinmiller.org"
+      "pre-push": "env-cmd -f ./.env cross-env-shell \"surge ./dist $REMOTE_URL\""
     }
   },
   "devDependencies": {
     "@yushijinhun/three-minifier-rollup": "^0.4.0",
+    "cross-env": "^7.0.3",
+    "env-cmd": "^10.1.0",
     "git-scripts": "^0.6.4",
     "path": "^0.12.7",
     "rollup-plugin-images": "^1.0.0",

@@ -6,7 +6,7 @@ import { createServer } from 'http'
 import express from 'express'
 import cors from 'cors'
 
-const port = Number(process.env.port) || 3789
+const port = Number(process.env.PORT) || 3789
 const app = express({ port })
 app.use(express.json())
 if (process.env.NODE_ENV !== 'production') {

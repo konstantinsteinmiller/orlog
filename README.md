@@ -19,6 +19,7 @@ npm run dev
 npm run build
 
 # publish production build in dist/ to surge.sh (need to adjust domain in script)
+# you need to provide an .env(copy from .env_template) file with PROD_URL= and optionally port= for the server
 npm run deploy
 ```
 

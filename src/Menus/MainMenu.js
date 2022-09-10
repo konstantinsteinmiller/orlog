@@ -197,7 +197,7 @@ export default class MainMenu extends EventEmitter {
     this.soundEffectsVolume = parseFloat(getStorage(GAME_SOUND_EFFECT_VOLUME, true)) ?? 1.0
     soundEffectsVolumeId.value = this.soundEffectsVolume
     soundEffectsVolumeId.onchange = (value) => {
-      this.soundEffectsVolume = soundEffectsVolumeId.value
+      this.soundEffectsVolume = parseFloat(value.target.value)
       setStorage(GAME_SOUND_EFFECT_VOLUME, soundEffectsVolumeId.value, true)
     }
   }

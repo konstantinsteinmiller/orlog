@@ -1,8 +1,8 @@
 # Trials of Faith
 A dice mini-game with physics in three.js
 
-playable demo on https://trials-of-faith.steinmiller.org
-or https://trials-of-faith.steinmiller.org/#debug to have some debugging options
+playable demo on http://trials-of-faith.steinmiller.org
+or http://trials-of-faith.steinmiller.org/#debug to have some debugging options
 
 ## Setup
 Download [Node.js](https://nodejs.org/en/download/).

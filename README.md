@@ -1,5 +1,6 @@
 # Trials of Faith
 A dice mini-game with physics in three.js
+and colyseus authoratative multiplayer server
 
 playable demo on http://trials-of-faith.steinmiller.org
 or http://trials-of-faith.steinmiller.org/#debug to have some debugging options
@@ -19,7 +20,8 @@ npm run dev
 npm run build
 
 # publish production build in dist/ to surge.sh (need to adjust domain in script)
-# you need to provide an .env(copy from .env_template) file with PROD_URL= and optionally port= for the server
+# you need to provide an .env(copy from .env_template) file
+# with SERVER_HOST=subdomain.your-hostname.com and optionally PORT= to connect to custom server port
 npm run deploy
 ```
 

@@ -33,20 +33,51 @@
         <div id="mainMenuId" class="menu-wrapper">
             <div class="menu">
                 <div id="loadingTriangleId"></div>
-                <ul class="menu-list" data-offset="10">
+                <ul class="menu-list menu-list__main-menu" data-offset="10">
                     <li class="menu-list-item selection--disabled" data-offset="20" onclick>
                         Start Game
                         <span class="Mask"><span>Start Game</span></span>
                         <span class="Mask"><span>Start Game</span></span>
                     </li>
-                    <li class="menu-list-item selection--disabled" data-offset="16" onclick>
+                    <li class="menu-list-item menu-list__multiplayer selection--disabled" data-offset="16" onclick>
                         Join Multiplayer game
                         <span class="Mask"><span>Join Multiplayer game</span></span>
                         <span class="Mask"><span>Join Multiplayer game</span></span>
                     </li>
+                    <li class="menu-list-item menu-list__options selection--disabled" data-offset="16" onclick>
+                        Options
+                        <span class="Mask"><span>Options</span></span>
+                        <span class="Mask"><span>Options</span></span>
+                    </li>
+                </ul>
+                <ul class="menu-list menu-list__options-menu" data-offset="10">
+                    <li class="menu-list-item menu-list__audio selection--disabled" data-offset="20" onclick>
+                        Audio
+                        <span class="Mask"><span>Audio</span></span>
+                        <span class="Mask"><span>Audio</span></span>
+                    </li>
+                    <li class="menu-list-item menu-list__back-button selection--disabled" data-offset="16" onclick>
+                        Back
+                        <span class="Mask"><span>Back</span></span>
+                        <span class="Mask"><span>Back</span></span>
+                    </li>
+                </ul>
+                <ul class="menu-list menu-list__options-menu-audio" data-offset="10">
+                    <li class="menu-list-item__normal selection--disabled" data-offset="20" onclick>
+                        Music Volume: <input id="musicVolumeId" type="range" value="0.02" min="0" max="1" step="0.01">
+                    </li>
+                    <li class="menu-list-item__normal selection--disabled" data-offset="20" onclick>
+                        Sound Effects Volume: <input id="soundEffectsVolumeId" type="range" value="1" min="0" max="1" step="0.01">
+                    </li>
+                    <li class="menu-list-item menu-list__back-button selection--disabled" data-offset="16" onclick>
+                        Back
+                        <span class="Mask"><span>Back</span></span>
+                        <span class="Mask"><span>Back</span></span>
+                    </li>
                 </ul>
             </div>
         </div>
+        <audio id="backgroundMusicId" />
     </div>
     <script type="module" src="./src/main.js"></script>
 </body>

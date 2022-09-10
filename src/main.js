@@ -4,6 +4,8 @@ import Experience from '@/Experience.js'
 import { PhysicsLoader } from 'enable3d/dist/index'
 import MainMenu from './Menus/MainMenu'
 import Resources from '@/Utils/Resources.js'
+import { setStorage, getStorage } from '@/Utils/storage.js'
+import { GAME_BACKGROUND_VOLUME, GAME_SOUND_EFFECT_VOLUME } from '@/Utils/constants.js'
 
 let isLoadingPhysics = true
 const mainMenu = new MainMenu(isLoadingPhysics)
@@ -15,6 +17,9 @@ PhysicsLoader('lib/ammo', () => {
   const resources = new Resources()
   resources.on('loaded-source', (loaded, toLoad, name) => {
     mainMenu.updateLoaderComponentName(name)
+    if (name === 'backgroundMusic') {
+      mainMenu.setBackgroundMusic()
+    }
     if (loaded === toLoad) {
       setTimeout(() => {
         mainMenu.updateLoaderComponentName('')
@@ -48,3 +53,33 @@ mainMenu.on('start-game', () => {
 // Array.prototype.forEach.call(images, (img) => {
 //   img.style.display = 'none'
 // })
+
+window.onload = () => {
+  let hasInteracted = false
+  let isPlaying = false
+  const onInteracted = () => {
+    hasInteracted = true
+    window.removeEventListener('scroll', () => onInteracted())
+    window.removeEventListener('click', () => onInteracted())
+    playBackgroundMusic()
+  }
+  window.onscroll = () => onInteracted()
+  window.onclick = () => onInteracted()
+
+  const playBackgroundMusic = () => {
+    if (hasInteracted && !isPlaying) {
+      isPlaying = true
+      backgroundMusicId.src = '/public/sounds/price-of-freedom-short6.ogg'
+
+      musicVolumeId.value = parseFloat(getStorage(GAME_BACKGROUND_VOLUME, true)) ?? 0.02
+
+      backgroundMusicId.volume = musicVolumeId.value
+      backgroundMusicId.repeat = true
+      backgroundMusicId.play()
+      musicVolumeId.onchange = () => {
+        backgroundMusicId.volume = musicVolumeId.value
+        setStorage(GAME_BACKGROUND_VOLUME, musicVolumeId.value, true)
+      }
+    }
+  }
+}

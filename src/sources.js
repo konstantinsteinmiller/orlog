@@ -1,5 +1,10 @@
 export default [
   {
+    name: 'backgroundMusic',
+    type: 'audio',
+    path: 'sounds/price-of-freedom-short6.ogg',
+  },
+  {
     name: 'environmentMapTexture',
     type: 'cubeTexture',
     path: [

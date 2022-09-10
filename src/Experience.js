@@ -45,7 +45,7 @@ export default class Experience {
     this.physics = new AmmoPhysics(this.scene)
     this.physics.debug.enable()
 
-    // this.client = new Client()
+    this.client = new Client()
 
     // Resize event
     this.sizes.on('resize', () => {

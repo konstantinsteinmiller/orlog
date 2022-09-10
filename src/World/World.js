@@ -40,7 +40,6 @@ export default class World {
 
   setupWorld() {
     // Setup
-    console.log(' BUILD world: ')
     this.floor = new Floor()
     this.dicesHandler = new DicesHandler()
     this.environment = new Environment()

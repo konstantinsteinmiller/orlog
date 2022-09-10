@@ -1,3 +1,6 @@
+import { getStorage, setStorage } from '@/Utils/storage.js'
+import { GAME_SOUND_EFFECT_VOLUME } from '@/Utils/constants.js'
+
 export default class Sounds {
   constructor() {
     this.experience = experience
@@ -10,6 +13,8 @@ export default class Sounds {
     this.audioListener = new THREE.AudioListener()
     this.diceHit1Sound = new THREE.Audio(this.audioListener)
     experience.scene.add(this.diceHit1Sound)
+
+    this.setSoundEffectVolume()
 
     // Wait for resources
     this.resources.on('ready', () => {
@@ -38,7 +43,7 @@ export default class Sounds {
 
     if (randomVolume) {
       var gainNode = this.audioCtx.createGain()
-      gainNode.gain.value = Math.random() * maxVolume + randomVolumeOffset
+      gainNode.gain.value = (Math.random() * maxVolume + randomVolumeOffset) * this.soundEffectsVolume
       gainNode.connect(this.audioCtx.destination)
 
       // now instead of connecting to aCtx.destination, connect to the gainNode
@@ -61,7 +66,7 @@ export default class Sounds {
   playHitSound(collision) {
     const impactStrength = collision.contact.getImpactVelocityAlongNormal()
     if (this.hitSound && impactStrength > 1.5) {
-      this.hitSound.volume = Math.random()
+      this.hitSound.volume = Math.random() * this.soundEffectsVolume
       this.hitSound.currentTime = 0
       try {
         this.hitSound.play()
@@ -72,7 +77,7 @@ export default class Sounds {
   playDiceShakeSound() {
     // this.playSound('diceShake', true)
     if (this.diceShakeSound) {
-      this.diceShakeSound.volume = Math.random() * 0.5 + 0.5
+      this.diceShakeSound.volume = (Math.random() * 0.5 + 0.5) * this.soundEffectsVolume
       this.diceShakeSound.currentTime = 0
       try {
         this.diceShakeSound.play()
@@ -90,5 +95,9 @@ export default class Sounds {
     //     soundInstance.play()
     //   } catch (e) {}
     // }
+  }
+
+  setSoundEffectVolume() {
+    this.soundEffectsVolume = parseFloat(getStorage(GAME_SOUND_EFFECT_VOLUME, true)) ?? 1.0
   }
 }

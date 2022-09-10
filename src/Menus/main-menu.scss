@@ -49,6 +49,25 @@ $mask-color-4: #CD5D5DED;
   -webkit-text-size-adjust: 100%;
 }
 
+%text-shadow-1 {
+  text-shadow:
+    0 1px 0px $mask-color-1,
+    1px 0 0px $mask-color-2,
+    1px 2px 1px $mask-color-1,
+    2px 1px 1px $mask-color-2,
+    2px 3px 2px $mask-color-1,
+    3px 2px 2px $mask-color-2,
+    3px 4px 2px $mask-color-1,
+    4px 3px 3px $mask-color-2,
+    4px 5px 3px $mask-color-1,
+    5px 4px 2px $mask-color-2,
+    5px 6px 2px $mask-color-1,
+    6px 5px 2px $mask-color-2,
+    6px 7px 1px $mask-color-1,
+    7px 6px 1px $mask-color-2,
+    7px 8px 0px $mask-color-1,
+    8px 7px 0px $mask-color-2;
+}
 %text-shadow-2 {
   text-shadow:
   0 1px 0px $mask-color-3,
@@ -117,7 +136,20 @@ $mask-color-4: #CD5D5DED;
     flex-direction: column;
     align-items: center;
     transform: translate(-50%, -50%) rotateX(-10deg) rotateY(20deg); // overwritten by JS
+
+    &__options-menu {
+      display:none;
+      &-audio {
+        display:none;
+      }
+    }
+
+    &__back-button {
+
+    }
   }
+
+
 
   // === menu item =====
   .menu-list-item {
@@ -132,23 +164,7 @@ $mask-color-4: #CD5D5DED;
       //background: #edde9c;
       padding-right: 1rem;
 
-      text-shadow:
-        0 1px 0px $mask-color-1,
-        1px 0 0px $mask-color-2,
-        1px 2px 1px $mask-color-1,
-        2px 1px 1px $mask-color-2,
-        2px 3px 2px $mask-color-1,
-        3px 2px 2px $mask-color-2,
-        3px 4px 2px $mask-color-1,
-        4px 3px 3px $mask-color-2,
-        4px 5px 3px $mask-color-1,
-        5px 4px 2px $mask-color-2,
-        5px 6px 2px $mask-color-1,
-        6px 5px 2px $mask-color-2,
-        6px 7px 1px $mask-color-1,
-        7px 6px 1px $mask-color-2,
-        7px 8px 0px $mask-color-1,
-        8px 7px 0px $mask-color-2;
+      @extend %text-shadow-1
     }
 
     // === Split Line =====
@@ -166,6 +182,16 @@ $mask-color-4: #CD5D5DED;
       transform: scale(0);
       transition: transform .8s cubic-bezier(.16,1.08,.38,.98);
       z-index: 1;
+    }
+
+    &__normal {
+      color: $split-color;
+      list-style: none;
+      @extend %text-shadow-1;
+
+      #audioVolumeId {
+        margin-left: 1rem;
+      }
     }
   }
 

@@ -62,6 +62,11 @@ export default [
     path: 'models/dices/dice6.glb',
   },
   {
+    name: 'coin',
+    type: 'gltfModel',
+    path: 'models/coin/coin.glb',
+  },
+  {
     name: 'hitSound',
     type: 'audio',
     path: 'sounds/hit.mp3',

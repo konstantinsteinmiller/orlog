@@ -19,12 +19,17 @@ export default class Environment {
   }
 
   setSunLight() {
-    this.sunLight = new THREE.DirectionalLight('#ffffff', 4)
+    this.sunLight = new THREE.DirectionalLight('#ffffff', 2)
     this.sunLight.castShadow = true
-    this.sunLight.shadow.camera.far = 15
+    this.sunLight.shadow.camera.near = 0.5
+    this.sunLight.shadow.camera.far = 22
+    this.sunLight.shadow.camera.left = -15
+    this.sunLight.shadow.camera.bottom = -15
+    this.sunLight.shadow.camera.right = 15
+    this.sunLight.shadow.camera.top = 15
     this.sunLight.shadow.mapSize.set(1024, 1024)
     this.sunLight.shadow.normalBias = 0.05
-    this.sunLight.position.set(3.5, 2, -1.25)
+    this.sunLight.position.set(6.5, 10, -3.25)
     this.scene.add(this.sunLight)
     // const sunLightHelper = new THREE.DirectionalLightHelper(this.sunLight, 0.2)
     // this.experience.debug.isActive && this.scene.add(sunLightHelper)
@@ -40,7 +45,7 @@ export default class Environment {
 
   setEnvironmentMap() {
     this.environmentMap = {}
-    this.environmentMap.intensity = 0.4
+    this.environmentMap.intensity = 1.0
     this.environmentMap.texture = this.resources.items.environmentMapTexture
     this.environmentMap.texture.encoding = THREE.sRGBEncoding
 

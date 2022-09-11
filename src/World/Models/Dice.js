@@ -4,6 +4,7 @@ import { isWithinRange } from '@/Utils/math.js'
 export default class Dice {
   constructor(
     group = null,
+    isPlayer = false,
     model = 1,
     position = new THREE.Vector3(0, 0, 0),
     rotation = new THREE.Vector3(0, 0, 0),
@@ -14,8 +15,11 @@ export default class Dice {
     this.scene = this.experience.scene
     this.sounds = this.experience.sounds
     this.resources = this.experience.resources
-    this.midZOffset = this.experience.world.midZOffset
-    this.offsetDirection = this.experience.world.offsetDirection
+
+    this.isPlayer = isPlayer
+    this.midZOffset = this.isPlayer ? 5 : 5
+    this.offsetDirection = this.isPlayer ? 1 : -1
+
     this.scale = 0.3
     this.mass = 300
     this.inertia = 13
@@ -30,7 +34,7 @@ export default class Dice {
     this.position = new THREE.Vector3(
       position.x,
       position.y,
-      this.offsetDirection * (this.midZOffset - 1) + position.z,
+      this.offsetDirection * (this.midZOffset + position.z),
     )
     this.rotation = rotation
 
@@ -79,10 +83,17 @@ export default class Dice {
     outlineMesh.position.copy(mesh.position)
     outlineMesh.scale.multiplyScalar(1.1)
     outlineMesh.name = 'diceHighlight'
+    this.highlightMesh = outlineMesh
     group.add(outlineMesh)
 
     return group
   }
+
+  toggleHighlight() {
+    this.highlightMesh.material.transparent = this.highlightMesh.material.opacity === 0.8
+    this.highlightMesh.material.opacity = this.highlightMesh.material.opacity === 0 ? 0.8 : 0
+  }
+
   setMesh() {
     this.mesh = this.resource.scene.children[0].clone(true)
     this.mesh.castShadow = true

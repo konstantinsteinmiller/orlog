@@ -16,7 +16,7 @@ let instance = null
 window.PI = Math.PI
 
 export default class Experience {
-  constructor(gameType) {
+  constructor(gameMode) {
     // Singleton
     if (instance) {
       return instance
@@ -29,7 +29,7 @@ export default class Experience {
 
     // Options
     this.canvas = webgl
-    this.gameType = gameType //GAME_TYPE_MULTIPLAYER GAME_TYPE_NPC
+    this.gameMode = gameMode //GAME_TYPE_MULTIPLAYER GAME_TYPE_NPC
 
     // Setup
     // this.mainMenu = mainMenu
@@ -46,7 +46,7 @@ export default class Experience {
     this.physics = new AmmoPhysics(this.scene)
     this.physics.debug.enable()
 
-    this.client = new Client()
+    // this.client = new Client()
 
     // Resize event
     this.sizes.on('resize', () => {

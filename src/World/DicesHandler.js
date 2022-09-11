@@ -1,5 +1,10 @@
 import Dice from '@/World/Models/Dice.js'
-import { HIGHLIGHT_POSITION_MAP, DICE_FACES_MAP, ROTATION_FACE_MAP } from '@/Utils/constants'
+import {
+  HIGHLIGHT_POSITION_MAP,
+  DICE_FACES_MAP,
+  ROTATION_FACE_MAP,
+  GAME_PLAYER_TYPES,
+} from '@/Utils/constants'
 import { isWithinRange } from '@/Utils/math'
 import { gsap as g } from 'gsap'
 import dice1Img from '/public/textures/dices/dice1.jpg'
@@ -11,7 +16,7 @@ import dice6Img from '/public/textures/dices/dice6.jpg'
 const images = [dice1Img, dice2Img, dice3Img, dice4Img, dice5Img, dice6Img]
 
 export default class DicesHandler {
-  constructor() {
+  constructor(playerId, isPlayer) {
     this.experience = experience
     this.scene = experience.scene
     this.physics = experience.physics
@@ -19,8 +24,12 @@ export default class DicesHandler {
     this.input = experience.input
     this.sounds = experience.sounds
     this.camera = experience.camera.instance
-    this.midZOffset = this.experience.world.midZOffset
-    this.offsetDirection = this.experience.world.offsetDirection
+
+    this.playerId = playerId
+    this.isPlayer = isPlayer
+    this.midZOffset = 5
+    this.offsetDirection = isPlayer ? 1 : -1
+
     this.dicesList = []
     this.diceMeshes = []
     this.availableThrows = 3
@@ -32,11 +41,13 @@ export default class DicesHandler {
     this.currentIntersect = null
     this.previousIntersect = null
 
+    this.isPlayerAtTurn = this.playerId === GAME_PLAYER_TYPES.GAME_PLAYER_TYPE_PLAYER && isPlayer
+
     // init code
-    this.createDices()
+    this.isPlayerAtTurn && this.createDices()
 
     // Debug
-    if (this.debug.isActive) {
+    if (this.debug.isActive && !this.isPlayer) {
       this.debugFolder = this.debug.ui.addFolder('dices')
       this.debugFolder.add(this, 'createDices')
       this.debugFolder.add(this, 'availableThrows', 1, 10, 1)
@@ -59,7 +70,7 @@ export default class DicesHandler {
         this.physics.destroy(dice.group.body)
         highlightMesh.isPlaced = true
         this.hasDestroyedBodies = true
-        const offsetX = dice.modelNumber * 1.4 - 4.2
+        const offsetX = dice.modelNumber * 1.4 - 4.9
         const offsetHalfX = offsetX / 2
         const upwardFace = dice.mesh.userData.upwardFace
 
@@ -90,9 +101,9 @@ export default class DicesHandler {
           },
         )
         g.to(dice.group.position, {
-          y: 2.5,
           x: offsetHalfX,
-          z: this.offsetDirection * (this.midZOffset - 1) + -1.8,
+          y: 2.5,
+          z: this.offsetDirection * (this.midZOffset - 1.8),
           duration: 2,
           ease: 'sine.out',
           delay: 0,
@@ -100,10 +111,14 @@ export default class DicesHandler {
           g.to(dice.group.position, {
             x: offsetX,
             y: dice.scale,
-            z: this.offsetDirection * (this.midZOffset - 1) + -5,
+            z: this.offsetDirection * (this.midZOffset - 4),
             duration: 2,
             delay: 0,
             ease: 'sine.out',
+          }).then(() => {
+            // dice.toggleHighlight()
+            highlightMesh.isSelected = !highlightMesh.isSelected
+            highlightMesh.isHighlighted = false
           })
         })
       }
@@ -129,8 +144,10 @@ export default class DicesHandler {
             dice.setBody()
             dice.setCollisionHandler()
             this.diceMeshes = this.dicesList.map((dice) => dice.group.children[0])
-            dice.group.body.setVelocity(Math.PI * 0.3 - 0.6, Math.PI * -0.2 - 0.3, Math.PI * -0.9 + 0.4)
-            dice.group.body.setAngularVelocity(Math.PI * -4 + 4, Math.PI * -4 + 2, Math.PI * 3 - 2)
+            // dice.group.body.setVelocity(Math.PI * 0.3 - 0.6, Math.PI * -0.2 - 0.3, Math.PI * -0.9 + 0.4)
+            // dice.group.body.setAngularVelocity(Math.PI * -4 + 4, Math.PI * -4 + 2, Math.PI * 3 - 2)
+
+            this.setThrowVelocity(dice.group.body, dice)
           }, 500)
         }
       })
@@ -167,9 +184,7 @@ export default class DicesHandler {
               // set body back to dynamic
               body.setCollisionFlags(0)
 
-              // if you do not reset the velocity and angularVelocity, the object will keep it
-              body.setVelocity(Math.PI * 0.3 - 0.6, Math.PI * -0.2 - 0.3, Math.PI * -0.9 + 0.4)
-              body.setAngularVelocity(Math.PI * -4 + 4, Math.PI * -4 + 2, Math.PI * 3 - 2)
+              this.setThrowVelocity(body, dice)
             })
           }
         }
@@ -184,16 +199,57 @@ export default class DicesHandler {
     }, 400)
   }
 
+  setThrowVelocity(body, dice) {
+    const modelNumber = dice.modelNumber
+    const baseVelocityX = modelNumber === 6 ? Math.PI * 0.25 + 0.425 : Math.PI * 0.25 - 0.5
+    const baseVelocityZ = modelNumber === 6 ? Math.PI * -0.6 + 0.1 : Math.PI * -0.8 + 0.4
+    const baseAngularX = modelNumber === 6 ? Math.PI * -4 + 3.5 : Math.PI * -4 + 2
+    const baseAngularY = modelNumber === 6 ? Math.PI * -3 + 6.5 : Math.PI * -4 + 2
+    const baseAngularZ = modelNumber === 6 ? Math.PI * 3 - 5 : Math.PI * 3 - 2
+    const velocityX = baseVelocityX * this.offsetDirection
+    const velocityY = (Math.PI * -0.2 - 0.6) * this.offsetDirection
+    const velocityZ = baseVelocityZ * this.offsetDirection
+    const angularX = baseAngularX * this.offsetDirection
+    const angularY = baseAngularY * this.offsetDirection
+    const angularZ = baseAngularZ * this.offsetDirection
+    body.setVelocity(velocityX, velocityY, velocityZ)
+    body.setAngularVelocity(angularX, angularY, angularZ)
+  }
+
   createDices() {
     this.diceGroup = new THREE.Group({ name: 'diceGroup' })
     this.diceGroup.name = 'diceGroup'
     this.dicesList = [
-      new Dice(this.diceGroup, 1, new THREE.Vector3(-0.5, 3, 1), new THREE.Vector3(0, 0, 1)),
-      new Dice(this.diceGroup, 2, new THREE.Vector3(0, 3, 1), new THREE.Vector3(0, 0, PI * 0.5)),
-      new Dice(this.diceGroup, 3, new THREE.Vector3(0.5, 3, 1), new THREE.Vector3(0, 0, PI)),
-      new Dice(this.diceGroup, 4, new THREE.Vector3(-0.5, 3, 1.6), new THREE.Vector3(0, 0, PI * 1.5)),
-      new Dice(this.diceGroup, 5, new THREE.Vector3(0, 3, 1.6), new THREE.Vector3(PI * 0.5, 0, 0)),
-      new Dice(this.diceGroup, 6, new THREE.Vector3(0.5, 3, 1.6), new THREE.Vector3(PI * 0.5, PI, PI * 1.5)),
+      new Dice(this.diceGroup, this.isPlayer, 1, new THREE.Vector3(-0.5, 2, 1), new THREE.Vector3(0, 0, 1)),
+      new Dice(
+        this.diceGroup,
+        this.isPlayer,
+        2,
+        new THREE.Vector3(0, 2, 1),
+        new THREE.Vector3(0, 0, PI * 0.5),
+      ),
+      new Dice(this.diceGroup, this.isPlayer, 3, new THREE.Vector3(0.5, 2, 1), new THREE.Vector3(0, 0, PI)),
+      new Dice(
+        this.diceGroup,
+        this.isPlayer,
+        4,
+        new THREE.Vector3(-0.5, 2, 1.6),
+        new THREE.Vector3(0, 0, PI * 1.5),
+      ),
+      new Dice(
+        this.diceGroup,
+        this.isPlayer,
+        5,
+        new THREE.Vector3(-0.3, 1.6, 1.75),
+        new THREE.Vector3(PI * 0.5, 0, 0),
+      ),
+      new Dice(
+        this.diceGroup,
+        this.isPlayer,
+        6,
+        new THREE.Vector3(-0.2, 2.5, 2.3),
+        new THREE.Vector3(PI * 0.3, PI * -0.9, PI * -0.6),
+      ),
     ]
     this.diceMeshes = this.dicesList.map((dice) => dice.group.children[0])
     this.scene.add(this.diceGroup)
@@ -209,7 +265,7 @@ export default class DicesHandler {
       this.currentIntersect = intersections[0].object
       this.dicesList.forEach((dice) => {
         dice.group.getObjectByName('diceHighlight').isHighlighted =
-          this.currentIntersect.name === dice.mesh.name
+          this.currentIntersect.name === dice.mesh.name && !dice.highlightMesh.isPlaced
       })
       this.evaluateTopFace()
       this.setDiceTopFaceHighlighter()
@@ -221,14 +277,15 @@ export default class DicesHandler {
         if (this.currentIntersect.parent) {
           this.currentIntersect.parent.getObjectByName('diceHighlight').isHighlighted = false
         }
+        diceFacesLayout.style.opacity = 0
       }
       this.previousIntersect = { name: this.currentIntersect?.name }
       this.currentIntersect = null
-      diceFacesLayout.style.opacity = 0
     }
   }
 
   setDiceTopFaceHighlighter() {
+    console.log('diceFacesLayout: ', this.currentIntersect.name)
     if (this.currentIntersect.name.substring(0, 4) === 'Dice') {
       const diceModelNumber = this.currentIntersect.name.substring(4, 5)
       diceFacesLayout.style.opacity = 0.8
@@ -271,12 +328,12 @@ export default class DicesHandler {
         childMesh.userData.upwardFace = face
         childMesh.userData.upwardSymbol = DICE_FACES_MAP[dI]?.[face].symbol
         childMesh.userData.isGoldenSymbol = DICE_FACES_MAP[dI]?.[face].isGolden
-        /*this.debug?.isActive &&
-          console.error(
-            `${axis} ${face[0].toUpperCase()}${face.substring(1)} // ${DICE_FACES_MAP[dI]?.[face].symbol} ${
-              DICE_FACES_MAP[dI]?.[face].isGolden ? 'Golden' : ''
-            }`,
-          )*/
+        // this.debug?.isActive &&
+        // console.error(
+        //   `${axis} ${face[0].toUpperCase()}${face.substring(1)} // ${DICE_FACES_MAP[dI]?.[face].symbol} ${
+        //     DICE_FACES_MAP[dI]?.[face].isGolden ? 'Golden' : ''
+        //   }`,
+        // )
       }
 
       if (Uy > Fy && Uy > Ry) {

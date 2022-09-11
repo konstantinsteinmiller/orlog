@@ -26,6 +26,7 @@ PhysicsLoader('lib/ammo', () => {
         mainMenu.updateLoaderComponentName('')
         setTimeout(() => {
           mainMenu.removeLoader()
+          location.hash.includes('debug') && mainMenu.onStartClick() // DEBUG only
         }, 200)
       })
     }

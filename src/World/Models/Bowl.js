@@ -1,16 +1,17 @@
 // import * as THREE from 'three'
 
 export default class Bowl {
-  constructor(position = new THREE.Vector3(0, 0, 0), rotation = new THREE.Vector3(0, 0, 0)) {
+  constructor(isPlayer) {
     this.experience = experience
     this.physics = experience.physics
     this.scene = this.experience.scene
     this.resources = this.experience.resources
-    this.midZOffset = this.experience.world.midZOffset
-    this.offsetDirection = this.experience.world.offsetDirection
 
-    this.position = position
-    this.rotation = rotation
+    this.midZOffset = 5
+    this.offsetDirection = isPlayer ? 1 : -1
+
+    this.position = new THREE.Vector3(0, 0, 0)
+    this.rotation = new THREE.Vector3(0, 0, 0)
     this.scale = 1
 
     this.setMesh()
@@ -22,7 +23,7 @@ export default class Bowl {
     this.mesh = this.resources.items['bowl'].scene.children[0].clone(true)
 
     this.mesh.scale.set(this.scale, this.scale, this.scale)
-    this.position.z += this.offsetDirection * (this.midZOffset - 1)
+    this.position.z += this.offsetDirection * this.midZOffset
     this.mesh.position.copy(this.position)
     this.mesh.rotation.set(this.rotation.x, this.rotation.y, this.rotation.z)
 

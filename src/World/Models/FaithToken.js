@@ -2,13 +2,14 @@ import { disposeMeshAndRemoveFromScene } from '@/Utils/ThreeHelpers.js'
 import { gsap as g } from 'gsap'
 
 export default class FaithToken {
-  constructor(id = 0, timeoutInMs) {
+  constructor(isPlayer, id = 0, timeoutInMs) {
     this.experience = experience
     this.physics = experience.physics
     this.scene = this.experience.scene
     this.resources = this.experience.resources
-    this.midZOffset = this.experience.world.midZOffset
-    this.offsetDirection = this.experience.world.offsetDirection
+
+    this.midZOffset = 5
+    this.offsetDirection = isPlayer ? 1 : -1
 
     this.id = id
     this.scale = 0.25
@@ -31,9 +32,9 @@ export default class FaithToken {
   destroyFaithToken(timeoutInMs) {
     const timeout = timeoutInMs * 0.001
     g.to(this.mesh.position, {
-      x: this.offsetDirection * (5 - Math.floor(this.id / 15) * 0.8),
+      x: this.offsetDirection * (5.5 - Math.floor(this.id / 5) * 0.8 + Math.floor(this.id / 20) * 3.2),
       y: 2.5,
-      z: this.mesh.position.z + this.offsetDirection * 0.5,
+      z: this.offsetDirection * (this.midZOffset - 0.5 - Math.floor(this.id / 20) * 0.8),
       duration: 0.5,
       delay: timeout * 1.3,
     }).then(() =>
@@ -41,7 +42,7 @@ export default class FaithToken {
         .to(this.mesh.position, {
           x: this.offsetDirection * (5 - Math.floor(this.id / 15) * 0.8),
           y: 2.5,
-          z: this.offsetDirection * this.midZOffset + this.mesh.position.z + this.offsetDirection * 12,
+          z: this.offsetDirection * this.midZOffset + this.mesh.position.z + this.offsetDirection * 16,
           duration: 1.8,
         })
         .then(() => {
@@ -54,25 +55,23 @@ export default class FaithToken {
     g.fromTo(
       this.mesh.position,
       {
-        x: this.offsetDirection * (5 - Math.floor(this.id / 15) * 0.8),
+        x: this.offsetDirection * (5 - Math.floor(this.id / 20) * 0.8),
         y: 2.5,
-        z: this.offsetDirection * 10 + this.offsetDirection * 0.5,
+        z: this.offsetDirection * 16 + this.offsetDirection * 0.5,
         duration: 0.5,
       },
       {
-        x: this.offsetDirection * (5 - Math.floor(this.id / 15) * 0.8),
+        x: this.offsetDirection * (5.5 - Math.floor(this.id / 5) * 0.8 + Math.floor(this.id / 20) * 3.2),
         y: 2.5,
-        z: this.mesh.position.z + this.offsetDirection * 0.5,
+        z: this.offsetDirection * (this.midZOffset - 0.5 - Math.floor(this.id / 20) * 0.8),
         duration: 0.5,
         delay: timeoutInMs,
       },
     ).then(() =>
       g.to(this.mesh.position, {
-        x: this.offsetDirection * (5 - Math.floor(this.id / 15) * 0.8),
+        x: this.offsetDirection * (6 - Math.floor(this.id / 5) * 0.8 + Math.floor(this.id / 20) * 3.2),
         y: 0.05 + Math.floor(this.id % 5) * 0.15,
-        z:
-          this.offsetDirection *
-          (this.midZOffset + 1.5 - Math.floor(this.id / 5) * 0.8 + Math.floor(this.id / 15) * 2.4),
+        z: this.offsetDirection * (this.midZOffset - 1.5 - Math.floor(this.id / 20) * 0.8),
         duration: 1.0,
       }),
     )

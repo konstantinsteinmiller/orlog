@@ -120,10 +120,12 @@ export default class Debug {
     this.physics = experience.physics
     if (this.isPhysicsDebugActive) {
       this.physics.debug.disable()
-      experience.world.dicesHandler.dicesList.forEach((dice) => {
-        dice.group.getObjectByName('upSideDetector').scale.set(new THREE.Vector3(0, 0, 0))
-        dice.group.getObjectByName('frontSideDetector').scale.set(new THREE.Vector3(0, 0, 0))
-        dice.group.getObjectByName('rightSideDetector').scale.set(new THREE.Vector3(0, 0, 0))
+      experience.world.players.forEach((player) => {
+        player.dicesHandler.dicesList.forEach((dice) => {
+          dice.group.getObjectByName('upSideDetector').scale.set(new THREE.Vector3(0, 0, 0))
+          dice.group.getObjectByName('frontSideDetector').scale.set(new THREE.Vector3(0, 0, 0))
+          dice.group.getObjectByName('rightSideDetector').scale.set(new THREE.Vector3(0, 0, 0))
+        })
       })
     } else {
       this.physics.debug.enable()

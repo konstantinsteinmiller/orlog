@@ -2,13 +2,14 @@ import { disposeMeshAndRemoveFromScene } from '@/Utils/ThreeHelpers.js'
 import { gsap as g } from 'gsap'
 
 export default class LifeStone {
-  constructor(id = 0, timeoutInMs = 0) {
+  constructor(isPlayer = false, id = 0, timeoutInMs = 0) {
     this.experience = experience
     this.physics = experience.physics
     this.scene = this.experience.scene
     this.resources = this.experience.resources
-    this.midZOffset = this.experience.world.midZOffset
-    this.offsetDirection = this.experience.world.offsetDirection
+
+    this.midZOffset = 5
+    this.offsetDirection = isPlayer ? 1 : -1
 
     this.id = id
     this.modelNumber = Math.floor(Math.random() * 4)
@@ -46,13 +47,13 @@ export default class LifeStone {
     g.fromTo(
       this.mesh.position,
       {
-        x: this.offsetDirection * (-8 + (this.id % 5) * 0.7),
+        x: this.offsetDirection * (-this.midZOffset - 3 + (this.id % 5) * 0.7),
         y: 0.05 + Math.floor(this.id % 5) * 0.15,
-        z: this.offsetDirection * 10,
+        z: this.offsetDirection * 15,
         duration: 0.5,
       },
       {
-        x: this.offsetDirection * (this.offsetDirection * (-7 + (this.id % 5) * 0.7)),
+        x: this.offsetDirection * (-this.midZOffset - 1 + (this.id % 5) * 0.7),
         y: 0.05 + Math.floor(this.id % 5) * 0.15,
         z: this.mesh.position.z + this.offsetDirection * 0.5,
         duration: 0.5,

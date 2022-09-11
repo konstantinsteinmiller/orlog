@@ -98,6 +98,10 @@ $mask-color-4: #CD5D5DED;
 
 // === Codepen Setup =====
 
+#backToMenuButton {
+  display: none;
+}
+
 #mainMenuId.menu-wrapper {
   overflow: hidden;
   height: 100%;

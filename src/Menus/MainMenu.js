@@ -105,10 +105,12 @@ export default class MainMenu extends EventEmitter {
   }
 
   onStartClick() {
+    backToMenuButton.style.display = 'block'
     this.trigger('start-game')
   }
 
   onJoinMultiplayerClick() {
+    backToMenuButton.style.display = 'block'
     this.trigger('join-multiplayer-game')
   }
 
@@ -127,15 +129,14 @@ export default class MainMenu extends EventEmitter {
   }
 
   toggleLeaveConsentModal() {
-    // leaveConsentModal.value = !leaveConsentModal.value
     leaveConsentModal.click()
   }
 
   onBackToMainClick(event, isFromGame) {
     if (isFromGame) {
       mainMenuId.style.display = 'block'
+      backToMenuButton.style.display = 'none'
     }
-    console.log('onBackToMainClick')
     Array.prototype.forEach.call(this.$menuLists, (menu) => {
       menu.style.display = 'none'
     })

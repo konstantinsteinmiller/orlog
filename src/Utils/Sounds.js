@@ -43,7 +43,8 @@ export default class Sounds {
 
     if (randomVolume) {
       var gainNode = this.audioCtx.createGain()
-      gainNode.gain.value = (Math.random() * maxVolume + randomVolumeOffset) * this.soundEffectsVolume
+      gainNode.gain.value =
+        (Math.random() * maxVolume + randomVolumeOffset) * (this.soundEffectsVolume ?? 1.0)
       gainNode.connect(this.audioCtx.destination)
 
       // now instead of connecting to aCtx.destination, connect to the gainNode
@@ -98,6 +99,7 @@ export default class Sounds {
   }
 
   setSoundEffectVolume() {
-    this.soundEffectsVolume = parseFloat(getStorage(GAME_SOUND_EFFECT_VOLUME, true)) ?? 1.0
+    const value = parseFloat(getStorage(GAME_SOUND_EFFECT_VOLUME, true))
+    this.soundEffectsVolume = value ? value : 1.0
   }
 }

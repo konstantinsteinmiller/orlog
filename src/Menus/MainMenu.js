@@ -5,8 +5,8 @@ import { GAME_SOUND_EFFECT_VOLUME } from '@/Utils/constants.js'
 export default class MainMenu extends EventEmitter {
   constructor(isLoadingPhysics) {
     super()
-    this.menuWrapper = document.querySelector('.menu-wrapper')
-    this.menu = document.querySelector('.menu-list')
+    this.$menuWrapper = document.querySelector('.menu-wrapper')
+    this.$menu = document.querySelector('.menu-list')
     this.$startButton = document.querySelector('.menu-list-item:first-child')
     this.$joinButton = document.querySelector('.menu-list-item.menu-list__multiplayer')
     this.$optionsButton = document.querySelector('.menu-list-item.menu-list__options')
@@ -27,13 +27,15 @@ export default class MainMenu extends EventEmitter {
     this.addLoader(isLoadingPhysics)
     this.setSoundEffectVolume()
 
-    this.menuWrapper.addEventListener('mousemove', (e) => this.onMouseMove(e))
+    this.$menuWrapper.addEventListener('mousemove', (e) => this.onMouseMove(e))
     this.$startButton.addEventListener('click', (e) => this.onStartClick(e))
     this.$joinButton.addEventListener('click', (e) => this.onJoinMultiplayerClick(e))
     this.$optionsButton.addEventListener('click', (e) => this.onOptionsClick(e))
     this.$audioButton.addEventListener('click', (e) => this.onAudioClick(e))
     this.$backButtonOptions.addEventListener('click', (e) => this.onBackToMainClick(e))
     this.$backButtonAudio.addEventListener('click', (e) => this.onBackToOptionsClick(e))
+    backToMenuButton.addEventListener('click', (e) => this.toggleLeaveConsentModal(e))
+    doLeaveGameId.addEventListener('click', (e) => this.onBackToMainClick(e, true))
   }
 
   onMouseMove(e) {
@@ -43,7 +45,7 @@ export default class MainMenu extends EventEmitter {
     const dx = e.pageX - this.w / 2 //@w/2 = center of poster
     const theta = Math.atan2(dy, dx) //angle between cursor and center of poster in RAD
     let angle = (theta * 180) / Math.PI - 90 //convert rad in degrees
-    const offsetPoster = this.menu.dataset.offset
+    const offsetPoster = this.$menu.dataset.offset
     const transformPoster = `translate(-50%, -50%) translate3d(0, ${-offsetX * offsetPoster}px, 0) rotateX(${
       -offsetY * offsetPoster
     }deg) rotateY(${offsetX * (offsetPoster * 2)}deg)` //poster transform
@@ -54,7 +56,7 @@ export default class MainMenu extends EventEmitter {
     }
 
     //poster transform
-    this.menu.style.transform = transformPoster
+    this.$menu.style.transform = transformPoster
 
     //parallax for each layer
     Array.prototype.forEach.call(this.items, (node) => {
@@ -124,7 +126,16 @@ export default class MainMenu extends EventEmitter {
     this.$audioMenu.style.display = 'flex'
   }
 
-  onBackToMainClick() {
+  toggleLeaveConsentModal() {
+    // leaveConsentModal.value = !leaveConsentModal.value
+    leaveConsentModal.click()
+  }
+
+  onBackToMainClick(event, isFromGame) {
+    if (isFromGame) {
+      mainMenuId.style.display = 'block'
+    }
+    console.log('onBackToMainClick')
     Array.prototype.forEach.call(this.$menuLists, (menu) => {
       menu.style.display = 'none'
     })

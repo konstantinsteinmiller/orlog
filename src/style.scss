@@ -41,6 +41,21 @@ body,
     position: absolute;
     transform: translateY(-50%);
 }
+
+#backToMenuButton {
+    position: absolute;
+    left: 0;
+    top: 0;
+    padding: 0.25rem 1.25rem;
+    width: 6rem;
+    opacity: 1;
+    display: block;
+
+    &:hover {
+        cursor: pointer;
+    }
+}
+
 .selection--disabled {
     -webkit-user-select: none;
     -khtml-user-select: none;

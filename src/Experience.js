@@ -16,7 +16,7 @@ let instance = null
 window.PI = Math.PI
 
 export default class Experience {
-  constructor(mainMenu) {
+  constructor(gameType) {
     // Singleton
     if (instance) {
       return instance
@@ -29,9 +29,10 @@ export default class Experience {
 
     // Options
     this.canvas = webgl
+    this.gameType = gameType //GAME_TYPE_MULTIPLAYER GAME_TYPE_NPC
 
     // Setup
-    this.mainMenu = mainMenu
+    // this.mainMenu = mainMenu
     this.debug = new Debug()
     this.sizes = new Sizes()
     this.time = new Time()

@@ -30,6 +30,7 @@ npm run deploy
 - three.js
 - colyseus
 - express
+- daisyUi
 
 # Music
 background music by <a href="https://pixabay.com/users/daddysmusic-22836301/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=music&amp;utm_content=33106">DaddysMusic</a> from <a href="https://pixabay.com/music//?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=music&amp;utm_content=33106">Pixabay</a>

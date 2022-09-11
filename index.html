@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <link rel="shortcut icon" href="./public/favicon-trials-of-faith_128_128_dark.ico" media="(prefers-color-scheme: dark)"/>
     <link rel="shortcut icon" href="./public/favicon-trials-of-faith_128_128.ico" media="(prefers-color-scheme: light)" />
+<!--    <link rel="stylesheet" href="./src/style.scss">-->
     <link rel="stylesheet" href="./src/Menus/main-menu.scss">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trials of Faith</title>
@@ -30,8 +31,13 @@
                  draggable="false"
             >
         </div>
+        <div id="backToMenuButton">
+            <svg for="leaveConsentModal" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 1000 1000">
+                <g><path fill="black" d="M28.4,540.7l305.7,237.6c30.9,24.6,76.8,2.4,76.8-37.2v-82.4c0-26.1,20.6-46.7,46.7-46.7h487.1c26.2,0,45.2-22.2,45.2-48.3V436.2c0-26.1-19-45.9-45.2-45.9H457.7c-26.1,0-46.7-23-46.7-49.1v-81.6c0-39.6-45.9-62.6-77.6-38l-305,244C3.9,484.5,3.9,521.7,28.4,540.7z"/></g>
+            </svg>
+        </div>
         <div id="mainMenuId" class="menu-wrapper">
-            <div class="menu">
+            <div class="main-menu">
                 <div id="loadingTriangleId"></div>
                 <ul class="menu-list menu-list__main-menu" data-offset="10">
                     <li class="menu-list-item selection--disabled" data-offset="20" onclick>
@@ -78,6 +84,18 @@
             </div>
         </div>
         <audio id="backgroundMusicId" />
+    </div>
+
+
+    <input type="checkbox" id="leaveConsentModal" class="modal-toggle" />
+    <div class="modal modal-bottom sm:modal-middle">
+        <div class="modal-box">
+            <h3 class="font-bold text-lg">Your trying to leave this active game!</h3>
+            <p class="py-4">Are you sure you want to abandon this game? You will lose this match.</p>
+            <div class="modal-action">
+                <label id="doLeaveGameId" for="leaveConsentModal" class="btn btn-outline">Yes, I really want to leave!</label>
+                <label for="leaveConsentModal" class="btn btn-primary">No, stay in the game</label></div>
+        </div>
     </div>
     <script type="module" src="./src/main.js"></script>
 </body>

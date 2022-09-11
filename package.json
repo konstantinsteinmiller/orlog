@@ -27,14 +27,18 @@
   "dependencies": {
     "@enable3d/ammo-physics": "^0.25.2",
     "@enable3d/three-graphics": "^0.25.2",
+    "autoprefixer": "^10.4.8",
     "colyseus.js": "^0.14.13",
     "cors": "^2.8.5",
+    "daisyui": "^2.6.0",
     "dotenv": "^16.0.2",
     "enable3d": "^0.25.2",
     "gsap": "^3.10.4",
     "http": "^0.0.1-security",
     "lil-gui": "^0.17.0",
+    "postcss": "^8.4.7",
     "stats.js": "^0.17.0",
+    "tailwindcss": "^3.0.23",
     "three": "^0.143.0",
     "three-screen-quad": "^0.2.1",
     "three-to-cannon": "^4.2.0"

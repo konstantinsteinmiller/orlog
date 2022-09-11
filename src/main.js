@@ -1,3 +1,4 @@
+import './app.css'
 import './style.scss'
 
 import Experience from '@/Experience.js'
@@ -5,7 +6,7 @@ import { PhysicsLoader } from 'enable3d/dist/index'
 import MainMenu from './Menus/MainMenu'
 import Resources from '@/Utils/Resources.js'
 import { setStorage, getStorage } from '@/Utils/storage.js'
-import { GAME_BACKGROUND_VOLUME, GAME_SOUND_EFFECT_VOLUME } from '@/Utils/constants.js'
+import { GAME_BACKGROUND_VOLUME, GAME_TYPES } from '@/Utils/constants.js'
 
 let isLoadingPhysics = true
 const mainMenu = new MainMenu(isLoadingPhysics)
@@ -35,7 +36,20 @@ PhysicsLoader('lib/ammo', () => {
 mainMenu.on('start-game', () => {
   if (!isLoadingPhysics) {
     mainMenuId.style.display = 'none'
-    const experience = new Experience(mainMenu)
+    const experience = new Experience(GAME_TYPES.GAME_TYPE_NPC)
+  } else {
+    PhysicsLoader('lib/ammo', () => {
+      isLoadingPhysics = false
+      mainMenu.updateLoaderComponentName('')
+      // const experience = new Experience(mainMenu)
+    })
+  }
+})
+
+mainMenu.on('join-multiplayer-game', () => {
+  if (!isLoadingPhysics) {
+    mainMenuId.style.display = 'none'
+    const experience = new Experience(GAME_TYPES.GAME_TYPE_MULTIPLAYER)
   } else {
     PhysicsLoader('lib/ammo', () => {
       isLoadingPhysics = false

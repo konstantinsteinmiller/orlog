@@ -90,6 +90,7 @@ export default class Dice {
   }
 
   toggleHighlight() {
+    // might be wrong
     this.highlightMesh.material.transparent = this.highlightMesh.material.opacity === 0.8
     this.highlightMesh.material.opacity = this.highlightMesh.material.opacity === 0 ? 0.8 : 0
   }
@@ -125,6 +126,9 @@ export default class Dice {
       width: 2,
       height: 2,
       depth: 2,
+      // breakable: true,
+      // fractureImpulse: 5,
+      // collisionFlags: 3,
     })
   }
 

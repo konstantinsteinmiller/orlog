@@ -1,12 +1,14 @@
 import * as gui from 'lil-gui'
 import Stats from 'stats.js'
 import { disposeMeshAndRemoveFromScene } from '@/Utils/ThreeHelpers.js'
+import Experience from '@/Experience.js'
 
 export default class Debug {
   constructor() {
-    this.experience = experience
+    this.experience = new Experience()
     this.scene = this.experience.scene
     this.input = this.experience.input
+    this.world = this.experience.world
     this.resources = this.experience.resources
     this.isActive = window.location.hash === '#debug'
     this.isPhysicsDebugActive = true
@@ -84,6 +86,15 @@ export default class Debug {
           this.debugCubeOptions.debugCube.position.y,
           this.debugCubeOptions.debugCube.position.z,
           this.debugCubeOptions.debugCube,
+        )
+      }
+    } else if (event.code === 'KeyT') {
+      this.world = this.experience.world
+      if (this.world.players) {
+        console.log(
+          'player turns',
+          this.world.players[this.world.orderedPlayerIds[0]].isPlayerAtTurn,
+          this.world.players[this.world.orderedPlayerIds[1]].isPlayerAtTurn,
         )
       }
     }

@@ -14,13 +14,19 @@ export default class Camera {
   }
 
   setInstance() {
+    const perspective = 800
+
+    // this equation
+    const fov = (180 * (2 * Math.atan(innerHeight / 2 / perspective))) / Math.PI
+    // console.log('fov: ', fov)
     this.instance = new THREE.PerspectiveCamera(
-      55,
+      fov,
       this.canvas.clientWidth / this.canvas.clientHeight,
       0.1,
       100,
     )
     this.instance.position.set(0, 18, 5)
+    // this.instance.position.set(0, 0, 5)
     this.scene.add(this.instance)
   }
 

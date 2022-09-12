@@ -1,6 +1,7 @@
 import Environment from '@/World/Environment.js'
 import Floor from '@/World/Models/Floor.js'
 import Player from '@/World/Player.js'
+import Coin from '@/World/Models/Coin.js'
 import { GAME_TYPES, GAME_PLAYER_TYPES } from '@/Utils/constants.js'
 
 export default class World {
@@ -14,6 +15,7 @@ export default class World {
     this.physics = experience.physics
     this.isPlayer = true
     this.players = {}
+    this.orderedPlayerIds = []
 
     const direction = this.isPlayer ? 1 : -1
     this.midZOffset = 5
@@ -39,6 +41,8 @@ export default class World {
     this.floor = new Floor()
     this.environment = new Environment()
     this.createPlayers()
+    this.coin = new Coin()
+    this.coin.flipCoin()
   }
 
   createPlayers() {
@@ -52,13 +56,16 @@ export default class World {
       this.createPlayer(GAME_PLAYER_TYPES.GAME_PLAYER_TYPE_NPC)
     }
   }
+
   createPlayer(playerId, isPlayer) {
     this.players[playerId] = new Player(playerId, !!isPlayer)
+    this.orderedPlayerIds.push(playerId)
+    return this.players[playerId]
   }
 
   update() {
     Object.values(this.players).forEach((player) => {
-      player.update()
+      player?.update()
     })
   }
 }

@@ -52,6 +52,16 @@ export default class Floor {
   }
 
   setPhysicsBody() {
-    this.physics.add.existing(this.mesh, { mass: 0 })
+    this.physics.add.box({
+      shape: 'box',
+      y: this.mesh.position.y - 0.51,
+      x: this.mesh.position.x,
+      z: this.mesh.position.z,
+      mass: 0,
+      width: 64,
+      depth: 64,
+      height: 1,
+      collisionFlags: 1,
+    })
   }
 }

@@ -285,7 +285,6 @@ export default class DicesHandler {
   }
 
   setDiceTopFaceHighlighter() {
-    console.log('diceFacesLayout: ', this.currentIntersect.name)
     if (this.currentIntersect.name.substring(0, 4) === 'Dice') {
       const diceModelNumber = this.currentIntersect.name.substring(4, 5)
       diceFacesLayout.style.opacity = 0.8

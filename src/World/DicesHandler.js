@@ -218,11 +218,10 @@ export default class DicesHandler {
 
   createDices() {
     const player = this.experience.world.players[this.playerId]
-
-    console.log('dicesHandler:isPlayerAtTurn ', player.isPlayerAtTurn)
     if (!player.isPlayerAtTurn) {
       return
     }
+
     this.diceGroup = new THREE.Group({ name: 'diceGroup' })
     this.diceGroup.name = 'diceGroup'
     this.dicesList = [

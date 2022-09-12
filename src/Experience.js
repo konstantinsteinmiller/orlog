@@ -44,7 +44,7 @@ export default class Experience {
     this.renderer = new Renderer()
     this.world = new World()
     this.physics = new AmmoPhysics(this.scene)
-    this.physics.debug.enable()
+    this.debug.isActive && this.physics.debug.enable()
 
     // this.client = new Client()
 

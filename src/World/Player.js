@@ -35,13 +35,13 @@ export default class Player {
       this.debugFolder.add(this.debug, 'faithTokenAmount', 1, 20, 1)
     }
 
-    setTimeout(() => {
-      this.destroyLifeStones(3)
-    }, 2500)
-
-    setTimeout(() => {
-      this.destroyFaithTokens(3)
-    }, 5700)
+    // setTimeout(() => {
+    //   this.destroyLifeStones(3)
+    // }, 2500)
+    //
+    // setTimeout(() => {
+    //   this.destroyFaithTokens(3)
+    // }, 5700)
   }
 
   init() {

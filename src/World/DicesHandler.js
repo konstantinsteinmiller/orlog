@@ -41,11 +41,11 @@ export default class DicesHandler {
     this.currentIntersect = null
     this.previousIntersect = null
 
-    this.isPlayerAtTurn = this.playerId === GAME_PLAYER_TYPES.GAME_PLAYER_TYPE_PLAYER && isPlayer
+    this.isPlayerAtTurn = null /*this.playerId === GAME_PLAYER_TYPES.GAME_PLAYER_TYPE_PLAYER && isPlayer*/
 
     // init code
-    this.isPlayerAtTurn && this.createDices()
-
+    // this.createDices()
+    //
     // Debug
     if (this.debug.isActive && !this.isPlayer) {
       this.debugFolder = this.debug.ui.addFolder('dices')
@@ -217,6 +217,12 @@ export default class DicesHandler {
   }
 
   createDices() {
+    const player = this.experience.world.players[this.playerId]
+
+    console.log('dicesHandler:isPlayerAtTurn ', player.isPlayerAtTurn)
+    if (!player.isPlayerAtTurn) {
+      return
+    }
     this.diceGroup = new THREE.Group({ name: 'diceGroup' })
     this.diceGroup.name = 'diceGroup'
     this.dicesList = [

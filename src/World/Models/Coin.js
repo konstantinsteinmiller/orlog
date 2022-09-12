@@ -58,13 +58,13 @@ export default class {
 
   flipCoin() {
     const flipInterval = setInterval(() => {
-      if (this.mesh.position.y < 0.3) {
+      if (this.mesh.position.y < 0.5) {
         this.mesh.body.setAngularVelocity(0, 0, 0)
         this.mesh.body.setVelocity(0, 0, 0)
         clearInterval(flipInterval)
         setTimeout(() => {
           this.moveCoinToStartingPlayer()
-        }, 200)
+        }, 1000)
       }
     }, 50)
   }
@@ -114,6 +114,9 @@ export default class {
         firstPlayer.isPlayerAtTurn = isAxesUp
         const secondPlayer = world.players[world.orderedPlayerIds[1]]
         secondPlayer.isPlayerAtTurn = !isAxesUp
+        console.log('firstPlayer: ', firstPlayer)
+        firstPlayer.dicesHandler.createDices()
+        secondPlayer.dicesHandler.createDices()
       })
   }
 }

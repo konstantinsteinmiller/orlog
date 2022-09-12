@@ -35,6 +35,7 @@ export default class StrategyManager {
     let unselectedDices = 6
     let collectedAxes = 0
     let collectedArrows = 0
+    let enemyHands = 0
     this.dicesHandler.dicesList.forEach((dice) => {
       const diceHighlight = dice.highlightMesh
       if (diceHighlight.isPlaced) {
@@ -69,6 +70,7 @@ export default class StrategyManager {
     enemyPlayer.dicesHandler.dicesList.forEach((dice) => {
       dice.mesh.userData.upwardSymbol === GAME_SYMBOLS.AXE && enemyAxes++
       dice.mesh.userData.upwardSymbol === GAME_SYMBOLS.ARROW && enemyArrows++
+      dice.mesh.userData.upwardSymbol === GAME_SYMBOLS.HAND && enemyHands++
     })
 
     console.log('goldenDices: ', goldenDices.length)
@@ -82,11 +84,19 @@ export default class StrategyManager {
       this.addAvailableToSelectedDices(unselectedDices, targetList)
     }
 
+    if (handDices.length && enemyPlayer.lifeStones.length >= 2) {
+      targetList.push(arrowDices)
+    }
+
     // prefer collecting golden dices
     if (this.hasHighHP()) {
       // this.selectedDices.push(goldenDices)
 
       targetList.push(goldenDices)
+
+      if (handDices.length && enemyPlayer.faithTokens.length >= 2) {
+        targetList.push(handDices)
+      }
       if ((axesDices.length >= 2 && collectedAxes >= 1) || axesDices.length >= 3) {
         targetList.push(axesDices)
       }
@@ -101,13 +111,17 @@ export default class StrategyManager {
       // this.selectedDices.push(goldenDices)
       // this.selectedDices.push(axesDices)
       // this.selectedDices.push(arrowDices)
-      targetList.push(goldenDices, axesDices, arrowDices)
+
+      if (handDices.length && enemyPlayer.faithTokens.length >= 2) {
+        targetList.push(handDices)
+      }
+      targetList.push(goldenDices, axesDices, arrowDices, handDices)
       this.addAvailableToSelectedDices(unselectedDices, targetList)
     }
 
     // prefer collecting defence dices and attack dices and heals
     if (this.hasCritialHP()) {
-      targetList.push(shieldDices, helmDices, goldenDices)
+      targetList.push(shieldDices, helmDices, goldenDices, handDices, arrowDices, axesDices)
       this.addAvailableToSelectedDices(unselectedDices, targetList)
     }
 

@@ -82,11 +82,21 @@ export default class World {
     player.on(GAMES_PHASES.DICE_ROLL, () => {
       this.switchPlayerAtTurn()
       const player = this.getPlayerAtTurn()
+      console.log('player.dicesHandler.availableThrows: ', player.dicesHandler.availableThrows)
       if (player.dicesHandler.availableThrows === 3) {
         player.dicesHandler.createDices()
-      } else {
         player.dicesHandler.randomDiceThrow()
+      } else {
       }
+      player.dicesHandler.resetThrow()
+      player.dicesHandler.throwOnNextCycle = true
+      // setTimeout(() => {
+      //
+      // }, 1000)
+    })
+    player.on('dices-rebuild', () => {
+      const player = this.getPlayerAtTurn()
+      player.dicesHandler.randomDiceThrow()
     })
     player.on(GAMES_PHASES.FAITH_CASTING, () => {
       if (++this.playerDoneWithRollingAmount === 2) {

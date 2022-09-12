@@ -130,9 +130,10 @@ export default class {
     firstPlayer.isStartingPlayer = false
     secondPlayer.isStartingPlayer = true
 
-    firstPlayer.dicesHandler.createDices()
+    // firstPlayer.dicesHandler.createDices()
     secondPlayer.dicesHandler.createDices()
+    secondPlayer.dicesHandler.randomDiceThrow()
     // start AI
-    secondPlayer?.strategyManager?.addAssessDices()
+    // secondPlayer?.strategyManager?.addAssessDices()
   }
 }

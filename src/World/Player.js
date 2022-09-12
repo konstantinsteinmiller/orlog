@@ -59,6 +59,16 @@ export default class Player extends EventEmitter {
     this.lifeStones = [...Array(15).keys()].map((id) => new LifeStone(this.isPlayer, id, id * 0.1))
     this.faithTokens = [...Array(13).keys()].map((id) => new FaithToken(this.isPlayer, id, id * 0.2))
 
+    this.dicesHandler.on('finished-moving', () => {
+      console.log('finished-moving: ')
+      this.trigger(GAMES_PHASES.DICE_ROLL)
+      // setTimeout(() => this.dicesHandler.randomDiceThrow(), 300)
+    })
+    this.dicesHandler.on('dices-rebuild', () => {
+      console.log('dices-rebuild')
+      this.trigger('dices-rebuild')
+      // setTimeout(() => this.dicesHandler.randomDiceThrow(), 300)
+    })
     this.dicesHandler.on(GAMES_PHASES.DICE_ROLL, () => {
       this.trigger(GAMES_PHASES.DICE_ROLL)
     })

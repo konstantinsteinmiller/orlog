@@ -50,16 +50,17 @@ export default class DicesHandler extends EventEmitter {
       this.debugFolder.add(this, 'availableThrows', 1, 10, 1)
     }
 
-    this.input.on('dblclick', () => this.randomDiceThrow())
+    this.input.on('dblclick', () => this.moveSelectedDicesToEnemy())
     this.input.on('click', () => this.toggleDiceSelection())
   }
 
   destroy() {
-    this.input.off('dblclick', () => this.randomDiceThrow())
+    this.input.off('dblclick', () => this.moveSelectedDicesToEnemy())
     this.input.off('click', () => this.toggleDiceSelection())
   }
 
   moveSelectedDicesToEnemy() {
+    let firstDiceFinishedMoving = false
     this.dicesList.forEach((dice) => {
       const highlightMesh = dice.group.getObjectByName('diceHighlight')
 
@@ -114,9 +115,12 @@ export default class DicesHandler extends EventEmitter {
             ease: 'sine.out',
           }).then(() => {
             dice.toggleDice(false, false)
-            setTimeout(() => {
-              this.trigger(GAMES_PHASES.DICE_ROLL)
-            }, 500)
+            !firstDiceFinishedMoving &&
+              (firstDiceFinishedMoving = true) &&
+              setTimeout(() => {
+                firstDiceFinishedMoving = true
+                this.trigger('finished-moving')
+              }, 500)
           })
         })
       }
@@ -127,11 +131,12 @@ export default class DicesHandler extends EventEmitter {
   resetThrow() {
     this.moveSelectedDicesToEnemy()
 
+    let firstDiceRebuild = false
     /* for some weird reason ammo breaks when even one body is destroyed,
      * so we have to destroy each other dice and recreate them.
      * This might cause memory leaks!!!!!!!!!!! */
-    this.hasDestroyedBodies &&
-      this.dicesList.forEach((dice) => {
+    if (this.hasDestroyedBodies) {
+      this.dicesList.filter((dice) => {
         const highlightMesh = dice.group.getObjectByName('diceHighlight')
         if (!highlightMesh.isSelected) {
           this.physics.destroy(dice.group.body)
@@ -142,13 +147,16 @@ export default class DicesHandler extends EventEmitter {
             dice.setBody()
             dice.setCollisionHandler()
             this.diceMeshes = this.dicesList.map((dice) => dice.group.children[0])
-            // dice.group.body.setVelocity(Math.PI * 0.3 - 0.6, Math.PI * -0.2 - 0.3, Math.PI * -0.9 + 0.4)
-            // dice.group.body.setAngularVelocity(Math.PI * -4 + 4, Math.PI * -4 + 2, Math.PI * 3 - 2)
-
             this.setThrowVelocity(dice.group.body, dice)
+            !firstDiceRebuild &&
+              (firstDiceRebuild = true) &&
+              setTimeout(() => {
+                this.trigger('dices-rebuild')
+              }, 100)
           }, 500)
         }
       })
+    }
   }
 
   randomDiceThrow() {
@@ -160,7 +168,7 @@ export default class DicesHandler extends EventEmitter {
       return
     }
 
-    this.resetThrow()
+    // this.resetThrow()
     this.isThrowing = true
 
     this.world.disableDiceCollisonSound = false
@@ -262,7 +270,6 @@ export default class DicesHandler extends EventEmitter {
     ]
     this.diceMeshes = this.dicesList.map((dice) => dice.group.children[0])
     this.scene.add(this.diceGroup)
-    this.randomDiceThrow()
   }
 
   handleDiceHover() {
@@ -383,7 +390,7 @@ export default class DicesHandler extends EventEmitter {
       !this.didAllDicesStopMoving &&
       !this.isThrowing &&
       this.didStartThrowing &&
-      this.dicesList.every((dice) => dice.mesh.userData.isMoving === false)
+      this.dicesList.every((dice) => dice.mesh.userData.isMoving === false && dice.group.position.y < 0.5)
     ) {
       // alert('all dices stopped moving')
       console.log('ALL Dices stopped moving!!!!!!!!!!!!!')
@@ -452,11 +459,7 @@ export default class DicesHandler extends EventEmitter {
           isWithinRange(angularVelocity, -0.1, 0.1) && isWithinRange(velocity, -0.1, 0.1) && velocity !== 0
         if (didDiceStoppedMoving) {
           if (dice.group.position.y > 0.5 && this.didStartThrowing) {
-            dice.group.body.applyForce(
-              Math.random() * 5 - 2.5,
-              Math.random() * 5 - 2.5,
-              Math.random() * 5 - 2.5,
-            )
+            dice.group.body.applyForce(Math.random() * 5 - 2.5, Math.random() * 5, Math.random() * 5 - 2.5)
             console.log('dice.group.position.y: ', dice.group.position.y)
           } else {
             dice.mesh.userData.isMoving = !didDiceStoppedMoving

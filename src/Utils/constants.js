@@ -117,6 +117,13 @@ export const GAME_TYPES = {
 }
 
 export const GAME_PLAYER_TYPES = {
-  GAME_PLAYER_TYPE_PLAYER: 'GAME_PLAYER_TYPE_PLAYER',
-  GAME_PLAYER_TYPE_NPC: 'GAME_PLAYER_TYPE_NPC',
+  GAME_PLAYER_TYPE_PLAYER: 'PLAYER',
+  GAME_PLAYER_TYPE_NPC: 'NPC',
+}
+
+export const GAMES_PHASES = {
+  DICE_ROLL: 'dice-roll-phase',
+  FAITH_CASTING: 'faith-casting-phase',
+  DICE_RESOLVE: 'dice-resolve-phase',
+  FAITH_RESOLVE: 'faith-resolve-phase',
 }

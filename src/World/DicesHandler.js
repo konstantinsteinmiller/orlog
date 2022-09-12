@@ -1,10 +1,6 @@
 import Dice from '@/World/Models/Dice.js'
-import {
-  HIGHLIGHT_POSITION_MAP,
-  DICE_FACES_MAP,
-  ROTATION_FACE_MAP,
-  GAME_PLAYER_TYPES,
-} from '@/Utils/constants'
+import EventEmitter from '@/Utils/EventEmitter.js'
+import { HIGHLIGHT_POSITION_MAP, DICE_FACES_MAP, ROTATION_FACE_MAP, GAMES_PHASES } from '@/Utils/constants'
 import { isWithinRange } from '@/Utils/math'
 import { gsap as g } from 'gsap'
 import dice1Img from '/public/textures/dices/dice1.jpg'
@@ -15,8 +11,9 @@ import dice5Img from '/public/textures/dices/dice5.jpg'
 import dice6Img from '/public/textures/dices/dice6.jpg'
 const images = [dice1Img, dice2Img, dice3Img, dice4Img, dice5Img, dice6Img]
 
-export default class DicesHandler {
+export default class DicesHandler extends EventEmitter {
   constructor(playerId, isPlayer) {
+    super()
     this.experience = experience
     this.scene = this.experience.scene
     this.physics = this.experience.physics
@@ -36,6 +33,7 @@ export default class DicesHandler {
     this.availableThrows = 3
     this.isThrowing = false
     this.didAllDicesStopMoving = false
+    this.didStartThrowing = false
 
     this.rayCaster = new THREE.Raycaster()
     this.currentIntersect = null
@@ -44,7 +42,6 @@ export default class DicesHandler {
     this.isPlayerAtTurn = null /*this.playerId === GAME_PLAYER_TYPES.GAME_PLAYER_TYPE_PLAYER && isPlayer*/
 
     // init code
-    // this.createDices()
     //
     // Debug
     if (this.debug.isActive && !this.isPlayer) {
@@ -116,9 +113,10 @@ export default class DicesHandler {
             delay: 0,
             ease: 'sine.out',
           }).then(() => {
-            // dice.toggleHighlight()
-            highlightMesh.isSelected = !highlightMesh.isSelected
-            highlightMesh.isHighlighted = false
+            dice.toggleDice(false, false)
+            setTimeout(() => {
+              this.trigger(GAMES_PHASES.DICE_ROLL)
+            }, 500)
           })
         })
       }
@@ -154,6 +152,10 @@ export default class DicesHandler {
   }
 
   randomDiceThrow() {
+    if (this.dicesList.filter((dice) => dice.highlightMesh?.isPlaced)?.length === 6) {
+      this.trigger(GAMES_PHASES.FAITH_CASTING)
+      // this.world.nextPhase(GAMES_PHASES.FAITH_CASTING)
+    }
     if (this.availableThrows <= 0 || this.isThrowing) {
       return
     }
@@ -165,6 +167,7 @@ export default class DicesHandler {
     this.sounds.playDiceShakeSound()
     setTimeout(() => {
       /* pickup all not selected dices to rethrow them */
+      this.didStartThrowing = true
       this.dicesList.forEach((dice) => {
         const diceHighlight = dice?.group.getObjectByName('diceHighlight')
         if (!diceHighlight?.isSelected && !diceHighlight?.isPlaced) {
@@ -366,10 +369,44 @@ export default class DicesHandler {
     if (this.currentIntersect && !this.isThrowing) {
       const diceHighlightMesh = this.currentIntersect.parent.getObjectByName('diceHighlight')
       if (!diceHighlightMesh?.isPlaced) {
-        diceHighlightMesh.isSelected = !diceHighlightMesh.isSelected
-        diceHighlightMesh.isHighlighted = true
+        console.log('diceHighlightMesh.parent: ', this.currentIntersect)
+        this.dicesList.some((dice) => dice.mesh.name === this.currentIntersect.name && dice.toggleDice(true))
+        // diceHighlightMesh.isSelected = !diceHighlightMesh.isSelected
+        // diceHighlightMesh.isHighlighted = true
       }
     }
+  }
+
+  detectIfDicesStoppedMoving() {
+    if (
+      this.debug.isPhysicsDebugActive &&
+      !this.didAllDicesStopMoving &&
+      !this.isThrowing &&
+      this.didStartThrowing &&
+      this.dicesList.every((dice) => dice.mesh.userData.isMoving === false)
+    ) {
+      // alert('all dices stopped moving')
+      console.log('ALL Dices stopped moving!!!!!!!!!!!!!')
+      this.didAllDicesStopMoving = true
+      this.didStartThrowing = false
+      this.world.disableDiceCollisonSound = true
+      this.trigger('dices-stopped')
+      setTimeout(() => {
+        this.evaluateTopFace()
+        this.trigger('faces-evaluated')
+        if (this.availableThrows === 0) {
+          this.dicesList.forEach((dice) => {
+            const diceHighlightMesh = dice.group.getObjectByName('diceHighlight')
+            if (!diceHighlightMesh.isSelected && !diceHighlightMesh.isPlaced) {
+              diceHighlightMesh.isSelected = true
+            }
+          })
+          this.moveSelectedDicesToEnemy()
+        }
+      }, 700)
+      return true
+    }
+    return false
   }
 
   update() {
@@ -414,35 +451,23 @@ export default class DicesHandler {
         const didDiceStoppedMoving =
           isWithinRange(angularVelocity, -0.1, 0.1) && isWithinRange(velocity, -0.1, 0.1) && velocity !== 0
         if (didDiceStoppedMoving) {
-          dice.mesh.userData.isMoving = !didDiceStoppedMoving
+          if (dice.group.position.y > 0.5 && this.didStartThrowing) {
+            dice.group.body.applyForce(
+              Math.random() * 5 - 2.5,
+              Math.random() * 5 - 2.5,
+              Math.random() * 5 - 2.5,
+            )
+            console.log('dice.group.position.y: ', dice.group.position.y)
+          } else {
+            dice.mesh.userData.isMoving = !didDiceStoppedMoving
+          }
         }
         return didDiceStoppedMoving
       })
 
-    if (
-      this.debug.isPhysicsDebugActive &&
-      !this.didAllDicesStopMoving &&
-      !this.isThrowing &&
-      this.dicesList.every((dice) => dice.mesh.userData.isMoving === false)
-    ) {
-      // alert('all dices stopped moving')
-      // console.log('ALL Dices stopped moving!!!!!!!!!!!!!')
-      this.didAllDicesStopMoving = true
-      this.world.disableDiceCollisonSound = true
-      setTimeout(() => {
-        this.evaluateTopFace()
-        if (this.availableThrows === 0) {
-          this.dicesList.forEach((dice) => {
-            const diceHighlightMesh = dice.group.getObjectByName('diceHighlight')
-            if (!diceHighlightMesh.isSelected && !diceHighlightMesh.isPlaced) {
-              diceHighlightMesh.isSelected = true
-            }
-          })
-          this.moveSelectedDicesToEnemy()
-        }
-      }, 700)
-    }
+    this.detectIfDicesStoppedMoving()
 
+    /* enable hovering over dices as all faces are evaluated */
     this.dicesList.every((dice) => dice.mesh?.userData?.upwardFace !== undefined) && this.handleDiceHover()
   }
 }

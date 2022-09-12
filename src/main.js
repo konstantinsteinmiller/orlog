@@ -1,7 +1,7 @@
 import './app.css'
 import './style.scss'
 
-import backgroundTrack from '/public/sounds/price-of-freedom-short.ogg'
+import backgroundMusicTrack from '/public/sounds/background-music-track.ogg'
 import Experience from '@/Experience.js'
 import { PhysicsLoader } from 'enable3d/dist/index'
 import MainMenu from './Menus/MainMenu'
@@ -85,7 +85,7 @@ window.onload = () => {
   const playBackgroundMusic = () => {
     if (hasInteracted && !isPlaying) {
       isPlaying = true
-      backgroundMusicId.src = backgroundTrack
+      backgroundMusicId.src = backgroundMusicTrack
 
       musicVolumeId.value = parseFloat(getStorage(GAME_BACKGROUND_VOLUME, true) || 0.02) ?? 0.02
 

@@ -2,7 +2,7 @@ import Environment from '@/World/Environment.js'
 import Floor from '@/World/Models/Floor.js'
 import Player from '@/World/Player.js'
 import Coin from '@/World/Models/Coin.js'
-import { GAME_TYPES, GAME_PLAYER_TYPES } from '@/Utils/constants.js'
+import { GAME_TYPES, GAME_PLAYER_TYPES, GAMES_PHASES } from '@/Utils/constants.js'
 
 export default class World {
   constructor() {
@@ -20,6 +20,8 @@ export default class World {
     const direction = this.isPlayer ? 1 : -1
     this.midZOffset = 5
     this.offsetDirection = direction
+
+    this.playerDoneWithRollingAmount = 0
 
     // const axisHelper = new THREE.AxesHelper(3)
     // this.scene.add(axisHelper)
@@ -57,10 +59,45 @@ export default class World {
     }
   }
 
+  getPlayer(playerIndex) {
+    return this.players[this.orderedPlayerIds[playerIndex]]
+  }
+
+  // find the player that is not at turn and give turn to him
+  switchPlayerAtTurn() {
+    Object.values(this.players).forEach((player) => {
+      player.isPlayerAtTurn = !player.isPlayerAtTurn
+    })
+  }
+
+  getPlayerAtTurn() {
+    return Object.values(this.players).find((player) => player.isPlayerAtTurn)
+  }
+
   createPlayer(playerId, isPlayer) {
-    this.players[playerId] = new Player(playerId, !!isPlayer)
+    const player = new Player(playerId, !!isPlayer)
+    this.players[playerId] = player
     this.orderedPlayerIds.push(playerId)
-    return this.players[playerId]
+
+    player.on(GAMES_PHASES.DICE_ROLL, () => {
+      this.switchPlayerAtTurn()
+      const player = this.getPlayerAtTurn()
+      if (player.dicesHandler.availableThrows === 3) {
+        player.dicesHandler.createDices()
+      } else {
+        player.dicesHandler.randomDiceThrow()
+      }
+    })
+    player.on(GAMES_PHASES.FAITH_CASTING, () => {
+      if (++this.playerDoneWithRollingAmount === 2) {
+        const player = this.getPlayer(0)
+        player?.isStartingPlayer && player.startFaithSelection()
+      }
+    })
+    player.on(GAMES_PHASES.DICE_RESOLVE, () => {})
+    player.on(GAMES_PHASES.FAITH_RESOLVE, () => {})
+
+    return player
   }
 
   update() {

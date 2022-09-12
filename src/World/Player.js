@@ -1,11 +1,15 @@
+import StrategyManager from '@/World/StrategyManager.js'
+import EventEmitter from '@/Utils/EventEmitter.js'
 import DicesHandler from '@/World/DicesHandler.js'
 import Bowl from '@/World/Models/Bowl.js'
 import LifeStone from '@/World/Models/LifeStone.js'
 import FaithToken from '@/World/Models/FaithToken.js'
 import Experience from '@/Experience.js'
+import { GAME_PLAYER_TYPES, GAMES_PHASES } from '@/Utils/constants.js'
 
-export default class Player {
+export default class Player extends EventEmitter {
   constructor(playerId, isPlayer) {
+    super()
     this.experience = new Experience()
     this.debug = this.experience.debug
 
@@ -13,6 +17,8 @@ export default class Player {
     this.isPlayer = !!isPlayer
     this.lifeStones = []
     this.faithTokens = []
+    this.isPlayerAtTurn = null
+    this.isStartingPlayer = null
 
     this.init()
 
@@ -46,9 +52,25 @@ export default class Player {
 
   init() {
     this.dicesHandler = new DicesHandler(this.playerId, this.isPlayer)
+    if (!this.isPlayer && this.playerId === GAME_PLAYER_TYPES.GAME_PLAYER_TYPE_NPC) {
+      this.strategyManager = new StrategyManager(this)
+    }
     new Bowl(this.isPlayer)
     this.lifeStones = [...Array(15).keys()].map((id) => new LifeStone(this.isPlayer, id, id * 0.1))
     this.faithTokens = [...Array(13).keys()].map((id) => new FaithToken(this.isPlayer, id, id * 0.2))
+
+    this.dicesHandler.on(GAMES_PHASES.DICE_ROLL, () => {
+      this.trigger(GAMES_PHASES.DICE_ROLL)
+    })
+    this.dicesHandler.on(GAMES_PHASES.FAITH_CASTING, () => {
+      this.trigger(GAMES_PHASES.FAITH_CASTING)
+    })
+    this.dicesHandler.on(GAMES_PHASES.DICE_RESOLVE, () => {
+      this.trigger(GAMES_PHASES.DICE_RESOLVE)
+    })
+    this.dicesHandler.on(GAMES_PHASES.FAITH_RESOLVE, () => {
+      this.trigger(GAMES_PHASES.FAITH_RESOLVE)
+    })
   }
 
   destroyLifeStones(amount) {
@@ -65,6 +87,10 @@ export default class Player {
       faithToken?.destroyFaithToken(200 * index)
       faithToken = null
     })
+  }
+
+  startFaithSelection() {
+    console.log('startFaithSelection: ')
   }
 
   update() {

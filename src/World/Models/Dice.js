@@ -161,4 +161,13 @@ export default class Dice {
       }
     })
   }
+
+  toggleDice(doHighLight = false, selection) {
+    if (selection !== undefined) {
+      this.highlightMesh.isSelected = selection
+    } else {
+      this.highlightMesh.isSelected = !this.highlightMesh.isSelected
+    }
+    this.highlightMesh.isHighlighted = doHighLight
+  }
 }

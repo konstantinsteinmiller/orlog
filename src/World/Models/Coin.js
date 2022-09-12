@@ -106,13 +106,33 @@ export default class {
         })
       })
       .then(() => {
-        const world = this.experience.world
-        const firstPlayer = world.players[world.orderedPlayerIds[0]]
-        firstPlayer.isPlayerAtTurn = isAxesUp
-        const secondPlayer = world.players[world.orderedPlayerIds[1]]
-        secondPlayer.isPlayerAtTurn = !isAxesUp
-        firstPlayer.dicesHandler.createDices()
-        secondPlayer.dicesHandler.createDices()
+        // const world = this.experience.world
+        // const firstPlayer = world.players[world.orderedPlayerIds[0]]
+        // const secondPlayer = world.players[world.orderedPlayerIds[1]]
+        // firstPlayer.isPlayerAtTurn = isAxesUp
+        // secondPlayer.isPlayerAtTurn = !isAxesUp
+        // firstPlayer.isStartingPlayer = isAxesUp
+        // secondPlayer.isStartingPlayer = !isAxesUp
+        //
+        // firstPlayer.dicesHandler.createDices()
+        // secondPlayer.dicesHandler.createDices()
+        // // start AI
+        // secondPlayer?.strategyManager?.addAssessDices()
       })
+
+    const world = this.experience.world
+    const firstPlayer = world.players[world.orderedPlayerIds[0]]
+    const secondPlayer = world.players[world.orderedPlayerIds[1]]
+    // firstPlayer.isPlayerAtTurn = isAxesUp
+    // secondPlayer.isPlayerAtTurn = !isAxesUp
+    firstPlayer.isPlayerAtTurn = false
+    secondPlayer.isPlayerAtTurn = true
+    firstPlayer.isStartingPlayer = false
+    secondPlayer.isStartingPlayer = true
+
+    firstPlayer.dicesHandler.createDices()
+    secondPlayer.dicesHandler.createDices()
+    // start AI
+    secondPlayer?.strategyManager?.addAssessDices()
   }
 }

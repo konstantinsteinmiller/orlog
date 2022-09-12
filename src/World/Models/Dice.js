@@ -134,10 +134,7 @@ export default class Dice {
 
   setCollisionHandler() {
     this.group.body.on.collision((otherObject, event) => {
-      if (
-        this.experience.world?.dicesHandler?.disableDiceCollisonSound === false &&
-        otherObject.name === 'bowl2'
-      ) {
+      if (this.experience.world?.disableDiceCollisonSound === false && otherObject.name === 'bowl2') {
         if (!this.isPlayingCollisionSound) {
           this.sounds.playSound(['diceHit1', 'diceHit2', 'diceHit3'], true, 0.2, 0.5)
           this.isPlayingCollisionSound = true

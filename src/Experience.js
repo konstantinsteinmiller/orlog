@@ -50,7 +50,7 @@ export default class Experience {
       this.client = new Client()
     }
 
-    // Resize event
+    // Resize eventnpm ru
     this.sizes.on('resize', () => {
       this.resize()
     })

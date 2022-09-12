@@ -18,12 +18,13 @@ const images = [dice1Img, dice2Img, dice3Img, dice4Img, dice5Img, dice6Img]
 export default class DicesHandler {
   constructor(playerId, isPlayer) {
     this.experience = experience
-    this.scene = experience.scene
-    this.physics = experience.physics
-    this.debug = experience.debug
-    this.input = experience.input
-    this.sounds = experience.sounds
-    this.camera = experience.camera.instance
+    this.scene = this.experience.scene
+    this.physics = this.experience.physics
+    this.debug = this.experience.debug
+    this.input = this.experience.input
+    this.sounds = this.experience.sounds
+    this.camera = this.experience.camera.instance
+    this.world = this.experience.world
 
     this.playerId = playerId
     this.isPlayer = isPlayer
@@ -35,7 +36,6 @@ export default class DicesHandler {
     this.availableThrows = 3
     this.isThrowing = false
     this.didAllDicesStopMoving = false
-    this.disableDiceCollisonSound = false
 
     this.rayCaster = new THREE.Raycaster()
     this.currentIntersect = null
@@ -160,7 +160,8 @@ export default class DicesHandler {
 
     this.resetThrow()
     this.isThrowing = true
-    this.disableDiceCollisonSound = false
+
+    this.world.disableDiceCollisonSound = false
     this.sounds.playDiceShakeSound()
     setTimeout(() => {
       /* pickup all not selected dices to rethrow them */
@@ -427,7 +428,7 @@ export default class DicesHandler {
       // alert('all dices stopped moving')
       // console.log('ALL Dices stopped moving!!!!!!!!!!!!!')
       this.didAllDicesStopMoving = true
-      this.disableDiceCollisonSound = true
+      this.world.disableDiceCollisonSound = true
       setTimeout(() => {
         this.evaluateTopFace()
         if (this.availableThrows === 0) {

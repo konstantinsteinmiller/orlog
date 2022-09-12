@@ -1,6 +1,9 @@
 import EventEmitter from '@/Utils/EventEmitter.js'
 import { getStorage, setStorage } from '@/Utils/storage.js'
-import { GAME_SOUND_EFFECT_VOLUME } from '@/Utils/constants.js'
+import {
+  GAME_BACKGROUND_VOLUME,
+  GAME_SOUND_EFFECT_VOLUME,
+} from '@/Utils/constants.js';
 
 export default class MainMenu extends EventEmitter {
   constructor(isLoadingPhysics) {
@@ -171,6 +174,8 @@ export default class MainMenu extends EventEmitter {
       if (document[hidden]) {
         backgroundMusicId.pause()
       } else {
+        backgroundMusicId.loop = true
+        backgroundMusicId.volume = parseFloat(getStorage(GAME_BACKGROUND_VOLUME, true) || 0.02) ?? 0.02
         backgroundMusicId.play()
       }
     }
@@ -206,7 +211,7 @@ export default class MainMenu extends EventEmitter {
   }
 
   setSoundEffectVolume() {
-    this.soundEffectsVolume = parseFloat(getStorage(GAME_SOUND_EFFECT_VOLUME, true)) ?? 1.0
+    this.soundEffectsVolume = parseFloat(getStorage(GAME_SOUND_EFFECT_VOLUME, true)) ?? 0.5
     soundEffectsVolumeId.value = this.soundEffectsVolume
     soundEffectsVolumeId.onchange = (value) => {
       this.soundEffectsVolume = parseFloat(value.target.value)

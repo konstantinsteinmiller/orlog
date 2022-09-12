@@ -1,9 +1,6 @@
 import Experience from '@/Experience.js'
 import { isWithinRange } from '@/Utils/math.js'
 import { gsap as g } from 'gsap'
-// CSG
-import { CSG } from '@enable3d/three-graphics/jsm/csg'
-import { lessThan } from 'three/examples/jsm/nodes/shadernode/ShaderNodeBaseElements.js'
 
 export default class {
   constructor() {
@@ -74,14 +71,14 @@ export default class {
       isWithinRange(this.mesh.body.rotation.x, -0.1, 0.1) ||
       isWithinRange(this.mesh.body.rotation.x, Math.PI * 2 - 0.1, Math.PI * 2 + 0.1)
 
-    isAxesUp ? console.log('AXES UP - Player One starts') : console.log('ARROWS up - Player Two starts')
+    // isAxesUp ? console.log('AXES UP - Player One starts') : console.log('ARROWS up - Player Two starts')
 
     const direction = isAxesUp ? 1 : -1
     const angularDirection = isAxesUp ? 1 : -2
 
     this.mesh.body.setCollisionFlags(2)
     this.physics.destroy(this.mesh.body)
-    // this.mesh.position.set(-5, 1.3, 2 * direction)
+
     g.to(this.mesh.rotation, {
       x: (Math.PI + Math.PI * angularDirection) * direction,
       y: 0,
@@ -114,7 +111,6 @@ export default class {
         firstPlayer.isPlayerAtTurn = isAxesUp
         const secondPlayer = world.players[world.orderedPlayerIds[1]]
         secondPlayer.isPlayerAtTurn = !isAxesUp
-        console.log('firstPlayer: ', firstPlayer)
         firstPlayer.dicesHandler.createDices()
         secondPlayer.dicesHandler.createDices()
       })

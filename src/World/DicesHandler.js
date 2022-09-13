@@ -64,17 +64,9 @@ export default class DicesHandler extends EventEmitter {
       this.debugFolder.close()
     }
 
-    this.isWaitingToFinishRound = false
-    this.input.on('dblclick', () => {
-      // console.log(
-      //   'this.playerId === getStorage(GAME_PLAYER_ID, true): ',
-      //   this.dicesList.every((dice) => {
-      //     console.log('dice.highlightMesh.isSelected: ', !dice.highlightMesh.isSelected)
-      //     return !dice.highlightMesh.isSelected
-      //   }),
-      //   this.playerId,
-      //   this.world.getPlayerAtTurn().playerId,
-      // )
+    // this.isWaitingToFinishRound = false
+    this.input.on('dblclick', () =>
+      /*{
       console.log(
         'this.playerId, getStorage(GAME_PLAYER_ID, true): ',
         this.playerId,
@@ -111,7 +103,8 @@ export default class DicesHandler extends EventEmitter {
       ) {
         this.moveSelectedDicesToEnemy()
       }
-    })
+    }*/ this.moveSelectedDicesToEnemy(),
+    )
     this.input.on('click', () => this.toggleDiceSelection())
   }
 
@@ -127,8 +120,9 @@ export default class DicesHandler extends EventEmitter {
   moveSelectedDicesToEnemy() {
     this.rearrangePlacedDices()
 
+    const otherPlayer = this.world.getPlayerAtTurn(true)
     let firstDiceFinishedMoving = false
-    this.dicesList.forEach((dice, index) => {
+    otherPlayer.dicesHandler.dicesList.concat(this.dicesList).forEach((dice, index) => {
       const highlightMesh = dice.group.getObjectByName('diceHighlight')
 
       if (highlightMesh.isSelected && !highlightMesh.isPlaced) {

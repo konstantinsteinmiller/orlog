@@ -34,6 +34,7 @@ export default class Debug {
       this.ui = new gui.GUI()
       this.debugFolter = this.ui.addFolder('physics')
       this.debugFolter.add(this, 'togglePhysicsDebug').name('Toggle physics debug')
+      this.ui.close()
 
       setTimeout(() => {
         this.input = this.experience.input

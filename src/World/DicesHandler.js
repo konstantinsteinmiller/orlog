@@ -95,7 +95,7 @@ export default class DicesHandler extends EventEmitter {
             x: fromRotation.x,
             y: fromRotation.y,
             z: fromRotation.z,
-            duration: 2,
+            duration: 1.7,
             ease: 'sine.out',
             delay: 0,
           },
@@ -103,7 +103,7 @@ export default class DicesHandler extends EventEmitter {
             x: toRotation.x,
             y: toRotation.y,
             z: toRotation.z,
-            duration: 1.8,
+            duration: 1.5,
             ease: 'sine.out',
             delay: index * 0.7,
           },
@@ -112,14 +112,21 @@ export default class DicesHandler extends EventEmitter {
         g.to(dice.group.position, {
           motionPath: {
             path: [
-              { x: dice.group.position.x, y: dice.group.position.y, z: dice.group.position.z },
-              { y: 2.5, z: this.offsetDirection * (this.midZOffset - 0.6) },
+              { x: dice.group.position.x, y: dice.group.position.y - 3, z: dice.group.position.z },
+              { x: dice.group.position.x, y: dice.group.position.y - 3, z: dice.group.position.z },
+              { y: 2.5, z: this.offsetDirection * (this.midZOffset - 0.6) }, //ANCHOR
+              { y: 2.5, z: this.offsetDirection * (this.midZOffset - 0.8) }, //control
+              { y: 2.5, z: this.offsetDirection * (this.midZOffset - 1.0) }, //control
+              { y: 1.25, z: this.offsetDirection * (this.midZOffset - 2.6) }, //ANCHOR
+              { y: 1.25, z: this.offsetDirection * (this.midZOffset - 2.4) }, //control
+              { y: 1.25, z: this.offsetDirection * (this.midZOffset - 2.4) }, //control
               { x: offsetX, y: dice.scale, z: this.offsetDirection * (this.midZOffset - 4) },
             ],
-            curviness: 2,
+            curviness: 1.3,
+            // type: 'cubic',
           },
-          duration: 4.5,
-          delay: index * 0.5,
+          duration: 3.5,
+          delay: index * 0.8,
         }).then(() => {
           dice.toggleDice(false, false)
           !firstDiceFinishedMoving &&
@@ -156,7 +163,13 @@ export default class DicesHandler extends EventEmitter {
           dice.group.clear()
           this.scene.remove(dice.group)
           setTimeout(() => {
-            dice.setMesh()
+            dice.setMesh(
+              new THREE.Vector3(
+                dice.modelNumber * 2,
+                -dice.modelNumber * 2 - 2,
+                this.offsetDirection * (dice.modelNumber * 2 + 1),
+              ),
+            )
             dice.setBody()
             dice.setCollisionHandler()
             this.diceMeshes = this.dicesList.map((dice) => dice.group.children[0])

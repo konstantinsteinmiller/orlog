@@ -42,7 +42,14 @@ export default class Dice {
 
     this.resource = this.resources.items[`diceModel${this.modelNumber}`]
 
-    this.setMesh()
+    // place dices under the board to hide them from falling before throw
+    this.setMesh(
+      new THREE.Vector3(
+        this.modelNumber * 2,
+        -this.modelNumber * 2 - 2,
+        this.offsetDirection * (this.modelNumber * 2 + 1),
+      ),
+    )
     this.setBody()
     this.setCollisionHandler()
   }
@@ -97,7 +104,7 @@ export default class Dice {
     this.highlightMesh.material.opacity = this.highlightMesh.material.opacity === 0 ? 0.8 : 0
   }
 
-  setMesh() {
+  setMesh(customPosition) {
     this.mesh = this.resource.scene.children[0].clone(true)
     this.mesh.castShadow = true
     this.mesh.receiveShadow = true
@@ -108,7 +115,11 @@ export default class Dice {
     const group = this.createSideDetectorCubes(this.mesh)
     this.group = group
     group.scale.set(this.scale, this.scale, this.scale)
-    group.position.copy(this.position)
+    if (customPosition) {
+      group.position.copy(customPosition)
+    } else {
+      group.position.copy(this.position)
+    }
 
     const randomRotationX = Math.random() * PI * 2
     const randomRotationY = Math.random() * PI * 2

@@ -44,13 +44,7 @@ export default class StrategyManager {
         unselectedDices--
         return
       }
-      // console.log(
-      //   'dice.mesh.userData: ',
-      //   dice.mesh,
-      //   dice.mesh.userData,
-      //   dice.mesh.userData.upwardSymbol,
-      //   `${dice.mesh.userData.isGoldenSymbol ? 'isGolden' : ''}`,
-      // )
+
       dice.mesh.userData.isGoldenSymbol && goldenDices.push(dice)
       dice.mesh.userData.upwardSymbol === GAME_SYMBOLS.AXE && axesDices.push(dice)
       dice.mesh.userData.upwardSymbol === GAME_SYMBOLS.ARROW && arrowDices.push(dice)
@@ -63,17 +57,16 @@ export default class StrategyManager {
       this.world.players[
         Object.keys(this.world.players).find((playerId) => playerId !== this.player.playerId)
       ]
-    console.log('enemyPlayer: ', enemyPlayer)
+
     let enemyAxes = 0
     let enemyArrows = 0
-    console.log('enemyAxes, enemyArrows: ', enemyAxes, enemyArrows)
+
     enemyPlayer.dicesHandler.dicesList.forEach((dice) => {
       dice.mesh.userData.upwardSymbol === GAME_SYMBOLS.AXE && enemyAxes++
       dice.mesh.userData.upwardSymbol === GAME_SYMBOLS.ARROW && enemyArrows++
       dice.mesh.userData.upwardSymbol === GAME_SYMBOLS.HAND && enemyHands++
     })
 
-    console.log('goldenDices: ', goldenDices.length)
     let targetList = []
     if (enemyAxes > 0) {
       targetList.push(axesDices)
@@ -108,10 +101,6 @@ export default class StrategyManager {
 
     // prefer collecting attack dices and golden
     if (this.hasMediumHP()) {
-      // this.selectedDices.push(goldenDices)
-      // this.selectedDices.push(axesDices)
-      // this.selectedDices.push(arrowDices)
-
       if (handDices.length && enemyPlayer.faithTokens.length >= 2) {
         targetList.push(handDices)
       }
@@ -129,14 +118,14 @@ export default class StrategyManager {
 
     setTimeout(() => {
       this.selectDices()
-    }, 3000)
+    }, 2000)
   }
 
   addAvailableToSelectedDices(unselectedDices, listOfDicesList) {
     let currentList = null
     while (unselectedDices > 0) {
       if (currentList?.length > 0) {
-        console.log('add dice to selection', unselectedDices)
+        // console.log('add dice to selection', unselectedDices)
         this.selectedDices.push(currentList.shift())
         unselectedDices--
       }
@@ -146,7 +135,7 @@ export default class StrategyManager {
         unselectedDices = 0
       }
     }
-    console.log('this.selectedDices, listOfDicesList: ', this.selectedDices, listOfDicesList)
+    // console.log('this.selectedDices, listOfDicesList: ', this.selectedDices, listOfDicesList)
   }
 
   selectDices() {
@@ -155,7 +144,7 @@ export default class StrategyManager {
     })
     setTimeout(() => {
       this.moveDicesToEnemy()
-    }, 1500)
+    }, 1000)
   }
 
   moveDicesToEnemy() {

@@ -5,6 +5,7 @@ export default class Dice {
   constructor(
     group = null,
     isPlayer = false,
+    playerId,
     model = 1,
     position = new THREE.Vector3(0, 0, 0),
     rotation = new THREE.Vector3(0, 0, 0),
@@ -17,6 +18,7 @@ export default class Dice {
     this.resources = this.experience.resources
 
     this.isPlayer = isPlayer
+    this.playerId = playerId
     this.midZOffset = this.isPlayer ? 5 : 5
     this.offsetDirection = this.isPlayer ? 1 : -1
 
@@ -101,6 +103,7 @@ export default class Dice {
     this.mesh.receiveShadow = true
     this.mesh.name = `Dice${this.modelNumber}Mesh`
     this.mesh.identifier = 'mainMesh'
+    this.mesh.userData.playerId = this.playerId
 
     const group = this.createSideDetectorCubes(this.mesh)
     this.group = group

@@ -24,7 +24,7 @@ export default class Player extends EventEmitter {
 
     // Debug
     if (this.debug.isActive && !this.isPlayer) {
-      this.debugFolder = this.debug.ui.addFolder('world')
+      this.debugFolder = this.debug.ui.addFolder('player')
       this.debugFolder
         .addColor(this.lifeStones[0].highlightMesh.material, 'color')
         .name('color of the lifeStone highlight')
@@ -39,6 +39,7 @@ export default class Player extends EventEmitter {
       this.debugFolder.add(this.debug, 'lifeStoneAmount', 1, 20, 1)
       this.debugFolder.add(this, 'destroyFaithTokens')
       this.debugFolder.add(this.debug, 'faithTokenAmount', 1, 20, 1)
+      this.debugFolder.close()
     }
 
     // setTimeout(() => {
@@ -59,25 +60,30 @@ export default class Player extends EventEmitter {
     this.lifeStones = [...Array(15).keys()].map((id) => new LifeStone(this.isPlayer, id, id * 0.1))
     this.faithTokens = [...Array(13).keys()].map((id) => new FaithToken(this.isPlayer, id, id * 0.2))
 
-    this.dicesHandler.on('finished-moving', () => {
-      console.log('finished-moving: ')
+    this.dicesHandler.on('finished-moving-dices-to-enemy', () => {
+      if (this.dicesHandler.dicesList.every((dice) => dice.highlightMesh?.isPlaced)) {
+        this.dicesHandler.availableThrows = 0
+        this.trigger(GAMES_PHASES.FAITH_CASTING)
+      }
       this.trigger(GAMES_PHASES.DICE_ROLL)
-      // setTimeout(() => this.dicesHandler.randomDiceThrow(), 300)
     })
+
     this.dicesHandler.on('dices-rebuild', () => {
-      console.log('dices-rebuild')
       this.trigger('dices-rebuild')
-      // setTimeout(() => this.dicesHandler.randomDiceThrow(), 300)
     })
+
     this.dicesHandler.on(GAMES_PHASES.DICE_ROLL, () => {
       this.trigger(GAMES_PHASES.DICE_ROLL)
     })
+
     this.dicesHandler.on(GAMES_PHASES.FAITH_CASTING, () => {
       this.trigger(GAMES_PHASES.FAITH_CASTING)
     })
+
     this.dicesHandler.on(GAMES_PHASES.DICE_RESOLVE, () => {
       this.trigger(GAMES_PHASES.DICE_RESOLVE)
     })
+
     this.dicesHandler.on(GAMES_PHASES.FAITH_RESOLVE, () => {
       this.trigger(GAMES_PHASES.FAITH_RESOLVE)
     })
@@ -100,7 +106,7 @@ export default class Player extends EventEmitter {
   }
 
   startFaithSelection() {
-    console.log('startFaithSelection: ')
+    console.log('startFaithSelection: ', this.playerId)
   }
 
   update() {

@@ -1,11 +1,13 @@
 import Experience from '@/Experience.js'
 import { isWithinRange } from '@/Utils/math.js'
 import { gsap as g } from 'gsap'
+import { GAMES_PHASES } from '@/Utils/constants.js'
 
 export default class {
   constructor() {
     this.experience = new Experience()
     this.resources = this.experience.resources
+    this.world = this.experience.world
     this.physics = this.experience.physics
     this.scene = this.experience.scene
 
@@ -106,34 +108,36 @@ export default class {
         })
       })
       .then(() => {
-        // const world = this.experience.world
-        // const firstPlayer = world.players[world.orderedPlayerIds[0]]
-        // const secondPlayer = world.players[world.orderedPlayerIds[1]]
-        // firstPlayer.isPlayerAtTurn = isAxesUp
-        // secondPlayer.isPlayerAtTurn = !isAxesUp
-        // firstPlayer.isStartingPlayer = isAxesUp
-        // secondPlayer.isStartingPlayer = !isAxesUp
-        //
-        // firstPlayer.dicesHandler.createDices()
-        // secondPlayer.dicesHandler.createDices()
-        // // start AI
-        // secondPlayer?.strategyManager?.addAssessDices()
+        if (!this.experience.debug.isActive) {
+          this.defineStartingPlayerAndStartDiceRolls(isAxesUp)
+        }
       })
 
+    /* this is just for development reasons,
+     * clear and put into then block for live version */
+    if (this.experience.debug.isActive) {
+      this.defineStartingPlayerAndStartDiceRolls(isAxesUp, (firstPlayer, secondPlayer) => {
+        firstPlayer.isPlayerAtTurn = true
+        secondPlayer.isPlayerAtTurn = false
+        firstPlayer.isStartingPlayer = false
+        secondPlayer.isStartingPlayer = true
+      })
+    }
+  }
+
+  defineStartingPlayerAndStartDiceRolls(isAxesUp, customStartCallback) {
     const world = this.experience.world
     const firstPlayer = world.players[world.orderedPlayerIds[0]]
     const secondPlayer = world.players[world.orderedPlayerIds[1]]
-    // firstPlayer.isPlayerAtTurn = isAxesUp
-    // secondPlayer.isPlayerAtTurn = !isAxesUp
-    firstPlayer.isPlayerAtTurn = false
-    secondPlayer.isPlayerAtTurn = true
-    firstPlayer.isStartingPlayer = false
-    secondPlayer.isStartingPlayer = true
-
-    // firstPlayer.dicesHandler.createDices()
-    secondPlayer.dicesHandler.createDices()
-    secondPlayer.dicesHandler.randomDiceThrow()
-    // start AI
-    // secondPlayer?.strategyManager?.addAssessDices()
+    if (customStartCallback) {
+      customStartCallback(firstPlayer, secondPlayer)
+    } else {
+      firstPlayer.isStartingPlayer = isAxesUp
+      firstPlayer.isPlayerAtTurn = !isAxesUp
+      secondPlayer.isStartingPlayer = !isAxesUp
+      secondPlayer.isPlayerAtTurn = isAxesUp // let the other player start, so it can switch in world
+    }
+    !firstPlayer?.isStartingPlayer && firstPlayer.trigger(GAMES_PHASES.DICE_ROLL)
+    !secondPlayer?.isStartingPlayer && secondPlayer.trigger(GAMES_PHASES.DICE_ROLL)
   }
 }

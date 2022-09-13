@@ -1,8 +1,15 @@
 import Dice from '@/World/Models/Dice.js'
 import EventEmitter from '@/Utils/EventEmitter.js'
-import { HIGHLIGHT_POSITION_MAP, DICE_FACES_MAP, ROTATION_FACE_MAP, GAMES_PHASES } from '@/Utils/constants'
+import {
+  HIGHLIGHT_POSITION_MAP,
+  DICE_FACES_MAP,
+  ROTATION_FACE_MAP,
+  GAMES_PHASES,
+  GAME_PLAYER_TYPES,
+} from '@/Utils/constants'
 import { isWithinRange } from '@/Utils/math'
 import { gsap as g } from 'gsap'
+import { MotionPathPlugin } from 'gsap/all'
 import dice1Img from '/public/textures/dices/dice1.jpg'
 import dice2Img from '/public/textures/dices/dice2.jpg'
 import dice3Img from '/public/textures/dices/dice3.jpg'
@@ -10,6 +17,8 @@ import dice4Img from '/public/textures/dices/dice4.jpg'
 import dice5Img from '/public/textures/dices/dice5.jpg'
 import dice6Img from '/public/textures/dices/dice6.jpg'
 const images = [dice1Img, dice2Img, dice3Img, dice4Img, dice5Img, dice6Img]
+
+g.registerPlugin(MotionPathPlugin)
 
 export default class DicesHandler extends EventEmitter {
   constructor(playerId, isPlayer) {
@@ -34,20 +43,20 @@ export default class DicesHandler extends EventEmitter {
     this.isThrowing = false
     this.didAllDicesStopMoving = false
     this.didStartThrowing = false
+    this.isMovingDices = false
 
     this.rayCaster = new THREE.Raycaster()
     this.currentIntersect = null
     this.previousIntersect = null
 
-    this.isPlayerAtTurn = null /*this.playerId === GAME_PLAYER_TYPES.GAME_PLAYER_TYPE_PLAYER && isPlayer*/
+    this.isPlayerAtTurn = null
 
-    // init code
-    //
     // Debug
     if (this.debug.isActive && !this.isPlayer) {
       this.debugFolder = this.debug.ui.addFolder('dices')
       this.debugFolder.add(this, 'createDices')
       this.debugFolder.add(this, 'availableThrows', 1, 10, 1)
+      this.debugFolder.close()
     }
 
     this.input.on('dblclick', () => this.moveSelectedDicesToEnemy())
@@ -61,7 +70,7 @@ export default class DicesHandler extends EventEmitter {
 
   moveSelectedDicesToEnemy() {
     let firstDiceFinishedMoving = false
-    this.dicesList.forEach((dice) => {
+    this.dicesList.forEach((dice, index) => {
       const highlightMesh = dice.group.getObjectByName('diceHighlight')
 
       if (highlightMesh.isSelected && !highlightMesh.isPlaced) {
@@ -78,6 +87,7 @@ export default class DicesHandler extends EventEmitter {
         dice.group.rotation.set(rotationProps.x, rotationProps.y, rotationProps.z)
 
         const toRotation = dice.group.rotation
+        this.isMovingDices = true
 
         g.fromTo(
           dice.group.rotation,
@@ -93,35 +103,32 @@ export default class DicesHandler extends EventEmitter {
             x: toRotation.x,
             y: toRotation.y,
             z: toRotation.z,
-            duration: 2,
+            duration: 1.8,
             ease: 'sine.out',
-            delay: 0,
+            delay: index * 0.7,
           },
         )
+
         g.to(dice.group.position, {
-          x: offsetHalfX,
-          y: 2.5,
-          z: this.offsetDirection * (this.midZOffset - 1.8),
-          duration: 2,
-          ease: 'sine.out',
-          delay: 0,
+          motionPath: {
+            path: [
+              { x: dice.group.position.x, y: dice.group.position.y, z: dice.group.position.z },
+              { y: 2.5, z: this.offsetDirection * (this.midZOffset - 0.6) },
+              { x: offsetX, y: dice.scale, z: this.offsetDirection * (this.midZOffset - 4) },
+            ],
+            curviness: 2,
+          },
+          duration: 4.5,
+          delay: index * 0.5,
         }).then(() => {
-          g.to(dice.group.position, {
-            x: offsetX,
-            y: dice.scale,
-            z: this.offsetDirection * (this.midZOffset - 4),
-            duration: 2,
-            delay: 0,
-            ease: 'sine.out',
-          }).then(() => {
-            dice.toggleDice(false, false)
-            !firstDiceFinishedMoving &&
-              (firstDiceFinishedMoving = true) &&
-              setTimeout(() => {
-                firstDiceFinishedMoving = true
-                this.trigger('finished-moving')
-              }, 500)
-          })
+          dice.toggleDice(false, false)
+          !firstDiceFinishedMoving &&
+            (firstDiceFinishedMoving = true) &&
+            setTimeout(() => {
+              firstDiceFinishedMoving = true
+              this.isMovingDices = false
+              this.trigger('finished-moving-dices-to-enemy')
+            }, 500)
         })
       }
       dice.mesh.userData.isMoving = false
@@ -132,13 +139,19 @@ export default class DicesHandler extends EventEmitter {
     this.moveSelectedDicesToEnemy()
 
     let firstDiceRebuild = false
+    if (this.dicesList.every((dice) => dice.highlightMesh?.isPlaced)) {
+      this.availableThrows = 0
+      this.trigger(GAMES_PHASES.FAITH_CASTING)
+      this.trigger(GAMES_PHASES.DICE_ROLL)
+    }
+
     /* for some weird reason ammo breaks when even one body is destroyed,
      * so we have to destroy each other dice and recreate them.
      * This might cause memory leaks!!!!!!!!!!! */
     if (this.hasDestroyedBodies) {
-      this.dicesList.filter((dice) => {
+      this.dicesList.forEach((dice) => {
         const highlightMesh = dice.group.getObjectByName('diceHighlight')
-        if (!highlightMesh.isSelected) {
+        if (!highlightMesh.isSelected && !highlightMesh.isPlaced) {
           this.physics.destroy(dice.group.body)
           dice.group.clear()
           this.scene.remove(dice.group)
@@ -160,9 +173,8 @@ export default class DicesHandler extends EventEmitter {
   }
 
   randomDiceThrow() {
-    if (this.dicesList.filter((dice) => dice.highlightMesh?.isPlaced)?.length === 6) {
+    if (this.dicesList.every((dice) => dice.highlightMesh?.isPlaced)) {
       this.trigger(GAMES_PHASES.FAITH_CASTING)
-      // this.world.nextPhase(GAMES_PHASES.FAITH_CASTING)
     }
     if (this.availableThrows <= 0 || this.isThrowing) {
       return
@@ -229,7 +241,7 @@ export default class DicesHandler extends EventEmitter {
   }
 
   createDices() {
-    const player = this.experience.world.players[this.playerId]
+    const player = this.world.players[this.playerId]
     if (!player.isPlayerAtTurn) {
       return
     }
@@ -237,18 +249,34 @@ export default class DicesHandler extends EventEmitter {
     this.diceGroup = new THREE.Group({ name: 'diceGroup' })
     this.diceGroup.name = 'diceGroup'
     this.dicesList = [
-      new Dice(this.diceGroup, this.isPlayer, 1, new THREE.Vector3(-0.5, 2, 1), new THREE.Vector3(0, 0, 1)),
       new Dice(
         this.diceGroup,
         this.isPlayer,
+        this.playerId,
+        1,
+        new THREE.Vector3(-0.5, 2, 1),
+        new THREE.Vector3(0, 0, 1),
+      ),
+      new Dice(
+        this.diceGroup,
+        this.isPlayer,
+        this.playerId,
         2,
         new THREE.Vector3(0, 2, 1),
         new THREE.Vector3(0, 0, PI * 0.5),
       ),
-      new Dice(this.diceGroup, this.isPlayer, 3, new THREE.Vector3(0.5, 2, 1), new THREE.Vector3(0, 0, PI)),
       new Dice(
         this.diceGroup,
         this.isPlayer,
+        this.playerId,
+        3,
+        new THREE.Vector3(0.5, 2, 1),
+        new THREE.Vector3(0, 0, PI),
+      ),
+      new Dice(
+        this.diceGroup,
+        this.isPlayer,
+        this.playerId,
         4,
         new THREE.Vector3(-0.5, 2, 1.6),
         new THREE.Vector3(0, 0, PI * 1.5),
@@ -256,6 +284,7 @@ export default class DicesHandler extends EventEmitter {
       new Dice(
         this.diceGroup,
         this.isPlayer,
+        this.playerId,
         5,
         new THREE.Vector3(-0.3, 1.6, 1.75),
         new THREE.Vector3(PI * 0.5, 0, 0),
@@ -263,6 +292,7 @@ export default class DicesHandler extends EventEmitter {
       new Dice(
         this.diceGroup,
         this.isPlayer,
+        this.playerId,
         6,
         new THREE.Vector3(-0.2, 2.5, 2.3),
         new THREE.Vector3(PI * 0.3, PI * -0.9, PI * -0.6),
@@ -288,7 +318,7 @@ export default class DicesHandler extends EventEmitter {
     } else {
       if (this.currentIntersect) {
         if (this.previousIntersect?.name !== this.currentIntersect?.name) {
-          this.debug.isActive && console.log('NEW Intersect: ', this.currentIntersect)
+          // this.debug.isActive && console.log('NEW Intersect: ', this.currentIntersect)
         }
         if (this.currentIntersect.parent) {
           this.currentIntersect.parent.getObjectByName('diceHighlight').isHighlighted = false
@@ -373,13 +403,32 @@ export default class DicesHandler extends EventEmitter {
   }
 
   toggleDiceSelection() {
+    const player = this.world.players[this.playerId]
     if (this.currentIntersect && !this.isThrowing) {
+      // console.log('this.currentIntersect: ', this.currentIntersect.userData?.playerId, this.playerId)
+      if (
+        player.playerId === GAME_PLAYER_TYPES.GAME_PLAYER_TYPE_NPC ||
+        this.currentIntersect.userData?.playerId !== this.playerId
+      ) {
+        this.debug.isActive &&
+          console.log(
+            `${
+              player.playerId === GAME_PLAYER_TYPES.GAME_PLAYER_TYPE_NPC ? 'NPC' : ''
+            } SHOULDN'T BE ABLE TO CALL THIS`,
+          )
+        return
+      }
+      if (
+        (!player.isPlayerAtTurn && player.playerId === GAME_PLAYER_TYPES.GAME_PLAYER_TYPE_PLAYER) ||
+        this.isMovingDices
+      ) {
+        this.debug.isActive && console.log('not my turn')
+        return
+      }
+
       const diceHighlightMesh = this.currentIntersect.parent.getObjectByName('diceHighlight')
       if (!diceHighlightMesh?.isPlaced) {
-        console.log('diceHighlightMesh.parent: ', this.currentIntersect)
         this.dicesList.some((dice) => dice.mesh.name === this.currentIntersect.name && dice.toggleDice(true))
-        // diceHighlightMesh.isSelected = !diceHighlightMesh.isSelected
-        // diceHighlightMesh.isHighlighted = true
       }
     }
   }
@@ -393,7 +442,7 @@ export default class DicesHandler extends EventEmitter {
       this.dicesList.every((dice) => dice.mesh.userData.isMoving === false && dice.group.position.y < 0.5)
     ) {
       // alert('all dices stopped moving')
-      console.log('ALL Dices stopped moving!!!!!!!!!!!!!')
+      // console.log('ALL Dices stopped moving!!!!!!!!!!!!!')
       this.didAllDicesStopMoving = true
       this.didStartThrowing = false
       this.world.disableDiceCollisonSound = true
@@ -459,8 +508,8 @@ export default class DicesHandler extends EventEmitter {
           isWithinRange(angularVelocity, -0.1, 0.1) && isWithinRange(velocity, -0.1, 0.1) && velocity !== 0
         if (didDiceStoppedMoving) {
           if (dice.group.position.y > 0.5 && this.didStartThrowing) {
-            dice.group.body.applyForce(Math.random() * 5 - 2.5, Math.random() * 5, Math.random() * 5 - 2.5)
-            console.log('dice.group.position.y: ', dice.group.position.y)
+            dice.group.body.applyForce(Math.random() * 30 - 2.5, Math.random() * 30, Math.random() * -25 - 5)
+            // console.log('dice.group.position.y: ', dice.group.position.y)
           } else {
             dice.mesh.userData.isMoving = !didDiceStoppedMoving
           }
@@ -472,5 +521,18 @@ export default class DicesHandler extends EventEmitter {
 
     /* enable hovering over dices as all faces are evaluated */
     this.dicesList.every((dice) => dice.mesh?.userData?.upwardFace !== undefined) && this.handleDiceHover()
+  }
+
+  reset() {
+    this.dicesList = []
+    this.diceMeshes = []
+    this.availableThrows = 3
+    this.isThrowing = false
+    this.didAllDicesStopMoving = false
+    this.didStartThrowing = false
+    this.isMovingDices = false
+
+    this.currentIntersect = null
+    this.previousIntersect = null
   }
 }

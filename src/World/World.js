@@ -1,8 +1,10 @@
 import Environment from '@/World/Environment.js'
+import DiceArrangeManager from '@/World/DiceArrangeManager.js'
 import Floor from '@/World/Models/Floor.js'
 import Player from '@/World/Player.js'
 import Coin from '@/World/Models/Coin.js'
-import { GAME_TYPES, GAME_PLAYER_TYPES, GAMES_PHASES } from '@/Utils/constants.js'
+import { GAME_TYPES, GAME_PLAYER_TYPES, GAMES_PHASES, GAME_PLAYER_ID } from '@/Utils/constants.js'
+import { setStorage } from '@/Utils/storage.js'
 
 export default class World {
   constructor() {
@@ -51,12 +53,16 @@ export default class World {
     this.players = {}
 
     if (this.experience.gameMode === GAME_TYPES.GAME_TYPE_NPC) {
+      setStorage(GAME_PLAYER_ID, GAME_PLAYER_TYPES.GAME_PLAYER_TYPE_PLAYER, true)
       this.createPlayer(GAME_PLAYER_TYPES.GAME_PLAYER_TYPE_PLAYER, true)
       this.createPlayer(GAME_PLAYER_TYPES.GAME_PLAYER_TYPE_NPC)
     } else if (this.experience.gameMode === GAME_TYPES.GAME_TYPE_MULTIPLAYER) {
+      // setStorage(GAME_PLAYER_ID, client.sessionId..., true)
+      // setStorage(GAME_PLAYER_ID, client.sessionId..., true)
       this.createPlayer(GAME_PLAYER_TYPES.GAME_PLAYER_TYPE_PLAYER, true)
       this.createPlayer(GAME_PLAYER_TYPES.GAME_PLAYER_TYPE_NPC)
     }
+    this.diceArrangeManager = new DiceArrangeManager()
   }
 
   getPlayer(playerIndex) {
@@ -70,8 +76,18 @@ export default class World {
     })
   }
 
-  getPlayerAtTurn() {
-    return Object.values(this.players).find((player) => player.isPlayerAtTurn)
+  getPlayerAtTurn(isNotAtTurn) {
+    return Object.values(this.players).find(
+      (player) => (isNotAtTurn && !player.isPlayerAtTurn) || (!isNotAtTurn && player.isPlayerAtTurn),
+    )
+  }
+
+  getStartingPlayer(isNotStartingPlayer) {
+    return Object.values(this.players).find(
+      (player) =>
+        (isNotStartingPlayer && !player.isStartingPlayer) ||
+        (!isNotStartingPlayer && player.isStartingPlayer),
+    )
   }
 
   createPlayer(playerId, isPlayer) {
@@ -87,6 +103,7 @@ export default class World {
         player.dicesHandler.createDices()
         player.dicesHandler.randomDiceThrow()
       }
+      console.log(player.playerId, ' .availableThrows: ', player.dicesHandler.availableThrows)
       if (player.dicesHandler.availableThrows > 0) {
         player.dicesHandler.resetThrow()
       } else if (this.playerDoneWithRollingAmount === 1) {

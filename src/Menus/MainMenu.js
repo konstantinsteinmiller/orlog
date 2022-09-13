@@ -100,7 +100,9 @@ export default class MainMenu extends EventEmitter {
 
   updateLoaderComponentName(name) {
     this.$componentName = document.querySelector('.loading-text__component-name')
-    this.$componentName.innerText = name
+    if (this.$componentName?.innerText) {
+      this.$componentName.innerText = name
+    }
   }
 
   removeLoader() {

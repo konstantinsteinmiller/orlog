@@ -35,6 +35,14 @@ export const GAME_SYMBOLS = {
   HAND: 'HAND',
 }
 
+export const GAME_SYMBOLS_ORDER = {
+  AXE: 1,
+  ARROW: 2,
+  HELM: 3,
+  SHIELD: 4,
+  HAND: 5,
+}
+
 export const DICE_FACES_MAP = {
   /* dice model number to side symbol mapping */
   1: {
@@ -111,6 +119,8 @@ export const KEYBOARD_STATE_ALIAS = {
 
 export const GAME_BACKGROUND_VOLUME = 'TRIALS_OF_FAITH_BACKGROUND_VOLUME'
 export const GAME_SOUND_EFFECT_VOLUME = 'TRIALS_OF_FAITH_SOUND_EFFECT_VOLUME'
+export const GAME_PLAYER_ID = 'GAME_PLAYER_ID'
+
 export const GAME_TYPES = {
   GAME_TYPE_MULTIPLAYER: 'GAME_TYPE_MULTIPLAYER',
   GAME_TYPE_NPC: 'GAME_TYPE_NPC',

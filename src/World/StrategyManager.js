@@ -1,5 +1,5 @@
 import Experience from '@/Experience.js'
-import { GAME_PLAYER_TYPES, DICE_FACES_MAP, GAME_SYMBOLS } from '@/Utils/constants.js'
+import { GAME_PLAYER_TYPES, GAME_SYMBOLS } from '@/Utils/constants.js'
 
 export default class StrategyManager {
   constructor(player) {
@@ -9,12 +9,8 @@ export default class StrategyManager {
     this.dicesHandler = player.dicesHandler
     this.selectedDices = []
 
-    this.dicesHandler.on('dices-stopped', () => {
-      // console.log('dices-stopped: ')
-      // this.addAssessDices()
-    })
+    this.dicesHandler.on('dices-stopped', () => {})
     this.dicesHandler.on('faces-evaluated', () => {
-      // console.log('faces-evaluated: ')
       this.addAssessDices()
     })
   }
@@ -35,12 +31,19 @@ export default class StrategyManager {
     let unselectedDices = 6
     let collectedAxes = 0
     let collectedArrows = 0
+    let collectedHelms = 0
+    let collectedShields = 0
     let enemyHands = 0
+    let enemyAxes = 0
+    let enemyArrows = 0
+
     this.dicesHandler.dicesList.forEach((dice) => {
       const diceHighlight = dice.highlightMesh
       if (diceHighlight.isPlaced) {
         dice.mesh.userData.upwardSymbol === GAME_SYMBOLS.AXE && collectedAxes++
         dice.mesh.userData.upwardSymbol === GAME_SYMBOLS.ARROW && collectedArrows++
+        dice.mesh.userData.upwardSymbol === GAME_SYMBOLS.HELM && collectedHelms++
+        dice.mesh.userData.upwardSymbol === GAME_SYMBOLS.SHIELD && collectedShields++
         unselectedDices--
         return
       }
@@ -58,33 +61,32 @@ export default class StrategyManager {
         Object.keys(this.world.players).find((playerId) => playerId !== this.player.playerId)
       ]
 
-    let enemyAxes = 0
-    let enemyArrows = 0
-
     enemyPlayer.dicesHandler.dicesList.forEach((dice) => {
-      dice.mesh.userData.upwardSymbol === GAME_SYMBOLS.AXE && enemyAxes++
-      dice.mesh.userData.upwardSymbol === GAME_SYMBOLS.ARROW && enemyArrows++
-      dice.mesh.userData.upwardSymbol === GAME_SYMBOLS.HAND && enemyHands++
+      if (dice.highlightMesh?.isPlaced) {
+        dice.mesh.userData.upwardSymbol === GAME_SYMBOLS.AXE && enemyAxes++
+        dice.mesh.userData.upwardSymbol === GAME_SYMBOLS.ARROW && enemyArrows++
+        dice.mesh.userData.upwardSymbol === GAME_SYMBOLS.HAND && enemyHands++
+      }
     })
 
     let targetList = []
     if (enemyAxes > 0) {
-      targetList.push(axesDices)
+      const helmsToAdd = enemyAxes - collectedHelms
+      helmsToAdd >= 1 && targetList.push(helmDices.slice(0, helmsToAdd))
       this.addAvailableToSelectedDices(unselectedDices, targetList)
     }
     if (enemyArrows > 0) {
-      targetList.push(arrowDices)
+      const shieldsToAdd = enemyArrows - collectedShields
+      shieldsToAdd >= 1 && targetList.push(shieldDices.slice(0, shieldsToAdd))
       this.addAvailableToSelectedDices(unselectedDices, targetList)
     }
 
-    if (handDices.length && enemyPlayer.lifeStones.length >= 2) {
+    if (arrowDices.length && enemyPlayer.lifeStones.length <= 5) {
       targetList.push(arrowDices)
     }
 
     // prefer collecting golden dices
     if (this.hasHighHP()) {
-      // this.selectedDices.push(goldenDices)
-
       targetList.push(goldenDices)
 
       if (handDices.length && enemyPlayer.faithTokens.length >= 2) {
@@ -114,24 +116,23 @@ export default class StrategyManager {
       this.addAvailableToSelectedDices(unselectedDices, targetList)
     }
 
-    // let him look like hes thinking
-
+    // let him look like he's thinking
     setTimeout(() => {
       this.selectDices()
     }, 2000)
   }
 
   addAvailableToSelectedDices(unselectedDices, listOfDicesList) {
-    let currentList = null
+    let currentList = []
     while (unselectedDices > 0) {
       if (currentList?.length > 0) {
         // console.log('add dice to selection', unselectedDices)
         this.selectedDices.push(currentList.shift())
         unselectedDices--
       }
-      if (listOfDicesList.length > 0 && (currentList === null || currentList.length === 0)) {
-        currentList = listOfDicesList.shift()
-      } else if (listOfDicesList.length === 0 && currentList.length === 0) {
+      if (listOfDicesList.length > 0 && currentList.length === 0) {
+        currentList = listOfDicesList.shift() || []
+      } else if (listOfDicesList.length === 0 && currentList?.length === 0) {
         unselectedDices = 0
       }
     }
@@ -143,7 +144,12 @@ export default class StrategyManager {
       dice.toggleDice(true, true)
     })
     setTimeout(() => {
-      this.moveDicesToEnemy()
+      if (this.dicesHandler.dicesList.some((dice) => dice.highlightMesh?.isSelected)) {
+        this.dicesHandler.didNotSelectAnyDices = false
+        this.moveDicesToEnemy()
+      } else if (this.dicesHandler.availableThrows > 0) {
+        this.dicesHandler.finishMovingDicesToEnemy()
+      }
     }, 1000)
   }
 

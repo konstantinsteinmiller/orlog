@@ -98,16 +98,19 @@ export default class World {
     player.on(GAMES_PHASES.DICE_ROLL, () => {
       this.switchPlayerAtTurn()
       const player = this.getPlayerAtTurn()
-      // console.log(player.playerId + ' availableThrows: ', player.dicesHandler.availableThrows)
       if (player.dicesHandler.availableThrows === 3) {
         player.dicesHandler.createDices()
         player.dicesHandler.randomDiceThrow()
       }
-      console.log(player.playerId, ' .availableThrows: ', player.dicesHandler.availableThrows)
+      this.debug.isActive && console.log(player.playerId, ' throws: ', player.dicesHandler.availableThrows)
+
       if (player.dicesHandler.availableThrows > 0) {
         player.dicesHandler.resetThrow()
       } else if (this.playerDoneWithRollingAmount === 1) {
         player.trigger(GAMES_PHASES.DICE_ROLL)
+      } else {
+        //  both players finished with  GAMES_PHASES.FAITH_CASTING
+        this.debug.isActive && console.log('========= both players finished with  GAMES_PHASES.FAITH_CASTING')
       }
     })
     player.on('dices-rebuild', () => {
@@ -115,11 +118,11 @@ export default class World {
       player.dicesHandler.randomDiceThrow()
     })
     player.on(GAMES_PHASES.FAITH_CASTING, () => {
-      const pl = this.getPlayer(0)
+      const player1 = this.getPlayer(0)
       const player2 = this.getPlayer(1)
-      console.log('GAMES_PHASES.FAITH_CASTING: ', player.playerId)
+      this.debug.isActive && console.log('GAMES_PHASES.FAITH_CASTING: ', player.playerId)
       if (++this.playerDoneWithRollingAmount === 2) {
-        pl?.isStartingPlayer && pl.startFaithSelection()
+        player1?.isStartingPlayer && player1.startFaithSelection()
         player2?.isStartingPlayer && player2.startFaithSelection()
       }
     })

@@ -2,6 +2,8 @@ import * as gui from 'lil-gui'
 import Stats from 'stats.js'
 import { disposeMeshAndRemoveFromScene } from '@/Utils/ThreeHelpers.js'
 import Experience from '@/Experience.js'
+import { isWithinRange } from '@/Utils/math.js'
+import { isDicePlanarRotated } from '@/Utils/utils.js'
 
 export default class Debug {
   constructor() {
@@ -88,6 +90,17 @@ export default class Debug {
           this.debugCubeOptions.debugCube.position.z,
           this.debugCubeOptions.debugCube,
         )
+      } else {
+        this.experience.world.players['NPC'].dicesHandler.dicesList.forEach((dice) => {
+          this.isActive &&
+            console.log(
+              ': ',
+              isDicePlanarRotated(dice),
+              (dice.group.rotation.x % Math.PI).toFixed(3),
+              (dice.group.rotation.y % Math.PI).toFixed(3),
+              (dice.group.rotation.z % Math.PI).toFixed(3),
+            )
+        })
       }
     } else if (event.code === 'KeyT') {
       this.world = this.experience.world

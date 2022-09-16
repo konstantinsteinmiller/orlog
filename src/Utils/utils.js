@@ -1,4 +1,5 @@
 import { GAME_SYMBOLS, GAME_SYMBOLS_ORDER } from '@/Utils/constants.js'
+import { isWithinRange } from '@/Utils/math.js'
 
 export const isDev = import.meta.env.MODE === 'development'
 
@@ -21,3 +22,14 @@ export const groupBySymbol = (listOfList) => (dice) => {
   dice.mesh.userData?.upwardSymbol === GAME_SYMBOLS.HAND && listOfList[4].push(dice)
   return true
 }
+
+export const isDicePlanarRotated = (dice) =>
+  isWithinRange(Math.abs(dice.group.rotation.x) % Math.PI, Math.PI - 0.1, Math.PI + 0.1) ||
+  isWithinRange(Math.abs(dice.group.rotation.x) % Math.PI, Math.PI / 2 - 0.1, Math.PI / 2 + 0.1) ||
+  isWithinRange(Math.abs(dice.group.rotation.x) % Math.PI, -0.1, +0.1) ||
+  isWithinRange(Math.abs(dice.group.rotation.y) % Math.PI, Math.PI - 0.1, Math.PI + 0.1) ||
+  isWithinRange(Math.abs(dice.group.rotation.y) % Math.PI, Math.PI / 2 - 0.1, Math.PI / 2 + 0.1) ||
+  isWithinRange(Math.abs(dice.group.rotation.y) % Math.PI, -0.1, +0.1) ||
+  isWithinRange(Math.abs(dice.group.rotation.z) % Math.PI, Math.PI - 0.1, Math.PI + 0.1) ||
+  isWithinRange(Math.abs(dice.group.rotation.z) % Math.PI, Math.PI / 2 - 0.1, Math.PI / 2 + 0.1) ||
+  isWithinRange(Math.abs(dice.group.rotation.z) % Math.PI, -0.1, +0.1)

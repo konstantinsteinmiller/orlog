@@ -16,7 +16,11 @@ export default class StrategyManager {
   }
 
   addAssessDices() {
-    if (this.player.isPlayerAtTurn && this.player.playerId === GAME_PLAYER_TYPES.GAME_PLAYER_TYPE_NPC) {
+    if (
+      this.player.isPlayerAtTurn &&
+      this.player.playerId === GAME_PLAYER_TYPES.GAME_PLAYER_TYPE_NPC &&
+      this.dicesHandler.availableThrows > 0
+    ) {
       this.assessDiceSelection()
     }
   }

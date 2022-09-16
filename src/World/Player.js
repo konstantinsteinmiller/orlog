@@ -25,14 +25,14 @@ export default class Player extends EventEmitter {
     // Debug
     if (this.debug.isActive && !this.isPlayer) {
       this.debugFolder = this.debug.ui.addFolder('player')
-      this.debugFolder
-        .addColor(this.lifeStones[0].highlightMesh.material, 'color')
-        .name('color of the lifeStone highlight')
-        .onChange((color) => {
-          this.lifeStones.forEach((stone) => {
-            stone.highlightMesh.material.color = color
-          })
-        })
+      // this.debugFolder
+      //   .addColor(this.lifeStones[0].highlightMesh.material, 'color')
+      //   .name('color of the lifeStone highlight')
+      //   .onChange((color) => {
+      //     this.lifeStones.forEach((stone) => {
+      //       stone.highlightMesh.material.color = color
+      //     })
+      //   })
       this.debug.faithTokenAmount = 3
       this.debug.lifeStoneAmount = 2
       this.debugFolder.add(this, 'destroyLifeStones')
@@ -51,12 +51,21 @@ export default class Player extends EventEmitter {
     // }, 5700)
   }
 
+  reset() {
+    this.lifeStones = []
+    this.faithTokens = []
+    this.isPlayerAtTurn = null
+    this.isStartingPlayer = null
+  }
+
   init() {
     this.dicesHandler = new DicesHandler(this.playerId, this.isPlayer)
     if (!this.isPlayer && this.playerId === GAME_PLAYER_TYPES.GAME_PLAYER_TYPE_NPC) {
       this.strategyManager = new StrategyManager(this)
     }
     new Bowl(this.isPlayer)
+    this.lifeStones = []
+    this.faithTokens = []
     this.lifeStones = [...Array(15).keys()].map((id) => new LifeStone(this.isPlayer, id, id * 0.1))
     this.faithTokens = [...Array(13).keys()].map((id) => new FaithToken(this.isPlayer, id, id * 0.2))
 

@@ -8,6 +8,7 @@ import {
   GAME_PLAYER_TYPES,
   GAME_SYMBOLS_ORDER,
   GAME_PLAYER_ID,
+  MAX_DICE_THROWS,
 } from '@/Utils/constants'
 import { isWithinRange } from '@/Utils/math'
 import { gsap as g } from 'gsap'
@@ -45,7 +46,7 @@ export default class DicesHandler extends EventEmitter {
 
     this.dicesList = []
     this.diceMeshes = []
-    this.availableThrows = 3
+    this.availableThrows = MAX_DICE_THROWS
     this.isThrowing = false
     this.didAllDicesStopMoving = false
     this.didStartThrowing = false
@@ -68,11 +69,16 @@ export default class DicesHandler extends EventEmitter {
 
     this.isWaitingToFinishRound = false
     this.input.on('dblclick', () => {
+      /* hide the controls overlay */
+      this.actionAfterDiceRollTimeout = Date.now()
+      this.showControlsOverlay(false)
+
       const playerIdAtTurn = this.world.getPlayerAtTurn()?.playerId
       if (
         !playerIdAtTurn === this.sessionPlayer ||
         !this.didAllDicesStopMoving ||
-        this.availableThrows === 0
+        this.availableThrows === 0 ||
+        this.currentIntersect !== null
       ) {
         return
       }
@@ -135,7 +141,6 @@ export default class DicesHandler extends EventEmitter {
     const sessionPlayerId = getStorage(GAME_PLAYER_ID, true)
 
     let firstDiceFinishedMoving = false
-    let maxTimeout = 0
     otherPlayer.dicesHandler.dicesList.concat(this.dicesList).forEach((dice, index) => {
       const highlightMesh = dice.group.getObjectByName('diceHighlight')
 
@@ -155,7 +160,6 @@ export default class DicesHandler extends EventEmitter {
         const diceGap = 0.8
         const maxXOffset = (this.world.maxPositionIndex * diceGap) / 2
         const offsetX = dice.positionIndex * diceGap - maxXOffset
-        const offsetXHalf = dice.group.position.x + offsetX - Math.abs(dice.group.position.x + offsetX) / 2
         const upwardFace = dice.mesh.userData.upwardFace
 
         const fromRotation = new THREE.Vector3().copy(dice.group.rotation)
@@ -274,12 +278,12 @@ export default class DicesHandler extends EventEmitter {
       this.dicesList.every((dice) => !dice.highlightMesh?.isPlaced) &&
       playerIdAtTurn === this.sessionPlayer
     ) {
-      this.debug.isActive &&
-        console.log(
-          this.playerId,
-          playerIdAtTurn,
-          'No dices are placed and none has been destroyed, so throw random dice',
-        )
+      // this.debug.isActive &&
+      // console.log(
+      //   this.playerId,
+      //   playerIdAtTurn,
+      //   'No dices are placed and none has been destroyed, so throw random dice',
+      // )
       this.randomDiceThrow()
     }
   }
@@ -483,7 +487,7 @@ export default class DicesHandler extends EventEmitter {
     } else {
       if (this.currentIntersect) {
         if (this.previousIntersect?.name !== this.currentIntersect?.name) {
-          // this.debug.isActive && console.log('NEW Intersect: ', this.currentIntersect)
+          this.debug.isActive && console.log('NEW Intersect: ', this.currentIntersect)
         }
         if (this.currentIntersect.parent) {
           this.currentIntersect.parent.getObjectByName('diceHighlight').isHighlighted = false
@@ -568,6 +572,9 @@ export default class DicesHandler extends EventEmitter {
   }
 
   toggleDiceSelection() {
+    this.actionAfterDiceRollTimeout = Date.now()
+    this.showControlsOverlay(false)
+
     const player = this.world.players[this.playerId]
     if (this.currentIntersect && !this.isThrowing) {
       // console.log('this.currentIntersect: ', this.currentIntersect.userData?.playerId, this.playerId)
@@ -614,10 +621,11 @@ export default class DicesHandler extends EventEmitter {
       this.trigger('dices-stopped')
       setTimeout(() => {
         this.evaluateTopFace()
-        this.trigger('faces-evaluated')
         this.availableThrows--
+        this.trigger('faces-evaluated')
 
         if (this.availableThrows === 0) {
+          this.showControlsOverlay(false)
           this.dicesList.forEach((dice) => {
             const diceHighlightMesh = dice.group.getObjectByName('diceHighlight')
             if (!diceHighlightMesh.isSelected && !diceHighlightMesh.isPlaced) {
@@ -627,9 +635,29 @@ export default class DicesHandler extends EventEmitter {
           this.moveSelectedDicesToEnemy()
         }
       }, 700)
+
+      /* show action input overlay */
+      const isSessionPlayerAtTurn =
+        this.world.getPlayerAtTurn()?.playerId === getStorage(GAME_PLAYER_ID, true)
+      this.actionAfterDiceRollTimeout = Date.now()
+
+      isSessionPlayerAtTurn &&
+        setTimeout(() => {
+          if (
+            Date.now() - this.actionAfterDiceRollTimeout > 7000 &&
+            this.world.currentGamePhase === GAMES_PHASES.DICE_ROLL
+          ) {
+            this.showControlsOverlay(true)
+          }
+        }, 7000)
+
       return true
     }
     return false
+  }
+
+  showControlsOverlay(isVisible) {
+    $controlsInfo.style.opacity = isVisible ? 0.8 : 0
   }
 
   update() {

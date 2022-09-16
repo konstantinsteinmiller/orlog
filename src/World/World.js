@@ -3,8 +3,15 @@ import DiceArrangeManager from '@/World/DiceArrangeManager.js'
 import Floor from '@/World/Models/Floor.js'
 import Player from '@/World/Player.js'
 import Coin from '@/World/Models/Coin.js'
-import { GAME_TYPES, GAME_PLAYER_TYPES, GAMES_PHASES, GAME_PLAYER_ID } from '@/Utils/constants.js'
+import {
+  GAME_TYPES,
+  GAME_PLAYER_TYPES,
+  GAMES_PHASES,
+  GAME_PLAYER_ID,
+  MAX_DICE_THROWS,
+} from '@/Utils/constants.js'
 import { setStorage } from '@/Utils/storage.js'
+import DiceResolver from '@/World/DiceResolver.js'
 
 export default class World {
   constructor() {
@@ -23,7 +30,9 @@ export default class World {
     this.midZOffset = 5
     this.offsetDirection = direction
 
+    this.currentGamePhase = GAMES_PHASES.DICE_ROLL
     this.playerDoneWithRollingAmount = 0
+    this.playerDoneWithFaithCastingAmount = 0
 
     // const axisHelper = new THREE.AxesHelper(3)
     // this.scene.add(axisHelper)
@@ -38,6 +47,12 @@ export default class World {
         this.setupWorld()
       })
     }
+  }
+
+  reset() {
+    this.currentGamePhase = GAMES_PHASES.DICE_ROLL
+    this.playerDoneWithRollingAmount = 0
+    this.playerDoneWithFaithCastingAmount = 0
   }
 
   setupWorld() {
@@ -90,6 +105,14 @@ export default class World {
     )
   }
 
+  getPlayers() {
+    const playersList = Object.values(this.players)
+    return [
+      playersList.find((player) => player?.isStartingPlayer),
+      playersList.find((player) => !player?.isStartingPlayer),
+    ]
+  }
+
   createPlayer(playerId, isPlayer) {
     const player = new Player(playerId, !!isPlayer)
     this.players[playerId] = player
@@ -98,11 +121,11 @@ export default class World {
     player.on(GAMES_PHASES.DICE_ROLL, () => {
       this.switchPlayerAtTurn()
       const player = this.getPlayerAtTurn()
-      if (player.dicesHandler.availableThrows === 3) {
+      if (player.dicesHandler.availableThrows === MAX_DICE_THROWS) {
         player.dicesHandler.createDices()
         player.dicesHandler.randomDiceThrow()
       }
-      this.debug.isActive && console.log(player.playerId, ' throws: ', player.dicesHandler.availableThrows)
+      // this.debug.isActive && console.log(player.playerId, ' throws: ', player.dicesHandler.availableThrows)
 
       if (player.dicesHandler.availableThrows > 0) {
         player.dicesHandler.resetThrow()
@@ -118,18 +141,37 @@ export default class World {
       player.dicesHandler.randomDiceThrow()
     })
     player.on(GAMES_PHASES.FAITH_CASTING, () => {
-      const player1 = this.getPlayer(0)
-      const player2 = this.getPlayer(1)
-      this.debug.isActive && console.log('GAMES_PHASES.FAITH_CASTING: ', player.playerId)
+      // this.debug.isActive && console.log('FAITH_CASTING: ', player.playerId)
       if (++this.playerDoneWithRollingAmount === 2) {
-        player1?.isStartingPlayer && player1.startFaithSelection()
-        player2?.isStartingPlayer && player2.startFaithSelection()
+        this.setPlayerAtTurnToStartingPlayer()
+        this.currentGamePhase = GAMES_PHASES.FAITH_CASTING
+        const startingPlayer = this.getStartingPlayer()
+        const secondPlayer = this.getStartingPlayer(true)
+        // startingPlayer.startFaithSelection()
+        startingPlayer.trigger(GAMES_PHASES.DICE_RESOLVE)
+        secondPlayer.trigger(GAMES_PHASES.DICE_RESOLVE)
       }
     })
-    player.on(GAMES_PHASES.DICE_RESOLVE, () => {})
+
+    player.on(GAMES_PHASES.DICE_RESOLVE, () => {
+      if (++this.playerDoneWithFaithCastingAmount === 2) {
+        this.setPlayerAtTurnToStartingPlayer()
+        this.currentGamePhase = GAMES_PHASES.DICE_RESOLVE
+        // this.debug.isActive && console.log('Phase - DICE_RESOLVE: ', player.playerId)
+        this.diceResolver = new DiceResolver()
+      }
+    })
+
     player.on(GAMES_PHASES.FAITH_RESOLVE, () => {})
 
     return player
+  }
+
+  setPlayerAtTurnToStartingPlayer() {
+    const [startingPlayer, secondPlayer] = this.getPlayers()
+    // const secondPlayer = this.getStartingPlayer(false)
+    startingPlayer.isPlayerAtTurn = true
+    secondPlayer.isPlayerAtTurn = false
   }
 
   update() {

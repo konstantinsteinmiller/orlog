@@ -1,7 +1,7 @@
 import './app.css'
 import './style.scss'
 
-import backgroundMusicTrack from '/public/sounds/background-music-track.ogg'
+import backgroundMusicTrack from '/public/sounds/background-music-track-complete.ogg'
 import Experience from '@/Experience.js'
 import { PhysicsLoader } from 'enable3d/dist/index'
 import MainMenu from './Menus/MainMenu'

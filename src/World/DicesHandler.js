@@ -135,6 +135,7 @@ export default class DicesHandler extends EventEmitter {
     const sessionPlayerId = getStorage(GAME_PLAYER_ID, true)
 
     let firstDiceFinishedMoving = false
+    let maxTimeout = 0
     otherPlayer.dicesHandler.dicesList.concat(this.dicesList).forEach((dice, index) => {
       const highlightMesh = dice.group.getObjectByName('diceHighlight')
 
@@ -154,6 +155,7 @@ export default class DicesHandler extends EventEmitter {
         const diceGap = 0.8
         const maxXOffset = (this.world.maxPositionIndex * diceGap) / 2
         const offsetX = dice.positionIndex * diceGap - maxXOffset
+        const offsetXHalf = dice.group.position.x + offsetX - Math.abs(dice.group.position.x + offsetX) / 2
         const upwardFace = dice.mesh.userData.upwardFace
 
         const fromRotation = new THREE.Vector3().copy(dice.group.rotation)
@@ -171,48 +173,50 @@ export default class DicesHandler extends EventEmitter {
             x: fromRotation.x,
             y: fromRotation.y,
             z: fromRotation.z,
-            duration: 1.7,
+            duration: 0.2,
             ease: 'sine.out',
-            delay: 0,
           },
           {
             x: toRotation.x,
             y: toRotation.y,
             z: toRotation.z,
-            duration: 1.5,
+            duration: 0.6,
             ease: 'sine.out',
-            delay: index * 0.7,
+            delay: index * 0.4 + 0.1,
           },
         )
 
         g.to(dice.group.position, {
-          motionPath: {
-            path: [
-              { x: dice.group.position.x, y: dice.group.position.y - 3, z: dice.group.position.z },
-              { x: dice.group.position.x, y: dice.group.position.y - 3, z: dice.group.position.z },
-              { y: 2.5, z: this.offsetDirection * ownerDirection * (this.midZOffset - 0.6) }, //ANCHOR
-              { y: 2.5, z: this.offsetDirection * ownerDirection * (this.midZOffset - 0.8) }, //control
-              { y: 2.5, z: this.offsetDirection * ownerDirection * (this.midZOffset - 1.0) }, //control
-              { y: 1.25, z: this.offsetDirection * ownerDirection * (this.midZOffset - 2.6) }, //ANCHOR
-              { y: 1.25, z: this.offsetDirection * ownerDirection * (this.midZOffset - 2.4) }, //control
-              { y: 1.25, z: this.offsetDirection * ownerDirection * (this.midZOffset - 2.4) }, //control
-              { x: offsetX, y: dice.scale, z: this.offsetDirection * ownerDirection * (this.midZOffset - 4) },
-            ],
-            curviness: 1.3,
-          },
-          duration: 3.2,
-          delay: index * 0.8,
+          x: dice.group.position.x,
+          y: 2.5,
+          z: dice.group.position.z,
+          duration: 0.4,
+          delay: index * 0.4,
         }).then(() => {
-          dice.toggleDice(false, false)
-          dice.isMovingToEnemy = false
-          !firstDiceFinishedMoving &&
-            (firstDiceFinishedMoving = true) &&
-            setTimeout(() => {
-              firstDiceFinishedMoving = true
-              this.isMovingDices = false
-              this.trigger('finished-moving-dices-to-enemy')
-            }, 500)
+          g.to(dice.group.position, {
+            x: offsetX,
+            y: 2.5,
+            z: this.offsetDirection * ownerDirection * (this.midZOffset - 4),
+            duration: 0.6,
+          }).then(() => {
+            g.to(dice.group.position, {
+              x: offsetX,
+              y: dice.scale,
+              z: this.offsetDirection * ownerDirection * (this.midZOffset - 4),
+              duration: 0.4,
+            }).then(() => {
+              dice.toggleDice(false, false)
+              dice.isMovingToEnemy = false
+            })
+          })
         })
+        !firstDiceFinishedMoving &&
+          (firstDiceFinishedMoving = true) &&
+          setTimeout(() => {
+            firstDiceFinishedMoving = true
+            this.isMovingDices = false
+            this.trigger('finished-moving-dices-to-enemy')
+          }, 4000)
       } else if (highlightMesh.isPlaced) {
         const diceGap = 0.8
         const maxXOffset = (this.world.maxPositionIndex * diceGap) / 2
@@ -222,26 +226,24 @@ export default class DicesHandler extends EventEmitter {
           g.to(dice.group.position, {
             x: dice.group.position.x,
             y: 2.5,
-            z: this.offsetDirection * ownerDirection * 2 + dice.group.position.z,
+            z: dice.group.position.z,
             duration: 1,
             delay: index * 0.3,
-          })
-            .then(() => {
-              g.to(dice.group.position, {
-                x: offsetX,
-                y: 2.5,
-                z: this.offsetDirection * ownerDirection * 2 + dice.group.position.z,
-                duration: 0.6,
-              })
-            })
-            .then(() => {
+          }).then(() => {
+            g.to(dice.group.position, {
+              x: offsetX,
+              y: 2.5,
+              z: this.offsetDirection * ownerDirection + dice.group.position.z,
+              duration: 0.6,
+            }).then(() => {
               g.to(dice.group.position, {
                 x: offsetX,
                 y: dice.scale,
-                z: dice.group.position.z + this.offsetDirection * ownerDirection * -2,
+                z: this.offsetDirection * ownerDirection * -1 + dice.group.position.z,
                 duration: 0.6,
               })
             })
+          })
         }
       }
 
@@ -474,7 +476,7 @@ export default class DicesHandler extends EventEmitter {
       this.currentIntersect = intersections[0].object
       this.dicesList.forEach((dice) => {
         dice.group.getObjectByName('diceHighlight').isHighlighted =
-          this.currentIntersect.name === dice.mesh.name && !dice.highlightMesh.isPlaced
+          this.currentIntersect.name === dice?.mesh?.name && !dice.highlightMesh?.isPlaced
       })
       this.evaluateTopFace()
       this.setDiceTopFaceHighlighter()

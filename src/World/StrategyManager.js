@@ -144,7 +144,10 @@ export default class StrategyManager {
       dice.toggleDice(true, true)
     })
     setTimeout(() => {
-      if (this.dicesHandler.dicesList.some((dice) => dice.highlightMesh?.isSelected)) {
+      if (
+        this.dicesHandler.dicesList.some((dice) => dice.highlightMesh?.isSelected) &&
+        this.dicesHandler.availableThrows > 0
+      ) {
         this.dicesHandler.didNotSelectAnyDices = false
         this.moveDicesToEnemy()
       } else if (this.dicesHandler.availableThrows > 0) {

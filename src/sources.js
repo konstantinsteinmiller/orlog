@@ -136,4 +136,55 @@ export default [
     type: 'texture',
     path: 'textures/debug/zneg.png',
   },
+  /* runes */
+  {
+    name: 'runeAnubis',
+    type: 'gltfModel',
+    path: 'models/runes/runeAnubis.glb',
+  },
+  {
+    name: 'runeBast',
+    type: 'gltfModel',
+    path: 'models/runes/runeBast.glb',
+  },
+  {
+    name: 'runeHorus',
+    type: 'gltfModel',
+    path: 'models/runes/runeHorus.glb',
+  },
+  {
+    name: 'runeIsis',
+    type: 'gltfModel',
+    path: 'models/runes/runeIsis.glb',
+  },
+  {
+    name: 'runeNekhbet',
+    type: 'gltfModel',
+    path: 'models/runes/runeNekhbet.glb',
+  },
+  {
+    name: 'runeOsiris',
+    type: 'gltfModel',
+    path: 'models/runes/runeOsiris.glb',
+  },
+  {
+    name: 'runeRa',
+    type: 'gltfModel',
+    path: 'models/runes/runeRa.glb',
+  },
+  {
+    name: 'runeSeth',
+    type: 'gltfModel',
+    path: 'models/runes/runeSeth.glb',
+  },
+  {
+    name: 'runeShu',
+    type: 'gltfModel',
+    path: 'models/runes/runeShu.glb',
+  },
+  {
+    name: 'runeSerqet',
+    type: 'gltfModel',
+    path: 'models/runes/runeSerqet.glb',
+  },
 ]

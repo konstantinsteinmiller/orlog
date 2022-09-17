@@ -138,3 +138,16 @@ export const GAMES_PHASES = {
   DICE_RESOLVE: 'DICE_RESOLVE',
   FAITH_RESOLVE: 'FAITH_RESOLVE',
 }
+
+export const GAMES_RUNES = {
+  RUNE_SERQET: 'runeSerqet',
+  RUNE_SHU: 'runeShu',
+  RUNE_SETH: 'runeSeth',
+  RUNE_RA: 'runeRa',
+  RUNE_OSIRIS: 'runeOsiris',
+  RUNE_NEKHBET: 'runeNekhbet',
+  RUNE_ISIS: 'runeIsis',
+  RUNE_HORUS: 'runeHorus',
+  RUNE_BAST: 'runeBast',
+  RUNE_ANUBIS: 'runeAnubis',
+}

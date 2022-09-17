@@ -46,7 +46,7 @@ export default class Dice {
     this.setMesh(
       new THREE.Vector3(
         this.modelNumber * 2,
-        -this.modelNumber * 2 - 2,
+        -this.modelNumber * 2 - 1000 /* place the dices out of visible sight */,
         this.offsetDirection * (this.modelNumber * 2 + 1),
       ),
     )

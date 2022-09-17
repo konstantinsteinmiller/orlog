@@ -51,7 +51,7 @@ export default class FaithToken {
     )
   }
 
-  moveFaithTokenToStack(timeoutInMs) {
+  moveFaithTokenToStackAtStart(timeoutInMs) {
     g.fromTo(
       this.mesh.position,
       {
@@ -75,6 +75,13 @@ export default class FaithToken {
         duration: 1.0,
       }),
     )
+  }
+
+  moveFaithTokenToStack() {
+    g.to(this.mesh.position, {
+      ...targetFaithTokenPosition(this.id, this.offsetDirection, this.midZOffset),
+      duration: 0.4,
+    })
   }
 
   moveCreatedFaithTokenToStack() {
@@ -110,13 +117,7 @@ export default class FaithToken {
         })
         .then(() =>
           g.to(this.mesh.position, {
-            x:
-              this.offsetDirection * (6 - Math.floor(this.id / 5) * 0.8 + Math.floor(this.id / 20) * 3.2) +
-              this.offsetDirection * (this.id % 5) * 0.03,
-            y: 0.05 + Math.floor(this.id % 5) * 0.13,
-            z:
-              this.offsetDirection * (this.midZOffset - 1.5 - Math.floor(this.id / 20) * 0.8) -
-              (this.id % 5) * 0.03,
+            ...targetFaithTokenPosition(this.id, this.offsetDirection, this.midZOffset),
             duration: 0.4,
           }),
         ),
@@ -135,5 +136,18 @@ export default class FaithToken {
     this.mesh.receiveShadow = true
   }
 
+  setOwner(attackerPlayer, id) {
+    this.offsetDirection = attackerPlayer.isPlayer ? 1 : -1
+    this.id = id
+  }
+
   update() {}
 }
+
+export const targetFaithTokenPosition = (id, offsetDirection, midZOffset) => ({
+  x:
+    offsetDirection * (6 - Math.floor(id / 5) * 0.8 + Math.floor(id / 20) * 3.2) +
+    offsetDirection * (id % 5) * 0.03,
+  y: 0.05 + Math.floor(id % 5) * 0.13,
+  z: offsetDirection * (midZOffset - 1.5 - Math.floor(id / 20) * 0.8) - (id % 5) * 0.03,
+})

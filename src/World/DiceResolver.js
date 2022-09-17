@@ -1,5 +1,5 @@
 import Experience from '@/Experience.js'
-import FaithToken from '@/World/Models/FaithToken.js'
+import FaithToken, { targetFaithTokenPosition } from '@/World/Models/FaithToken.js'
 import { getStorage } from '@/Utils/storage.js'
 import { GAME_PLAYER_ID, GAME_SYMBOLS } from '@/Utils/constants.js'
 import { gsap as g } from 'gsap'
@@ -17,10 +17,10 @@ export default class DiceResolver {
     this.allDicesList = this.startingPlayer.dicesHandler.dicesList.concat(
       this.secondTurnPlayer.dicesHandler.dicesList,
     )
-    console.log(
-      'this.allDicesList: ',
-      this.allDicesList.map((dice) => dice.mesh.userData?.upwardSymbol),
-    )
+    // console.log(
+    //   'this.allDicesList: ',
+    //   this.allDicesList.map((dice) => dice.mesh.userData?.upwardSymbol),
+    // )
 
     setTimeout(() => {
       this.createFaithTokens()
@@ -78,49 +78,68 @@ export default class DiceResolver {
       upwardSymbol === GAME_SYMBOLS.HAND && secondHandsDices.push(dice)
     })
 
-    await this.resolveAttackingSymbols(
+    /* resolve axes of attacker */
+    await this.resolveDiceSymbols(
       startingAxesDices,
       secondHelmsDices,
       this.startingPlayer,
       this.secondTurnPlayer,
     )
-    /* clean non attacked helmets */
 
-    await this.resolveAttackingSymbols(
+    /* resolve arrows of attacker */
+    await this.resolveDiceSymbols(
       startingArrowsDices,
       secondShieldsDices,
       this.startingPlayer,
       this.secondTurnPlayer,
     )
-    /* clean non attacked shields */
 
-    await this.resolveAttackingSymbols(
+    /* resolve axes of defender */
+    await this.resolveDiceSymbols(
       secondAxesDices,
       startingHelmsDices,
       this.secondTurnPlayer,
       this.startingPlayer,
     )
-    /* clean non attacked helmets */
 
-    await this.resolveAttackingSymbols(
+    /* resolve arrows of defender */
+    await this.resolveDiceSymbols(
       secondArrowsDices,
       startingShieldsDices,
       this.secondTurnPlayer,
       this.startingPlayer,
     )
-    /* clean non attacked shields */
 
-    /* resolve hands */
+    /* resolve hands for attacker */
+    await this.resolveDiceSymbols(
+      startingHandsDices,
+      secondHandsDices,
+      this.startingPlayer,
+      this.secondTurnPlayer,
+      true,
+    )
+
+    /* resolve hands for defender */
+    await this.resolveDiceSymbols(
+      secondHandsDices,
+      startingHandsDices,
+      this.secondTurnPlayer,
+      this.startingPlayer,
+      true,
+    )
   }
 
-  resolveAttackingSymbols(attackerDices, defenderDices, attackerPlayer, defenderPlayer) {
+  resolveDiceSymbols(attackerDices, defenderDices, attackerPlayer, defenderPlayer, isHands) {
     let damageAmount = 0
     return new Promise((resolve) => {
       if (!attackerDices.length) {
+        !isHands &&
+          defenderDices.forEach((die) => {
+            this.moveDieBackToStart(die, defenderPlayer)
+          })
         return resolve()
       } else {
-        /* give the player some time to see what happens */
-        setTimeout(() => {
+        !isHands &&
           attackerDices.forEach((dice, index) => {
             const defenderDie = defenderDices.shift()
             if (defenderDie) {
@@ -136,7 +155,7 @@ export default class DiceResolver {
                 y: 0,
                 z: 0,
                 duration: 0.5,
-                delay: 0.8 + index * 0.3,
+                delay: 0.8 + index * 0.3 /* 0.8sec wait: give the player some time to see what happens */,
               })
               return g
                 .to(dice.group.position, {
@@ -146,13 +165,16 @@ export default class DiceResolver {
                     defenderDie.group.position.z -
                     dice.scale * 2 * defenderPlayer.dicesHandler.offsetDirection,
                   duration: 0.7,
-                  delay: index * 0.3,
+                  delay: 0.8 + index * 0.3,
                 })
                 .then(() => {
                   /* add collision sound here */
                   this.moveDieBackToStart(defenderDie, defenderPlayer)
                   this.moveDieBackToStart(dice, attackerPlayer)
                   if (index === attackerDices.length - 1) {
+                    defenderDices.forEach((die) => {
+                      this.moveDieBackToStart(die, defenderPlayer)
+                    })
                     return resolve()
                   }
                 })
@@ -165,26 +187,107 @@ export default class DiceResolver {
                 damageAmount++
                 return g
                   .to(dice.group.position, {
-                    x: lifeStone.position.x,
-                    y: lifeStone.position.y + dice.scale,
-                    z: lifeStone.position.z - dice.scale * 1.5 * defenderPlayer.dicesHandler.offsetDirection,
+                    x: lifeStone.mesh.position.x,
+                    y: lifeStone.mesh.position.y + dice.scale,
+                    z:
+                      lifeStone.mesh.position.z -
+                      dice.scale * 1.5 * defenderPlayer.dicesHandler.offsetDirection,
                     duration: 1.5,
-                    delay: index * 0.3,
+                    delay: 0.8 + index * 0.3,
                   })
                   .then(() => {
-                    /* add collision sound here */
+                    /* add collision sound with lifeStone here */
                     lifeStone.destroyLifeStone()
                     this.moveDieBackToStart(dice, attackerPlayer)
                     if (index === attackerDices.length - 1) {
+                      defenderDices.forEach((die) => {
+                        this.moveDieBackToStart(die, defenderPlayer)
+                      })
                       return resolve()
                     }
                   })
               } else {
+                defenderDices.forEach((die) => {
+                  this.moveDieBackToStart(die, defenderPlayer)
+                })
                 return resolve()
               }
             }
           })
-        }, 800)
+
+        let faithTokensStolen = 0
+        isHands &&
+          attackerDices.forEach((dice, index) => {
+            const faithTokens = defenderPlayer.faithTokens
+            const faithTokensIndex = faithTokens.length - 1 - faithTokensStolen
+            const defenderFaithToken = defenderPlayer.faithTokens.pop()
+
+            const attackerFaithTokens = attackerPlayer.faithTokens
+            const attackerFaithTokensIndex = attackerFaithTokens.length + faithTokensStolen
+
+            if (faithTokensIndex >= 0) {
+              faithTokensStolen++
+
+              return g
+                .to(dice.group.position, {
+                  x: defenderFaithToken.mesh.position.x,
+                  y: defenderFaithToken.mesh.position.y + dice.scale * 2.3,
+                  z: defenderFaithToken.mesh.position.z,
+                  duration: 1.0,
+                  delay: 0.8 + index * 1.5,
+                })
+                .then(() => {
+                  /* move faithToken up under the dice */
+                  g.to(defenderFaithToken.mesh.position, {
+                    x: defenderFaithToken.mesh.position.x,
+                    y: defenderFaithToken.mesh.position.y + dice.scale,
+                    z: defenderFaithToken.mesh.position.z,
+                    duration: 0.5,
+                  })
+
+                  g.to(dice.group.position, {
+                    x: defenderFaithToken.mesh.position.x,
+                    y: defenderFaithToken.mesh.position.y + dice.scale * 2.5,
+                    z: defenderFaithToken.mesh.position.z,
+                    duration: 0.5,
+                  }).then(() => {
+                    /* move faithToken with the dice to own stack */
+                    const attackerFaithTokenPosition = targetFaithTokenPosition(
+                      attackerFaithTokensIndex,
+                      attackerPlayer.dicesHandler.offsetDirection,
+                      attackerPlayer.dicesHandler.midZOffset,
+                    )
+
+                    g.to(defenderFaithToken.mesh.position, {
+                      x: attackerFaithTokenPosition.x,
+                      y: attackerFaithTokenPosition.y + dice.scale,
+                      z: attackerFaithTokenPosition.z,
+                      duration: 0.8,
+                    })
+
+                    g.to(dice.group.position, {
+                      x: attackerFaithTokenPosition.x,
+                      y: attackerFaithTokenPosition.y + dice.scale * 2.5,
+                      z: attackerFaithTokenPosition.z,
+                      duration: 0.8,
+                    }).then(() => {
+                      defenderFaithToken.setOwner(attackerPlayer, attackerFaithTokensIndex)
+                      attackerPlayer.faithTokens.push(defenderFaithToken)
+
+                      defenderFaithToken.moveFaithTokenToStack()
+                      /* add hand steal sound here */
+                      this.moveDieBackToStart(dice, attackerPlayer)
+                      if (index === attackerDices.length - 1) {
+                        return resolve()
+                      }
+                    })
+                  })
+                })
+            } else {
+              this.moveDieBackToStart(dice, attackerPlayer)
+              return resolve()
+            }
+          })
       }
     })
   }
@@ -202,13 +305,13 @@ export default class DiceResolver {
         duration: 0.3,
       }).then(() => {
         g.to(die.group.position, {
-          x: die.modelNumber * 0.7 + 2.5,
+          x: ownerPlayer.dicesHandler.offsetDirection * (die.modelNumber * 0.7 + 2.5),
           y: 2,
           z: ownerPlayer.dicesHandler.offsetDirection * (ownerPlayer.dicesHandler.midZOffset + 3),
           duration: 0.5,
         }).then(() => {
           g.to(die.group.position, {
-            x: die.modelNumber * 0.7 + 2.5,
+            x: ownerPlayer.dicesHandler.offsetDirection * (die.modelNumber * 0.7 + 2.5),
             y: die.scale,
             z: ownerPlayer.dicesHandler.offsetDirection * (ownerPlayer.dicesHandler.midZOffset + 3),
             duration: 0.2,

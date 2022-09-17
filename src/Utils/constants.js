@@ -133,8 +133,8 @@ export const GAME_PLAYER_TYPES = {
 }
 
 export const GAMES_PHASES = {
-  DICE_ROLL: 'dice-roll-phase',
-  FAITH_CASTING: 'faith-casting-phase',
-  DICE_RESOLVE: 'dice-resolve-phase',
-  FAITH_RESOLVE: 'faith-resolve-phase',
+  DICE_ROLL: 'DICE_ROLL',
+  FAITH_CASTING: 'FAITH_CASTING',
+  DICE_RESOLVE: 'DICE_RESOLVE',
+  FAITH_RESOLVE: 'FAITH_RESOLVE',
 }

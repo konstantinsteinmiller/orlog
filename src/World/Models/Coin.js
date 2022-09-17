@@ -137,6 +137,8 @@ export default class {
       secondPlayer.isStartingPlayer = !isAxesUp
       secondPlayer.isPlayerAtTurn = isAxesUp // let the other player start, so it can switch in world
     }
+
+    this.world.gui.showPhaseOverlay(true)
     !firstPlayer?.isStartingPlayer && firstPlayer.trigger(GAMES_PHASES.DICE_ROLL)
     !secondPlayer?.isStartingPlayer && secondPlayer.trigger(GAMES_PHASES.DICE_ROLL)
   }

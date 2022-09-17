@@ -12,6 +12,7 @@ import {
 } from '@/Utils/constants.js'
 import { setStorage } from '@/Utils/storage.js'
 import DiceResolver from '@/World/DiceResolver.js'
+import GUI from '@/Menus/GUI.js'
 
 export default class World {
   constructor() {
@@ -22,17 +23,13 @@ export default class World {
     this.resources = experience.resources
     this.bowls = []
     this.physics = experience.physics
-    this.isPlayer = true
     this.players = {}
     this.orderedPlayerIds = []
-
-    const direction = this.isPlayer ? 1 : -1
-    this.midZOffset = 5
-    this.offsetDirection = direction
 
     this.currentGamePhase = GAMES_PHASES.DICE_ROLL
     this.playerDoneWithRollingAmount = 0
     this.playerDoneWithFaithCastingAmount = 0
+    this.diceResolver = null
 
     // const axisHelper = new THREE.AxesHelper(3)
     // this.scene.add(axisHelper)
@@ -53,6 +50,7 @@ export default class World {
     this.currentGamePhase = GAMES_PHASES.DICE_ROLL
     this.playerDoneWithRollingAmount = 0
     this.playerDoneWithFaithCastingAmount = 0
+    this.diceResolver = null
   }
 
   setupWorld() {
@@ -60,6 +58,7 @@ export default class World {
     this.floor = new Floor()
     this.environment = new Environment()
     this.createPlayers()
+    this.gui = new GUI()
     this.coin = new Coin()
     this.coin.flipCoin()
   }
@@ -132,8 +131,8 @@ export default class World {
       } else if (this.playerDoneWithRollingAmount === 1) {
         player.trigger(GAMES_PHASES.DICE_ROLL)
       } else {
-        //  both players finished with  GAMES_PHASES.FAITH_CASTING
-        this.debug.isActive && console.log('========= both players finished with  GAMES_PHASES.FAITH_CASTING')
+        //  both players finished with  GAMES_PHASES.DICE_ROLL
+        // this.debug.isActive && console.log('========= both players finished with  GAMES_PHASES.DICE_ROLL')
       }
     })
     player.on('dices-rebuild', () => {
@@ -143,22 +142,28 @@ export default class World {
     player.on(GAMES_PHASES.FAITH_CASTING, () => {
       // this.debug.isActive && console.log('FAITH_CASTING: ', player.playerId)
       if (++this.playerDoneWithRollingAmount === 2) {
-        this.setPlayerAtTurnToStartingPlayer()
         this.currentGamePhase = GAMES_PHASES.FAITH_CASTING
+        this.gui.showPhaseOverlay(true)
+        this.setPlayerAtTurnToStartingPlayer()
         const startingPlayer = this.getStartingPlayer()
         const secondPlayer = this.getStartingPlayer(true)
-        // startingPlayer.startFaithSelection()
-        startingPlayer.trigger(GAMES_PHASES.DICE_RESOLVE)
-        secondPlayer.trigger(GAMES_PHASES.DICE_RESOLVE)
+        startingPlayer.startFaithSelection()
+        // setTimeout(() => {
+        this.debug.isActive && startingPlayer.trigger(GAMES_PHASES.DICE_RESOLVE)
+        this.debug.isActive && secondPlayer.trigger(GAMES_PHASES.DICE_RESOLVE)
+        // }, 4000)
       }
     })
 
     player.on(GAMES_PHASES.DICE_RESOLVE, () => {
       if (++this.playerDoneWithFaithCastingAmount === 2) {
-        this.setPlayerAtTurnToStartingPlayer()
         this.currentGamePhase = GAMES_PHASES.DICE_RESOLVE
+        this.gui.showPhaseOverlay(true)
+        this.setPlayerAtTurnToStartingPlayer()
         // this.debug.isActive && console.log('Phase - DICE_RESOLVE: ', player.playerId)
-        this.diceResolver = new DiceResolver()
+        if (this.diceResolver === null) {
+          this.diceResolver = new DiceResolver()
+        }
       }
     })
 

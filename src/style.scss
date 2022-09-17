@@ -67,6 +67,7 @@ body,
 .fading-bg {
     font-family: 'Inconsolata', monospace;
     font-size: 15px;
+    font-style: italic;
     position: fixed;
     color: white;
     bottom: 20px;
@@ -86,8 +87,26 @@ body,
     border-left: 2px;
     border-style: solid;
     border-color: #3e3a3a08;
+    border-radius: 1rem;
 
     img {
         display: inline-block;
     }
 }
+
+.game-phase {
+    text-align: center;
+    font-style: italic;
+    font-size: 60px;
+    bottom: 50%;
+    width: 80%;
+    transform: translate(-50%, 50%);
+    filter: contrast(500%) brightness(500%);
+    //linear-gradient(0deg, rgba(37,37,45,0.9) 0%, rgba(0,0,0,0) 50%, rgba(37,37,45,0.9) 100%),
+    background:
+      linear-gradient(0deg, rgba(0,0,0,0) 0%, rgba(37,37,45,0.8) 30%, rgba(37,37,45,0.8) 70%, rgba(0,0,0,0) 100%),
+          //linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(37,37,45,0.3) 30%, rgba(37,37,45,0.3) 70%, rgba(0,0,0,0) 100%),
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 344 344' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='2.15' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' opacity='0.01' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    border-radius: 1rem;
+}
+

@@ -71,7 +71,7 @@ export default class DicesHandler extends EventEmitter {
     this.input.on('dblclick', () => {
       /* hide the controls overlay */
       this.actionAfterDiceRollTimeout = Date.now()
-      this.showControlsOverlay(false)
+      this.world.gui.showControlsOverlay(false)
 
       const playerIdAtTurn = this.world.getPlayerAtTurn()?.playerId
       if (
@@ -573,7 +573,7 @@ export default class DicesHandler extends EventEmitter {
 
   toggleDiceSelection() {
     this.actionAfterDiceRollTimeout = Date.now()
-    this.showControlsOverlay(false)
+    this.world.gui.showControlsOverlay(false)
 
     const player = this.world.players[this.playerId]
     if (this.currentIntersect && !this.isThrowing) {
@@ -625,7 +625,7 @@ export default class DicesHandler extends EventEmitter {
         this.trigger('faces-evaluated')
 
         if (this.availableThrows === 0) {
-          this.showControlsOverlay(false)
+          this.world.gui.showControlsOverlay(false)
           this.dicesList.forEach((dice) => {
             const diceHighlightMesh = dice.group.getObjectByName('diceHighlight')
             if (!diceHighlightMesh.isSelected && !diceHighlightMesh.isPlaced) {
@@ -647,17 +647,13 @@ export default class DicesHandler extends EventEmitter {
             Date.now() - this.actionAfterDiceRollTimeout > 7000 &&
             this.world.currentGamePhase === GAMES_PHASES.DICE_ROLL
           ) {
-            this.showControlsOverlay(true)
+            this.world.gui.showControlsOverlay(true)
           }
         }, 7000)
 
       return true
     }
     return false
-  }
-
-  showControlsOverlay(isVisible) {
-    $controlsInfo.style.opacity = isVisible ? 0.8 : 0
   }
 
   update() {

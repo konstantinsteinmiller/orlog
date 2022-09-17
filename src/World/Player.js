@@ -5,7 +5,7 @@ import Bowl from '@/World/Models/Bowl.js'
 import LifeStone from '@/World/Models/LifeStone.js'
 import FaithToken from '@/World/Models/FaithToken.js'
 import Experience from '@/Experience.js'
-import { GAME_PLAYER_TYPES, GAMES_PHASES } from '@/Utils/constants.js'
+import { GAME_PLAYER_TYPES, GAMES_PHASES, GAME_STARTING_LIFE_STONES } from '@/Utils/constants.js'
 
 export default class Player extends EventEmitter {
   constructor(playerId, isPlayer) {
@@ -66,8 +66,8 @@ export default class Player extends EventEmitter {
     new Bowl(this.isPlayer)
     this.lifeStones = []
     this.faithTokens = []
-    this.lifeStones = [...Array(15).keys()].map((id) => new LifeStone(this.isPlayer, id, id * 0.1))
-    this.faithTokens = [...Array(13).keys()].map((id) => new FaithToken(this.isPlayer, id, id * 0.2))
+    this.lifeStones = [...Array(GAME_STARTING_LIFE_STONES).keys()].map((id) => new LifeStone(this.isPlayer, id, id * 0.1))
+    // this.faithTokens = [...Array(13).keys()].map((id) => new FaithToken(this.isPlayer, id, id * 0.2))
 
     this.dicesHandler.on('finished-moving-dices-to-enemy', () => {
       if (this.dicesHandler.dicesList.every((dice) => dice.highlightMesh?.isPlaced)) {

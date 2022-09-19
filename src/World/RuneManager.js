@@ -1,5 +1,7 @@
 import Experience from '@/Experience.js'
-import webGL from 'three/examples/jsm/capabilities/WebGL.js';
+import webGL from 'three/examples/jsm/capabilities/WebGL.js'
+import Rune from '@/World/Models/Rune.js'
+import { GAMES_RUNES } from '@/Utils/constants.js'
 
 export default class RuneManager {
   constructor() {
@@ -14,6 +16,21 @@ export default class RuneManager {
     this.rayCaster = new THREE.Raycaster()
     this.currentIntersect = null
     this.previousIntersect = null
+
+    this.runes = [
+      new Rune(0, GAMES_RUNES.RUNE_ANUBIS, this.isPlayer, this),
+      new Rune(1, GAMES_RUNES.RUNE_BAST, this.isPlayer, this),
+      new Rune(2, GAMES_RUNES.RUNE_HORUS, this.isPlayer, this),
+      new Rune(3, GAMES_RUNES.RUNE_ISIS, this.isPlayer, this),
+      new Rune(4, GAMES_RUNES.RUNE_SHU, this.isPlayer, this),
+      new Rune(5, GAMES_RUNES.RUNE_SERQET, this.isPlayer, this),
+      new Rune(6, GAMES_RUNES.RUNE_SETH, this.isPlayer, this),
+      new Rune(7, GAMES_RUNES.RUNE_RA, this.isPlayer, this),
+      new Rune(8, GAMES_RUNES.RUNE_OSIRIS, this.isPlayer, this),
+      new Rune(9, GAMES_RUNES.RUNE_TAWARET, this.isPlayer, this),
+      new Rune(10, GAMES_RUNES.RUNE_NEKHBET, this.isPlayer, this),
+      // new Rune(11, GAMES_RUNES.RUNE_BABI, this.isPlayer, ownerPlayer),
+    ]
 
     this.runesMeshes = Object.values(this.world.players).reduce(
       (runeMeshesList, player) => runeMeshesList.concat(player.runes.map((rune) => rune.mesh)),
@@ -56,8 +73,9 @@ export default class RuneManager {
           this.previousIntersect?.toggleRune(false, this.previousIntersect?.isSelected)
         }
         this.previousIntersect = this.currentIntersect
-
-        this.gui.toggleCursor(true)
+        if (this.currentIntersect?.owner.playerId === this.world.getSessionPlayer()) {
+          this.gui.toggleCursor(true)
+        }
         this.currentIntersect.toggleRune(true, this.currentIntersect.isSelected)
         this.gui.showRuneOverlay(this.currentIntersect?.type)
       }

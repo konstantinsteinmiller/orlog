@@ -71,19 +71,27 @@ export default class Player extends EventEmitter {
     this.lifeStones = []
     this.faithTokens = []
     this.runes = []
+
+    let debugRunes = []
+    if (this.debug.isActive) {
+      debugRunes = [
+        new Rune(3, GAMES_RUNES.RUNE_ISIS, this.isPlayer, this),
+        new Rune(4, GAMES_RUNES.RUNE_SHU, this.isPlayer, this),
+        new Rune(5, GAMES_RUNES.RUNE_SERQET, this.isPlayer, this),
+        new Rune(6, GAMES_RUNES.RUNE_SETH, this.isPlayer, this),
+        new Rune(7, GAMES_RUNES.RUNE_RA, this.isPlayer, this),
+        new Rune(8, GAMES_RUNES.RUNE_OSIRIS, this.isPlayer, this),
+        new Rune(9, GAMES_RUNES.RUNE_TAWARET, this.isPlayer, this),
+        new Rune(10, GAMES_RUNES.RUNE_NEKHBET, this.isPlayer, this),
+        // new Rune(11, GAMES_RUNES.RUNE_BABI, this.isPlayer, ownerPlayer),
+      ]
+    }
+
     this.runes = [
       new Rune(0, GAMES_RUNES.RUNE_ANUBIS, this.isPlayer, this),
       new Rune(1, GAMES_RUNES.RUNE_BAST, this.isPlayer, this),
       new Rune(2, GAMES_RUNES.RUNE_HORUS, this.isPlayer, this),
-      new Rune(3, GAMES_RUNES.RUNE_ISIS, this.isPlayer, this),
-      new Rune(4, GAMES_RUNES.RUNE_SHU, this.isPlayer, this),
-      new Rune(5, GAMES_RUNES.RUNE_SERQET, this.isPlayer, this),
-      new Rune(6, GAMES_RUNES.RUNE_SETH, this.isPlayer, this),
-      new Rune(7, GAMES_RUNES.RUNE_RA, this.isPlayer, this),
-      new Rune(8, GAMES_RUNES.RUNE_OSIRIS, this.isPlayer, this),
-      new Rune(9, GAMES_RUNES.RUNE_TAWARET, this.isPlayer, this),
-      new Rune(10, GAMES_RUNES.RUNE_NEKHBET, this.isPlayer, this),
-      // new Rune(11, GAMES_RUNES.RUNE_BABI, this.isPlayer, ownerPlayer),
+      ...debugRunes,
     ]
     this.lifeStones = [...Array(GAME_STARTING_LIFE_STONES).keys()].map(
       (id) => new LifeStone(this, this.isPlayer, id, id * 0.1),

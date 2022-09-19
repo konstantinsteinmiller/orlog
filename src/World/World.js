@@ -10,9 +10,10 @@ import {
   GAME_PLAYER_ID,
   MAX_DICE_THROWS,
 } from '@/Utils/constants.js'
-import { setStorage } from '@/Utils/storage.js'
+import { getStorage, setStorage } from '@/Utils/storage.js'
 import DiceResolver from '@/World/DiceResolver.js'
 import GUI from '@/Menus/GUI.js'
+import RuneManager from '@/World/RuneManager.js'
 
 export default class World {
   constructor() {
@@ -22,6 +23,7 @@ export default class World {
     this.sounds = experience.sounds
     this.resources = experience.resources
     this.bowls = []
+    this.gui = null
     this.physics = experience.physics
     this.players = {}
     this.orderedPlayerIds = []
@@ -61,6 +63,7 @@ export default class World {
     this.gui = new GUI()
     this.coin = new Coin()
     this.coin.flipCoin()
+    this.runeManager = new RuneManager()
   }
 
   createPlayers() {
@@ -73,8 +76,10 @@ export default class World {
     } else if (this.experience.gameMode === GAME_TYPES.GAME_TYPE_MULTIPLAYER) {
       // setStorage(GAME_PLAYER_ID, client.sessionId..., true)
       // setStorage(GAME_PLAYER_ID, client.sessionId..., true)
-      this.createPlayer(GAME_PLAYER_TYPES.GAME_PLAYER_TYPE_PLAYER, true)
-      this.createPlayer(GAME_PLAYER_TYPES.GAME_PLAYER_TYPE_NPC)
+      const sessionPlayer = getStorage(GAME_PLAYER_ID, true)
+      const remotePlayer = 'xxxxxxxx'
+      this.createPlayer(sessionPlayer, true)
+      this.createPlayer(remotePlayer)
     }
     this.diceArrangeManager = new DiceArrangeManager()
   }
@@ -179,9 +184,22 @@ export default class World {
     secondPlayer.isPlayerAtTurn = false
   }
 
+  getSessionPlayer() {
+    return getStorage(GAME_PLAYER_ID, true)
+  }
+
+  isDiceRollPhase() {
+    return this.currentGamePhase === GAMES_PHASES.DICE_ROLL
+  }
+
+  isFaithCastingPhase() {
+    return this.currentGamePhase === GAMES_PHASES.FAITH_CASTING
+  }
+
   update() {
     Object.values(this.players).forEach((player) => {
       player?.update()
     })
+    this.runeManager?.update()
   }
 }

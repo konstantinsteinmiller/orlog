@@ -2,7 +2,7 @@ import { disposeMeshAndRemoveFromScene } from '@/Utils/ThreeHelpers.js'
 import { gsap as g } from 'gsap'
 
 export default class LifeStone {
-  constructor(isPlayer = false, id = 0, timeoutInMs = 0) {
+  constructor(owner, isPlayer = false, id = 0, timeoutInMs = 0) {
     this.experience = experience
     this.physics = experience.physics
     this.scene = this.experience.scene
@@ -11,6 +11,7 @@ export default class LifeStone {
     this.midZOffset = 5
     this.offsetDirection = isPlayer ? 1 : -1
 
+    this.owner = owner
     this.id = id
     this.modelNumber = Math.floor(Math.random() * 4)
     this.scale = 0.25
@@ -29,6 +30,7 @@ export default class LifeStone {
   destroyLifeStone(timeoutInMs) {
     const timeout = timeoutInMs * 0.001
     this.toggleHighlight()
+    this.owner.lifeStones.pop()
     g.to(this.mesh.position, {
       x: this.offsetDirection * (-6 + 2.1),
       y: 2.5,

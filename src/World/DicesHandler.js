@@ -37,6 +37,7 @@ export default class DicesHandler extends EventEmitter {
     this.sounds = this.experience.sounds
     this.camera = this.experience.camera.instance
     this.world = this.experience.world
+    this.gui = null
 
     this.sessionPlayer = getStorage(GAME_PLAYER_ID, true)
     this.playerId = playerId
@@ -410,6 +411,7 @@ export default class DicesHandler extends EventEmitter {
   }
 
   createDices() {
+    this.gui = this.world.gui
     const player = this.world.players[this.playerId]
     if (!player.isPlayerAtTurn) {
       return
@@ -484,6 +486,15 @@ export default class DicesHandler extends EventEmitter {
       })
       this.evaluateTopFace()
       this.setDiceTopFaceHighlighter()
+
+      if (
+        this.isPlayer &&
+        this.currentIntersect?.userData?.playerId === this.playerId &&
+        this.world.isDiceRollPhase()
+      ) {
+        console.log('isDiceRollPhase: ', this.world.isDiceRollPhase())
+        this.gui.toggleCursor(true)
+      }
     } else {
       if (this.currentIntersect) {
         if (this.previousIntersect?.name !== this.currentIntersect?.name) {
@@ -492,6 +503,8 @@ export default class DicesHandler extends EventEmitter {
         if (this.currentIntersect.parent) {
           this.currentIntersect.parent.getObjectByName('diceHighlight').isHighlighted = false
         }
+        console.log('remove CURSOR: ')
+        this.gui.toggleCursor(false)
         diceFacesLayout.style.opacity = 0
       }
       this.previousIntersect = { name: this.currentIntersect?.name }

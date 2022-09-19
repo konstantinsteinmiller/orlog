@@ -150,4 +150,6 @@ export const GAMES_RUNES = {
   RUNE_HORUS: 'runeHorus',
   RUNE_BAST: 'runeBast',
   RUNE_ANUBIS: 'runeAnubis',
+  RUNE_TAWARET: 'runeTawaret',
+  RUNE_BABI: 'runeBabi',
 }

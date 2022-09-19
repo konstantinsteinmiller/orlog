@@ -1,5 +1,5 @@
 import './app.css'
-import './style.scss'
+// import './style.scss'
 
 import backgroundMusicTrack from '/public/sounds/background-music-track-complete.ogg'
 import Experience from '@/Experience.js'

@@ -18,4 +18,17 @@ export default class GUI {
       $phaseOverlay.style.opacity = 0
     }, 3000)
   }
+
+  showRuneOverlay(type) {
+    // console.log('showRuneOverlay: ', type)
+    // $phaseOverlay.innerText = `${GAMES_PHASES[this.world.currentGamePhase].replace('_', ' ')} PHASE`
+    // $phaseOverlay.style.opacity = isVisible ? 0.8 : 0
+    // setTimeout(() => {
+    //   $phaseOverlay.style.opacity = 0
+    // }, 3000)
+  }
+
+  toggleCursor(isPointer) {
+    webgl.style.cursor = isPointer ? 'pointer' : 'default'
+  }
 }

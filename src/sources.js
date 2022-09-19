@@ -92,6 +92,26 @@ export default [
     path: 'sounds/ground_hit_3.wav',
   },
   {
+    name: 'arrowHitTargetAndWobble',
+    type: 'audioLoader',
+    path: 'sounds/arrow-hit-target-and-wobble.ogg',
+  },
+  {
+    name: 'arrowIntoStone',
+    type: 'audioLoader',
+    path: 'sounds/arrow-into-stone.ogg',
+  },
+  {
+    name: 'axeHitMetal',
+    type: 'audioLoader',
+    path: 'sounds/axe-hit-metal.ogg',
+  },
+  {
+    name: 'axeHitStoneBreak',
+    type: 'audioLoader',
+    path: 'sounds/axe-hit-stone-break.ogg',
+  },
+  {
     name: 'bowl',
     type: 'gltfModel',
     path: 'models/bowl/bowl.glb',
@@ -186,5 +206,10 @@ export default [
     name: 'runeSerqet',
     type: 'gltfModel',
     path: 'models/runes/runeSerqet.glb',
+  },
+  {
+    name: 'runeTawaret',
+    type: 'gltfModel',
+    path: 'models/runes/runeTawaret.glb',
   },
 ]

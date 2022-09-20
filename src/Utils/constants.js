@@ -141,7 +141,25 @@ export const GAMES_PHASES = {
   FAITH_RESOLVE: 'FAITH_RESOLVE',
 }
 
+/*
+ * Runes
+ * */
 export const GAMES_RUNES = {
+  RUNE_SERQET: 'RUNE_SERQET',
+  RUNE_SHU: 'RUNE_SHU',
+  RUNE_SETH: 'RUNE_SETH',
+  RUNE_RA: 'RUNE_RA',
+  RUNE_OSIRIS: 'RUNE_OSIRIS',
+  RUNE_NEKHBET: 'RUNE_NEKHBET',
+  RUNE_ISIS: 'RUNE_ISIS',
+  RUNE_HORUS: 'RUNE_HORUS',
+  RUNE_BAST: 'RUNE_BAST',
+  RUNE_ANUBIS: 'RUNE_ANUBIS',
+  RUNE_TAWARET: 'RUNE_TAWARET',
+  RUNE_BABI: 'RUNE_BABI',
+  RUNE_NEPHTHYS: 'RUNE_NEPHTHYS',
+}
+export const GAMES_RUNE_MODELS = {
   RUNE_SERQET: 'runeSerqet',
   RUNE_SHU: 'runeShu',
   RUNE_SETH: 'runeSeth',
@@ -154,4 +172,123 @@ export const GAMES_RUNES = {
   RUNE_ANUBIS: 'runeAnubis',
   RUNE_TAWARET: 'runeTawaret',
   RUNE_BABI: 'runeBabi',
+  RUNE_NEPHTHYS: 'runeNephthys',
+}
+
+export const RUNE_RESOLUTION_TYPES = {
+  BEGINNING_RESOLUTION: 'BEGINNING_RESOLUTION',
+  END_RESOLUTION: 'END_RESOLUTION',
+}
+
+export const RUNE_RESOLUTION_TYPES_DESCRIPTION = {
+  BEGINNING_RESOLUTION: 'Before dice resolution',
+  END_RESOLUTION: 'After dice resolution',
+}
+
+export const GAME_RUNES_DESCRIPTIONS = {
+  RUNE_SERQET: {
+    name: 'Serquet\'s sting',
+    description: 'each unblocked die deals X times damage (rounded up)',
+    tier1: { cost: { faith: '3', souls: '' }, text: '1.5x per die', value: 1.5 },
+    tier2: { cost: { faith: '6', souls: '' }, text: '2x per die' },
+    value: 2,
+    tier3: { cost: { faith: '10', souls: '' }, text: '2.5x per die', value: 2.5 },
+    type: RUNE_RESOLUTION_TYPES.BEGINNING_RESOLUTION,
+  },
+  RUNE_SHU: {
+    name: '\'s ',
+    description: '',
+    tier1: { cost: { faith: '0', souls: '' }, text: '+ 0 life stone', value: 0 },
+    tier2: { cost: { faith: '0', souls: '' }, text: '+ 0 life stone', value: 0 },
+    tier3: { cost: { faith: '0', souls: '' }, text: '+ 0 life stone', value: 0 },
+    type: RUNE_RESOLUTION_TYPES.END_RESOLUTION,
+  },
+  RUNE_SETH: {
+    name: 'Set\'s trickery',
+    description: 'Remove up to X dice from the enemies dice',
+    tier1: { cost: { faith: '3', souls: '' }, text: '+ 1 die', value: 1 },
+    tier2: { cost: { faith: '5', souls: '' }, text: '+ 2 dice', value: 2 },
+    tier3: { cost: { faith: '8', souls: '' }, text: '+ 3 dice', value: 3 },
+    type: RUNE_RESOLUTION_TYPES.BEGINNING_RESOLUTION,
+  },
+  RUNE_RA: {
+    name: '\'s ',
+    description: '',
+    tier1: { cost: { faith: '0', souls: '' }, text: '+ 0 life stone', value: 0 },
+    tier2: { cost: { faith: '0', souls: '' }, text: '+ 0 life stone', value: 0 },
+    tier3: { cost: { faith: '0', souls: '' }, text: '+ 0 life stone', value: 0 },
+    type: RUNE_RESOLUTION_TYPES.END_RESOLUTION,
+  },
+  RUNE_OSIRIS: {
+    name: '\'s ',
+    description: ' <i>dice resolution phase</i>',
+    // tier1: { cost: { faith: '3', souls: '' }, text: '+ 1 die', value: 1 },
+    // tier2: { cost: { faith: '5', souls: '' }, text: '+ 2 dice', value: 2 },
+    // tier3: { cost: { faith: '8', souls: '' }, text: '+ 3 dice', value: 3 },
+    // type: RUNE_RESOLUTION_TYPES.BEGINNING_RESOLUTION,
+  },
+  RUNE_NEKHBET: {
+    name: '\'s ',
+    description: '',
+    tier1: { cost: { faith: '0', souls: '' }, text: '+ 0 life stone', value: 0 },
+    tier2: { cost: { faith: '0', souls: '' }, text: '+ 0 life stone', value: 0 },
+    tier3: { cost: { faith: '0', souls: '' }, text: '+ 0 life stone', value: 0 },
+    type: RUNE_RESOLUTION_TYPES.END_RESOLUTION,
+  },
+  RUNE_ISIS: {
+    name: '\'s ',
+    description: '',
+    tier1: { cost: { faith: '0', souls: '' }, text: '+ 0 life stone', value: 0 },
+    tier2: { cost: { faith: '0', souls: '' }, text: '+ 0 life stone', value: 0 },
+    tier3: { cost: { faith: '0', souls: '' }, text: '+ 0 life stone', value: 0 },
+    type: RUNE_RESOLUTION_TYPES.END_RESOLUTION,
+  },
+  RUNE_HORUS: {
+    name: '\'s ',
+    description: '',
+    tier1: { cost: { faith: '0', souls: '' }, text: '+ 0 life stone', value: 0 },
+    tier2: { cost: { faith: '0', souls: '' }, text: '+ 0 life stone', value: 0 },
+    tier3: { cost: { faith: '0', souls: '' }, text: '+ 0 life stone', value: 0 },
+    type: RUNE_RESOLUTION_TYPES.END_RESOLUTION,
+  },
+  RUNE_BAST: {
+    name: '\'s ',
+    description: '',
+    tier1: { cost: { faith: '0', souls: '' }, text: '+ 0 life stone', value: 0 },
+    tier2: { cost: { faith: '0', souls: '' }, text: '+ 0 life stone', value: 0 },
+    tier3: { cost: { faith: '0', souls: '' }, text: '+ 0 life stone', value: 0 },
+    type: RUNE_RESOLUTION_TYPES.END_RESOLUTION,
+  },
+  RUNE_ANUBIS: {
+    name: '\'s ',
+    description: '',
+    tier1: { cost: { faith: '0', souls: '' }, text: '+ 0 life stone', value: 0 },
+    tier2: { cost: { faith: '0', souls: '' }, text: '+ 0 life stone', value: 0 },
+    tier3: { cost: { faith: '0', souls: '' }, text: '+ 0 life stone', value: 0 },
+    type: RUNE_RESOLUTION_TYPES.END_RESOLUTION,
+  },
+  RUNE_TAWARET: {
+    name: 'Tawaret\'s fertility',
+    description: 'Add X life stones',
+    tier1: { cost: { faith: '2', souls: '' }, text: '+ 1 life stone', value: 1 },
+    tier2: { cost: { faith: '6', souls: '' }, text: '+ 3 life stones', value: 3 },
+    tier3: { cost: { faith: '11', souls: '' }, text: '+ 5 life stones', value: 5 },
+    type: RUNE_RESOLUTION_TYPES.BEGINNING_RESOLUTION,
+  },
+  RUNE_BABI: {
+    name: 'Babi\'s bloodthirst',
+    description: 'Destroy X enemy\'s life stones',
+    tier1: { cost: { faith: '2', souls: '' }, text: '- 1 life stone', value: -1 },
+    tier2: { cost: { faith: '5', souls: '' }, text: '- 3 life stones', value: -3 },
+    tier3: { cost: { faith: '11', souls: '' }, text: '- 5 life stones', value: -5 },
+    type: RUNE_RESOLUTION_TYPES.END_RESOLUTION,
+  },
+  RUNE_NEPHTHYS: {
+    name: 'Nephthys\'s rites',
+    description: 'Receive faith tokens for each destroyed life stone',
+    tier1: { cost: { faith: '2', souls: '' }, text: '+ 1 per life stone', value: 1 },
+    tier2: { cost: { faith: '5', souls: '' }, text: '+ 2 per life stone', value: 2 },
+    tier3: { cost: { faith: '9', souls: '' }, text: '+ 3 per life stone', value: 3 },
+    type: RUNE_RESOLUTION_TYPES.END_RESOLUTION,
+  },
 }

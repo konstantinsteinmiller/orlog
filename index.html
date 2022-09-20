@@ -16,7 +16,7 @@
     </style>
 </head>
 <body>
-    <div class="ogame">
+    <div class="ogame" id="$gameWrapper">
         <canvas id="webgl"></canvas>
         <div class="dice-layout" id="diceFacesLayout">
             <img class="selection--disabled"
@@ -35,6 +35,32 @@
         <div class="fading-bg is-web selection--disabled" id="$controlsInfo">
             <img src="/public/textures/ui/mouse-click-icon2.png" width="15"> to select a die. <img src="/public/textures/ui/mouse-click-icon2.png" width="15"> <img src="/public/textures/ui/mouse-click-icon2.png" width="15"> to confirm
 <!--            <img src="/public/textures/ui/finger-tag-mobile.png" width="15"> to select a die. <img src="/public/textures/ui/finger-tag-mobile.png" width="15"> <img src="/public/textures/ui/finger-tag-mobile.png" width="15"> to confirm-->
+        </div>
+        <div class="fading-bg is-web selection--disabled" id="$controlsFaithInfo">
+            <img src="/public/textures/ui/mouse-click-icon2.png" width="15"> on rune to chose faith grant. <img src="/public/textures/ui/mouse-click-icon2.png" width="15"> <img src="/public/textures/ui/mouse-click-icon2.png" width="15"> to confirm
+<!--            <img src="/public/textures/ui/finger-tag-mobile.png" width="15"> to select a die. <img src="/public/textures/ui/finger-tag-mobile.png" width="15"> <img src="/public/textures/ui/finger-tag-mobile.png" width="15"> to confirm-->
+        </div>
+        <div class="fading-bg rune-info is-web selection--disabled" id="runeInfo">
+            <h3 id="runeName"></h3>
+            <div id="runeDescription"></div>
+            <hr>
+            <div id="runeTier1" class="tier tier--selected" data-tier="1">
+                <span class="tier-cost tier-select" data-tier="1"></span>
+                <img class="tier-cost-img tier--selected" data-tier="1" width="20" height="20">
+                <span class="tier-text tier--selected" data-tier="1"></span>
+            </div>
+            <div id="runeTier2" class="tier tier--selected" data-tier="2">
+                <span class="tier-cost tier--selected" data-tier="2"></span>
+                <img class="tier-cost-img" data-tier="2" width="20" height="20">
+                <span class="tier-text tier--selected" data-tier="2"></span>
+            </div>
+            <div id="runeTier3" class="tier tier--selected" data-tier="3">
+                <span class="tier-cost tier--selected" data-tier="3"></span>
+                <img class="tier-cost-img tier--selected" data-tier="3" width="20" height="20">
+                <span class="tier-text tier--selected" data-tier="3"></span>
+            </div>
+            <hr>
+            <div id="runeType"></div>
         </div>
         <div class="fading-bg game-phase selection--disabled" id="$phaseOverlay"></div>
         <div id="backToMenuButton">

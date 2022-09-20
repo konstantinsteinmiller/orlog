@@ -492,7 +492,6 @@ export default class DicesHandler extends EventEmitter {
         this.currentIntersect?.userData?.playerId === this.playerId &&
         this.world.isDiceRollPhase()
       ) {
-        console.log('isDiceRollPhase: ', this.world.isDiceRollPhase())
         this.gui.toggleCursor(true)
       }
     } else {
@@ -503,7 +502,6 @@ export default class DicesHandler extends EventEmitter {
         if (this.currentIntersect.parent) {
           this.currentIntersect.parent.getObjectByName('diceHighlight').isHighlighted = false
         }
-        console.log('remove CURSOR: ')
         this.gui.toggleCursor(false)
         diceFacesLayout.style.opacity = 0
       }

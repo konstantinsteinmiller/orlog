@@ -153,9 +153,10 @@ export default class World {
         const startingPlayer = this.getStartingPlayer()
         const secondPlayer = this.getStartingPlayer(true)
         startingPlayer.startFaithSelection()
+        this.runeManager.showControlHint()
         // setTimeout(() => {
-        this.debug.isActive && startingPlayer.trigger(GAMES_PHASES.DICE_RESOLVE)
-        this.debug.isActive && secondPlayer.trigger(GAMES_PHASES.DICE_RESOLVE)
+        // this.debug.isActive && startingPlayer.trigger(GAMES_PHASES.DICE_RESOLVE)
+        // this.debug.isActive && secondPlayer.trigger(GAMES_PHASES.DICE_RESOLVE)
         // }, 4000)
       }
     })
@@ -184,8 +185,17 @@ export default class World {
     secondPlayer.isPlayerAtTurn = false
   }
 
-  getSessionPlayer() {
+  getSessionPlayerId() {
     return getStorage(GAME_PLAYER_ID, true)
+  }
+
+  getEnemyPlayer() {
+    const sessionPlayerId = getStorage(GAME_PLAYER_ID, true)
+    return this.players.find((player) => player.playerId === sessionPlayerId)
+  }
+
+  isSessionPlayerAtTurn() {
+    return this.getPlayerAtTurn()?.playerId === this.getSessionPlayerId()
   }
 
   isDiceRollPhase() {

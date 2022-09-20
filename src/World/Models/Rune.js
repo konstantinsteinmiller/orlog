@@ -1,3 +1,6 @@
+import { GAMES_RUNE_MODELS, GAME_RUNES_DESCRIPTIONS } from '@/Utils/constants.js'
+import { gsap as g } from 'gsap'
+
 export default class Rune {
   constructor(id, type, isPlayer, player) {
     this.experience = experience
@@ -12,10 +15,14 @@ export default class Rune {
     this.owner = player
     this.instance = this
     this.id = id
+    this.model = GAMES_RUNE_MODELS[type]
     this.type = type
     this.scale = 2.5
     this.isHighlighted = false
     this.isSelected = false
+    this.selectedTier = null
+    this.rune = GAME_RUNES_DESCRIPTIONS[this.type]
+    this.didPayTierPrice = false
 
     const xPosition = 3.5 + this.id * 2.1
     const zPosition = this.midZOffset + 1
@@ -27,7 +34,7 @@ export default class Rune {
   }
 
   setMesh() {
-    this.mesh = this.resources.items[this.type].scene.children[0].clone(true)
+    this.mesh = this.resources.items[this.model].scene.children[0].clone(true)
 
     this.mesh.scale.set(this.scale, this.scale, this.scale)
     this.mesh.position.copy(this.position)
@@ -40,7 +47,6 @@ export default class Rune {
         color: 0x7a7a00,
         transparent: true,
         opacity: 0,
-        // opacity: 0.25,
       }),
     )
     const highlightScale = 1.1
@@ -63,5 +69,33 @@ export default class Rune {
     this.isHighlighted = doHighLight
     this.highlightMesh.material.opacity = isSelected ? 0.3 : this.isHighlighted ? 0.4 : 0
     this.highlightMesh.material.color.set(isSelected ? 0x00ff00 : 0x7a7a00)
+  }
+
+  payTierPrice() {
+    const attackerPlayer = this.experience.world.getPlayerAtTurn()
+    const tier = this.rune[this.selectedTier]
+    if (attackerPlayer.faithTokens.length >= +tier.cost.faith) {
+      attackerPlayer.destroyFaithTokens(+tier.cost.faith)
+      this.didPayTierPrice = true
+      this.enlargeRuneHighlight()
+    } else {
+      this.toggleRune(this.isHighlighted, false)
+    }
+  }
+
+  enlargeRuneHighlight() {
+    g.to(this.highlightMesh.scale, {
+      x: this.scale * 1.3,
+      y: this.scale * 1.3,
+      z: this.scale * 1.3,
+      duration: 0.7,
+    }).then(() => {
+      g.to(this.highlightMesh.scale, {
+        x: this.scale,
+        y: this.scale,
+        z: this.scale,
+        duration: 0.7,
+      })
+    })
   }
 }

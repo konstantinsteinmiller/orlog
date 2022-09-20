@@ -212,4 +212,14 @@ export default [
     type: 'gltfModel',
     path: 'models/runes/runeTawaret.glb',
   },
+  {
+    name: 'runeNephthys',
+    type: 'gltfModel',
+    path: 'models/runes/runeNephthys.glb',
+  },
+  {
+    name: 'runeBabi',
+    type: 'gltfModel',
+    path: 'models/runes/runeBabi.glb',
+  },
 ]

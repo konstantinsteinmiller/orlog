@@ -83,14 +83,15 @@ export default class Player extends EventEmitter {
         new Rune(8, GAMES_RUNES.RUNE_OSIRIS, this.isPlayer, this),
         new Rune(9, GAMES_RUNES.RUNE_TAWARET, this.isPlayer, this),
         new Rune(10, GAMES_RUNES.RUNE_NEKHBET, this.isPlayer, this),
-        // new Rune(11, GAMES_RUNES.RUNE_BABI, this.isPlayer, ownerPlayer),
+        new Rune(11, GAMES_RUNES.RUNE_HORUS, this.isPlayer, this),
+        new Rune(12, GAMES_RUNES.RUNE_NEPHTHYS, this.isPlayer, this),
       ]
     }
 
     this.runes = [
-      new Rune(0, GAMES_RUNES.RUNE_ANUBIS, this.isPlayer, this),
-      new Rune(1, GAMES_RUNES.RUNE_BAST, this.isPlayer, this),
-      new Rune(2, GAMES_RUNES.RUNE_HORUS, this.isPlayer, this),
+      new Rune(0, GAMES_RUNES.RUNE_BABI, this.isPlayer, this),
+      new Rune(1, GAMES_RUNES.RUNE_ANUBIS, this.isPlayer, this),
+      new Rune(2, GAMES_RUNES.RUNE_BAST, this.isPlayer, this),
       ...debugRunes,
     ]
     this.lifeStones = [...Array(GAME_STARTING_LIFE_STONES).keys()].map(

@@ -1,7 +1,6 @@
 import Experience from '@/Experience.js'
-import webGL from 'three/examples/jsm/capabilities/WebGL.js'
 import Rune from '@/World/Models/Rune.js'
-import { GAMES_RUNES } from '@/Utils/constants.js'
+import { GAMES_PHASES, GAMES_RUNES } from '@/Utils/constants.js'
 
 export default class RuneManager {
   constructor() {
@@ -16,6 +15,7 @@ export default class RuneManager {
     this.rayCaster = new THREE.Raycaster()
     this.currentIntersect = null
     this.previousIntersect = null
+    this.actionAfterDiceRollTimeout = null
 
     this.runes = [
       new Rune(0, GAMES_RUNES.RUNE_ANUBIS, this.isPlayer, this),
@@ -29,7 +29,8 @@ export default class RuneManager {
       new Rune(8, GAMES_RUNES.RUNE_OSIRIS, this.isPlayer, this),
       new Rune(9, GAMES_RUNES.RUNE_TAWARET, this.isPlayer, this),
       new Rune(10, GAMES_RUNES.RUNE_NEKHBET, this.isPlayer, this),
-      // new Rune(11, GAMES_RUNES.RUNE_BABI, this.isPlayer, ownerPlayer),
+      new Rune(11, GAMES_RUNES.RUNE_BABI, this.isPlayer, this),
+      new Rune(12, GAMES_RUNES.RUNE_NEPHTHYS, this.isPlayer, this),
     ]
 
     this.runesMeshes = Object.values(this.world.players).reduce(
@@ -37,7 +38,41 @@ export default class RuneManager {
       [],
     )
 
-    this.input.on('click', () => this.toggleRuneSelection())
+    this.input.on('click', (event) => {
+      this.gui.showFaithControlsOverlay(false)
+
+      if (this.gui.isShowingRuneInfo) {
+        this.gui.showRuneOverlay(false, this.currentIntersect?.type)
+        this.currentIntersect.owner.runes.forEach(
+          (rune) => this.currentIntersect.type !== rune.type && rune.toggleRune(false, false),
+        )
+
+        /* a tier was selected */
+        if (event.target?.classList.contains('tier--selected') && this.world.isFaithCastingPhase()) {
+          this.gui.toggleCursor(false)
+          const sessionPlayer = this.world.players[this.world.getSessionPlayerId()]
+          sessionPlayer.runes.forEach((rune) => (rune.selectedTier = null))
+          const rune = sessionPlayer.runes.find((rune) => rune?.type === runeType.dataset.type)
+
+          rune?.toggleRune(rune.isHighLighted, true)
+          rune.selectedTier = event.target.dataset?.tier ? `tier${event.target.dataset?.tier}` : null
+          this.showControlHint()
+        }
+      } else {
+        this.showControlHint()
+
+        this.toggleRuneSelection()
+      }
+    })
+
+    this.input.on('dblclick', (event) => {
+      this.actionAfterDiceRollTimeout = Date.now()
+      this.gui.showFaithControlsOverlay(false)
+      if (this.world.isSessionPlayerAtTurn()) {
+        const sessionPlayer = this.world.getPlayerAtTurn()
+        sessionPlayer.trigger(GAMES_PHASES.DICE_RESOLVE)
+      }
+    })
   }
 
   toggleRuneSelection() {
@@ -47,7 +82,9 @@ export default class RuneManager {
         return
       }
 
-      this.currentIntersect?.toggleRune(true, !this.currentIntersect?.isSelected)
+      this.gui.showRuneOverlay(true, this.currentIntersect?.type)
+      this.gui.toggleCursor(false)
+      this.currentIntersect?.toggleRune(true, false)
       this.currentIntersect.owner.runes.forEach(
         (rune) => this.currentIntersect.type !== rune.type && rune.toggleRune(false, false),
       )
@@ -58,6 +95,9 @@ export default class RuneManager {
     this.rayCaster.setFromCamera(new THREE.Vector2(this.input.x, this.input.y), this.camera)
 
     const intersections = this.rayCaster.intersectObjects(this.runesMeshes)
+    if (this.gui.isShowingRuneInfo) {
+      return
+    }
 
     if (intersections.length) {
       this.currentIntersect =
@@ -73,11 +113,11 @@ export default class RuneManager {
           this.previousIntersect?.toggleRune(false, this.previousIntersect?.isSelected)
         }
         this.previousIntersect = this.currentIntersect
-        if (this.currentIntersect?.owner.playerId === this.world.getSessionPlayer()) {
+
+        if (this.currentIntersect?.owner?.playerId === this.world.getSessionPlayerId()) {
           this.gui.toggleCursor(true)
         }
         this.currentIntersect.toggleRune(true, this.currentIntersect.isSelected)
-        this.gui.showRuneOverlay(this.currentIntersect?.type)
       }
     } else {
       if (this.currentIntersect) {
@@ -91,6 +131,19 @@ export default class RuneManager {
 
       this.currentIntersect = null
     }
+  }
+
+  showControlHint() {
+    /* show action input overlay */
+    const isSessionPlayerAtTurn = this.world.isSessionPlayerAtTurn()
+    this.actionAfterDiceRollTimeout = Date.now()
+
+    isSessionPlayerAtTurn &&
+      setTimeout(() => {
+        if (Date.now() - this.actionAfterDiceRollTimeout > 7000 && this.world.isFaithCastingPhase()) {
+          this.gui.showFaithControlsOverlay(true)
+        }
+      }, 7000)
   }
 
   update() {

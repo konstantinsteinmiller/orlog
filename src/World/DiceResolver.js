@@ -128,6 +128,8 @@ export default class DiceResolver {
       this.startingPlayer,
       true,
     )
+
+    await this.world.runeResolver.resolveRunesAfterDiceResolution()
   }
 
   resolveDiceSymbols(attackerDices, defenderDices, attackerPlayer, defenderPlayer, isHands) {

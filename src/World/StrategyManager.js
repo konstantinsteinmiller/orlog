@@ -212,7 +212,7 @@ export default class StrategyManager {
         }
       : null
     rune.toggleRune(false, true)
-    this.player.trigger(GAMES_PHASES.FAITH_CASTING)
+    this.player.trigger(GAMES_PHASES.DICE_RESOLVE)
   }
 
   selectHighestAvailableTier(runeData) {

@@ -33,8 +33,8 @@ export default class GUI {
   showRuneOverlay(isVisible, type, player, isPlayerRune = false, isFaithCastingPhase = false) {
     const rune = GAME_RUNES_DESCRIPTIONS[type]
     const typeDescription = RUNE_RESOLUTION_TYPES_DESCRIPTION[rune?.type]
-    if (!rune.name) {
-      console.log('type: ', type, rune.type)
+    if (!rune?.type) {
+      return
     }
     runeName.innerText = rune.name
 

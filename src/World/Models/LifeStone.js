@@ -2,7 +2,7 @@ import { disposeMeshAndRemoveFromScene } from '@/Utils/ThreeHelpers.js'
 import { gsap as g } from 'gsap'
 
 export default class LifeStone {
-  constructor(owner, isPlayer = false, id = 0, timeoutInMs = 0) {
+  constructor(owner, isPlayer = false, id = 0, timeoutInMs = 0, resolve = () => {}) {
     this.experience = experience
     this.physics = experience.physics
     this.scene = this.experience.scene
@@ -24,28 +24,36 @@ export default class LifeStone {
 
     this.setMesh()
 
-    this.moveLifeStoneToField(timeoutInMs)
+    this.moveLifeStoneToField(timeoutInMs, resolve)
   }
 
-  destroyLifeStone(timeoutInMs) {
+  destroyLifeStone(timeoutInMs, resolve = () => {}) {
     const timeout = timeoutInMs * 0.001
-    this.toggleHighlight()
-    this.owner.lifeStones.pop()
-    g.to(this.mesh.position, {
-      x: this.offsetDirection * (-6 + 2.1),
+    const lifeStone = this.owner.lifeStones.pop()
+    lifeStone.toggleHighlight()
+    g.to(lifeStone.mesh.position, {
+      x: lifeStone.offsetDirection * (-6 + 2.1),
       y: 2.5,
-      z: this.offsetDirection * this.midZOffset + this.mesh.position.z + this.offsetDirection * 12,
+      z:
+        lifeStone.offsetDirection * lifeStone.midZOffset +
+        lifeStone.mesh.position.z +
+        lifeStone.offsetDirection * 12,
       duration: 1.8,
       delay: timeout,
     }).then(() => {
-      this.mesh.remove(this.highlightMesh)
+      lifeStone.mesh.remove(lifeStone.highlightMesh)
 
-      disposeMeshAndRemoveFromScene(this.highlightMesh, this.mesh)
-      disposeMeshAndRemoveFromScene(this.mesh, this.scene)
+      disposeMeshAndRemoveFromScene(lifeStone.highlightMesh, lifeStone.mesh)
+      disposeMeshAndRemoveFromScene(lifeStone.mesh, lifeStone.scene)
+      resolve()
     })
   }
 
-  moveLifeStoneToField(timeoutInMs) {
+  moveLifeStoneToField(timeoutInMs, resolve = () => {}) {
+    if (timeoutInMs > 20) {
+      console.log('timeoutInMs too high, pls convert to Seconds: ', timeoutInMs)
+    }
+
     g.fromTo(
       this.mesh.position,
       {
@@ -61,14 +69,16 @@ export default class LifeStone {
         duration: 0.5,
         delay: timeoutInMs,
       },
-    ).then(() =>
+    ).then(() => {
       g.to(this.mesh.position, {
         x: this.offsetDirection * (-6 + (this.id % 5) * 0.7),
         y: 0,
         z: this.offsetDirection * (this.midZOffset + 1.5 - Math.floor(this.id / 5)),
         duration: 1.0,
-      }),
-    )
+      }).then(() => {
+        resolve()
+      })
+    })
   }
 
   toggleHighlight() {

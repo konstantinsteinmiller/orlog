@@ -5,6 +5,9 @@ import Bowl from '@/World/Models/Bowl.js'
 import LifeStone from '@/World/Models/LifeStone.js'
 import FaithToken from '@/World/Models/FaithToken.js'
 import Rune from '@/World/Models/Rune.js'
+import BabiRune from '@/World/Models/Runes/BabiRune.js'
+import AnubisRune from '@/World/Models/Runes/AnubisRune.js'
+import TawaretRune from '@/World/Models/Runes/TawaretRune.js'
 import Experience from '@/Experience.js'
 import { GAME_PLAYER_TYPES, GAMES_PHASES, GAME_STARTING_LIFE_STONES, GAMES_RUNES } from '@/Utils/constants.js'
 
@@ -77,26 +80,26 @@ export default class Player extends EventEmitter {
     let debugRunes = []
     if (this.debug.isActive) {
       debugRunes = [
-        new Rune(3, GAMES_RUNES.RUNE_ISIS, this.isPlayer, this),
-        new Rune(4, GAMES_RUNES.RUNE_SHU, this.isPlayer, this),
-        new Rune(5, GAMES_RUNES.RUNE_SERQET, this.isPlayer, this),
-        new Rune(6, GAMES_RUNES.RUNE_SETH, this.isPlayer, this),
-        new Rune(7, GAMES_RUNES.RUNE_RA, this.isPlayer, this),
-        new Rune(8, GAMES_RUNES.RUNE_OSIRIS, this.isPlayer, this),
-        new Rune(9, GAMES_RUNES.RUNE_TAWARET, this.isPlayer, this),
-        new Rune(10, GAMES_RUNES.RUNE_NEKHBET, this.isPlayer, this),
-        new Rune(11, GAMES_RUNES.RUNE_HORUS, this.isPlayer, this),
-        new Rune(12, GAMES_RUNES.RUNE_NEPHTHYS, this.isPlayer, this),
+        // new Rune(3, GAMES_RUNES.RUNE_ISIS, this),
+        // new Rune(4, GAMES_RUNES.RUNE_SHU, this),
+        // new Rune(5, GAMES_RUNES.RUNE_SERQET, this),
+        // new Rune(6, GAMES_RUNES.RUNE_SETH, this),
+        // new Rune(7, GAMES_RUNES.RUNE_RA, this),
+        // new Rune(8, GAMES_RUNES.RUNE_OSIRIS, this),
+        // new Rune(9, GAMES_RUNES.RUNE_TAWARET, this),
+        // new Rune(10, GAMES_RUNES.RUNE_NEKHBET, this),
+        // new Rune(11, GAMES_RUNES.RUNE_HORUS, this),
+        // new Rune(12, GAMES_RUNES.RUNE_NEPHTHYS, this),
       ]
     }
 
     this.runes = [
-      new Rune(0, GAMES_RUNES.RUNE_BABI, this.isPlayer, this),
-      // new Rune(0, GAMES_RUNES.RUNE_ANUBIS_BLACK, this.isPlayer, this),
-      new Rune(1, GAMES_RUNES.RUNE_ANUBIS, this.isPlayer, this),
-      new Rune(2, GAMES_RUNES.RUNE_TAWARET, this.isPlayer, this),
-      // new Rune(2, GAMES_RUNES.RUNE_ANUBIS_WHITE, this.isPlayer, this),
-      // new Rune(2, GAMES_RUNES.RUNE_BAST, this.isPlayer, this),
+      new BabiRune(0, this),
+      // new Rune(0, GAMES_RUNES.RUNE_ANUBIS_BLACK, this),
+      new AnubisRune(1, this),
+      new TawaretRune(2, this),
+      // new Rune(2, GAMES_RUNES.RUNE_ANUBIS_WHITE, this),
+      // new Rune(2, GAMES_RUNES.RUNE_BAST, this),
       ...debugRunes,
     ]
     this.lifeStones = [...Array(GAME_STARTING_LIFE_STONES).keys()].map(
@@ -134,11 +137,27 @@ export default class Player extends EventEmitter {
   }
 
   destroyLifeStones(amount) {
-    ;[...Array(amount || this.debug.lifeStoneAmount).keys()].forEach((stone, index) => {
-      let lifeStone = this.lifeStones.pop()
-      lifeStone?.destroyLifeStone(1000 + 200 * index)
-      lifeStone = null
-    })
+    return Promise.all(
+      [...Array(amount || this.debug.lifeStoneAmount).keys()].map(
+        (stone, index) =>
+          new Promise((resolve) => {
+            this.lifeStones[0]?.destroyLifeStone(1000 + 200 * index, resolve)
+          }),
+      ),
+    )
+  }
+
+  addLifeStones(amount) {
+    return Promise.all(
+      [...Array(amount).keys()].map(
+        (stone, index) =>
+          new Promise((resolve) => {
+            this.lifeStones.push(
+              new LifeStone(this, this.isPlayer, this.lifeStones.length, index * 0.1, resolve),
+            )
+          }),
+      ),
+    )
   }
 
   destroyFaithTokens(amount) {

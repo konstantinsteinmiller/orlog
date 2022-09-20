@@ -12,6 +12,7 @@ import {
 } from '@/Utils/constants.js'
 import { getStorage, setStorage } from '@/Utils/storage.js'
 import DiceResolver from '@/World/DiceResolver.js'
+import RuneResolver from '@/World/RuneResolver.js'
 import GUI from '@/Menus/GUI.js'
 import RuneManager from '@/World/RuneManager.js'
 
@@ -31,6 +32,8 @@ export default class World {
     this.currentGamePhase = GAMES_PHASES.DICE_ROLL
     this.playerDoneWithRollingAmount = 0
     this.playerDoneWithFaithCastingAmount = 0
+    this.playerDoneWithDiceResolveAmount = 0
+    this.runeResolver = null
     this.diceResolver = null
 
     // const axisHelper = new THREE.AxesHelper(3)
@@ -52,6 +55,7 @@ export default class World {
     this.currentGamePhase = GAMES_PHASES.DICE_ROLL
     this.playerDoneWithRollingAmount = 0
     this.playerDoneWithFaithCastingAmount = 0
+    this.playerDoneWithDiceResolveAmount = 0
     this.diceResolver = null
   }
 
@@ -82,10 +86,6 @@ export default class World {
       this.createPlayer(remotePlayer)
     }
     this.diceArrangeManager = new DiceArrangeManager()
-  }
-
-  getPlayer(playerIndex) {
-    return this.players[this.orderedPlayerIds[playerIndex]]
   }
 
   // find the player that is not at turn and give turn to him
@@ -160,19 +160,31 @@ export default class World {
       }
     })
 
-    player.on(GAMES_PHASES.DICE_RESOLVE, () => {
+    player.on(GAMES_PHASES.DICE_RESOLVE, async () => {
       if (++this.playerDoneWithFaithCastingAmount === 2) {
         this.currentGamePhase = GAMES_PHASES.DICE_RESOLVE
         this.gui.showPhaseOverlay(true)
         this.setPlayerAtTurnToStartingPlayer()
-        // this.debug.isActive && console.log('Phase - DICE_RESOLVE: ', player.playerId)
+
+        if (this.runeResolver === null) {
+          this.runeResolver = new RuneResolver()
+
+          await this.runeResolver.resolveRunesBeforeDiceResolution()
+        }
         if (this.diceResolver === null) {
           this.diceResolver = new DiceResolver()
         }
       }
     })
 
-    player.on(GAMES_PHASES.FAITH_RESOLVE, () => {})
+    player.on(GAMES_PHASES.FAITH_RESOLVE, () => {
+      if (++this.playerDoneWithDiceResolveAmount === 2) {
+        // this.currentGamePhase = GAMES_PHASES.FAITH_RESOLVE
+        // this.gui.showPhaseOverlay(true)
+        // this.setPlayerAtTurnToStartingPlayer()
+        // this.debug.isActive && console.log('Phase - FAITH_RESOLVE: ', player.playerId)
+      }
+    })
 
     return player
   }
@@ -192,9 +204,9 @@ export default class World {
     return Object.values(this.players).find((player) => player.playerId === getStorage(GAME_PLAYER_ID, true))
   }
 
-  getEnemyPlayer() {
-    const sessionPlayerId = getStorage(GAME_PLAYER_ID, true)
-    return Object.values(this.players).find((player) => player.playerId === sessionPlayerId)
+  getEnemyPlayer(playerId) {
+    // const sessionPlayerId = getStorage(GAME_PLAYER_ID, true)
+    return Object.values(this.players).find((player) => player.playerId !== playerId)
   }
 
   isSessionPlayerAtTurn() {

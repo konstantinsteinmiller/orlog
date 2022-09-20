@@ -2,16 +2,16 @@ import { GAMES_RUNE_MODELS, GAME_RUNES_DESCRIPTIONS } from '@/Utils/constants.js
 import { gsap as g } from 'gsap'
 
 export default class Rune {
-  constructor(id, type, isPlayer, player) {
+  constructor(id, type, player) {
     this.experience = experience
     this.physics = experience.physics
     this.scene = this.experience.scene
     this.resources = this.experience.resources
 
+    this.isPlayer = player.isPlayer
     this.midZOffset = 5
-    this.offsetDirection = isPlayer ? 1 : -1
+    this.offsetDirection = this.isPlayer ? 1 : -1
 
-    this.isPlayer = isPlayer
     this.owner = player
     this.instance = this
     this.id = id
@@ -27,7 +27,7 @@ export default class Rune {
     const zPosition = this.midZOffset + 1
 
     this.position = new THREE.Vector3(this.offsetDirection * xPosition, 0, this.offsetDirection * zPosition)
-    this.rotation = new THREE.Vector3(0, isPlayer ? 0 : Math.PI, 0)
+    this.rotation = new THREE.Vector3(0, this.isPlayer ? 0 : Math.PI, 0)
 
     this.setMesh()
   }
@@ -71,30 +71,52 @@ export default class Rune {
   }
 
   payTierPrice() {
-    const attackerPlayer = this.experience.world.getPlayerAtTurn()
+    const attackerPlayer = this.owner
     const tier = this.rune[this.owner.selectedRune?.tier]
     if (attackerPlayer.faithTokens.length >= +tier.cost.faith) {
       attackerPlayer.destroyFaithTokens(+tier.cost.faith)
       this.didPayTierPrice = true
       this.enlargeRuneHighlight()
     } else {
+      this.experience.sounds.playSound('fail')
       this.toggleRune(this.isHighlighted, false)
     }
   }
 
   enlargeRuneHighlight() {
     g.to(this.highlightMesh.scale, {
-      x: this.scale * 1.3,
-      y: this.scale * 1.3,
-      z: this.scale * 1.3,
+      x: 1.3,
+      y: 1.3,
+      z: 1.3,
       duration: 0.7,
     }).then(() => {
       g.to(this.highlightMesh.scale, {
-        x: this.scale,
-        y: this.scale,
-        z: this.scale,
+        x: 1.1,
+        y: 1.1,
+        z: 1.1,
         duration: 0.7,
+      }).then(() => {
+        this.toggleRune(this.isHighlighted, false)
       })
+    })
+  }
+
+  async resolution(effectCallback = () => {}) {
+    return new Promise((resolve) => {
+      if (this.owner.selectedRune) {
+        const tier = this.rune[this.owner.selectedRune?.tier]
+        this.payTierPrice()
+        if (this.didPayTierPrice) {
+          console.log('this.didPayTierPrice: ', this.didPayTierPrice, tier)
+          effectCallback(resolve, tier)
+
+          this.didPayTierPrice = false
+        } else {
+          resolve()
+        }
+      } else {
+        resolve()
+      }
     })
   }
 }

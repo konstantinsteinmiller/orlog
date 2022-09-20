@@ -112,6 +112,21 @@ export default [
     path: 'sounds/axe-hit-stone-break.ogg',
   },
   {
+    name: 'fail',
+    type: 'audioLoader',
+    path: 'sounds/fail.ogg',
+  },
+  {
+    name: 'thunder',
+    type: 'audioLoader',
+    path: 'sounds/thunder.ogg',
+  },
+  {
+    name: 'fountain',
+    type: 'audioLoader',
+    path: 'sounds/fountain.ogg',
+  },
+  {
     name: 'bowl',
     type: 'gltfModel',
     path: 'models/bowl/bowl.glb',

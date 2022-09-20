@@ -282,9 +282,9 @@ export const GAME_RUNES_DESCRIPTIONS = {
   RUNE_BABI: {
     name: 'Babi\'s bloodthirst',
     description: 'Destroy X enemy\'s life stones',
-    tier1: { cost: { faith: '2', souls: '' }, text: '- 1 life stone', value: -1 },
-    tier2: { cost: { faith: '5', souls: '' }, text: '- 3 life stones', value: -3 },
-    tier3: { cost: { faith: '11', souls: '' }, text: '- 5 life stones', value: -5 },
+    tier1: { cost: { faith: '2', souls: '' }, text: '- 1 life stone', value: 1 },
+    tier2: { cost: { faith: '5', souls: '' }, text: '- 3 life stones', value: 3 },
+    tier3: { cost: { faith: '11', souls: '' }, text: '- 5 life stones', value: 5 },
     type: RUNE_RESOLUTION_TYPES.END_RESOLUTION,
   },
   RUNE_NEPHTHYS: {

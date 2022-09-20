@@ -78,7 +78,7 @@ export default class RuneManager {
           this.showControlHint()
           this.gui.showRuneOverlay(
             true,
-            this.currentIntersect?.type,
+            runeType.dataset.type,
             sessionPlayer,
             tierBelongsSessionPlayer,
             this.world.isFaithCastingPhase(),
@@ -87,7 +87,7 @@ export default class RuneManager {
             /* close rune overlay and reset ownership */
             this.gui.showRuneOverlay(
               false,
-              this.currentIntersect?.type,
+              runeType.dataset.type,
               sessionPlayer,
               tierBelongsSessionPlayer,
               this.world.isFaithCastingPhase(),
@@ -113,7 +113,7 @@ export default class RuneManager {
     this.input.on('dblclick', (event) => {
       this.actionAfterDiceRollTimeout = Date.now()
       this.gui.showFaithControlsOverlay(false)
-      if (this.world.isSessionPlayerAtTurn()) {
+      if (this.world.isSessionPlayerAtTurn() && !this.gui.isShowingRuneInfo) {
         const sessionPlayer = this.world.getPlayerAtTurn()
         sessionPlayer.trigger(GAMES_PHASES.DICE_RESOLVE)
       }
@@ -122,11 +122,6 @@ export default class RuneManager {
 
   toggleRuneSelection() {
     if (this.world.isFaithCastingPhase && this.currentIntersect?.mesh?.identifier === 'rune') {
-      // if (!this.currentIntersect?.isPlayer) {
-      //   this.debug.isActive && console.log('YOU cant activate enemies Runes')
-      //   return
-      // }
-
       this.gui.showRuneOverlay(
         true,
         this.currentIntersect?.type,

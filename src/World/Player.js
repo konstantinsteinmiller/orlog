@@ -3,6 +3,7 @@ import EventEmitter from '@/Utils/EventEmitter.js'
 import DicesHandler from '@/World/DicesHandler.js'
 import Bowl from '@/World/Models/Bowl.js'
 import LifeStone from '@/World/Models/LifeStone.js'
+import FaithToken from '@/World/Models/FaithToken.js'
 import Rune from '@/World/Models/Rune.js'
 import Experience from '@/Experience.js'
 import { GAME_PLAYER_TYPES, GAMES_PHASES, GAME_STARTING_LIFE_STONES, GAMES_RUNES } from '@/Utils/constants.js'
@@ -21,6 +22,7 @@ export default class Player extends EventEmitter {
     this.runes = []
     this.isPlayerAtTurn = null
     this.isStartingPlayer = null
+    this.selectedRune = null
 
     this.init()
 
@@ -90,14 +92,17 @@ export default class Player extends EventEmitter {
 
     this.runes = [
       new Rune(0, GAMES_RUNES.RUNE_BABI, this.isPlayer, this),
+      // new Rune(0, GAMES_RUNES.RUNE_ANUBIS_BLACK, this.isPlayer, this),
       new Rune(1, GAMES_RUNES.RUNE_ANUBIS, this.isPlayer, this),
-      new Rune(2, GAMES_RUNES.RUNE_BAST, this.isPlayer, this),
+      new Rune(2, GAMES_RUNES.RUNE_TAWARET, this.isPlayer, this),
+      // new Rune(2, GAMES_RUNES.RUNE_ANUBIS_WHITE, this.isPlayer, this),
+      // new Rune(2, GAMES_RUNES.RUNE_BAST, this.isPlayer, this),
       ...debugRunes,
     ]
     this.lifeStones = [...Array(GAME_STARTING_LIFE_STONES).keys()].map(
       (id) => new LifeStone(this, this.isPlayer, id, id * 0.1),
     )
-    // this.faithTokens = [...Array(13).keys()].map((id) => new FaithToken(this.isPlayer, id, id * 0.2))
+    this.faithTokens = [...Array(12).keys()].map((id) => new FaithToken(this.isPlayer, id, id * 0.2))
 
     this.dicesHandler.on('finished-moving-dices-to-enemy', () => {
       if (this.dicesHandler.dicesList.every((dice) => dice.highlightMesh?.isPlaced)) {
@@ -145,7 +150,11 @@ export default class Player extends EventEmitter {
   }
 
   startFaithSelection() {
-    console.log('startFaithSelection: ', this.playerId)
+    if (this.world.isSessionPlayerAtTurn()) {
+      this.world.runeManager.showControlHint()
+    } else if (this.playerId === GAME_PLAYER_TYPES.GAME_PLAYER_TYPE_NPC) {
+      this.strategyManager.selectRune()
+    }
   }
 
   update() {

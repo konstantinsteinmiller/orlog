@@ -1,5 +1,11 @@
 import Experience from '@/Experience.js'
-import { GAME_PLAYER_TYPES, GAME_SYMBOLS } from '@/Utils/constants.js'
+import {
+  GAME_PLAYER_TYPES,
+  GAME_RUNES_DESCRIPTIONS,
+  GAME_SYMBOLS,
+  GAMES_PHASES,
+  GAMES_RUNES,
+} from '@/Utils/constants.js'
 
 export default class StrategyManager {
   constructor(player) {
@@ -175,5 +181,45 @@ export default class StrategyManager {
 
   hasCritialHP() {
     return this.player.lifeStones.length <= 5
+  }
+
+  selectRune() {
+    let rune = this.player.runes[Math.ceil(Math.random() * 3) - 1]
+    let runeData = GAME_RUNES_DESCRIPTIONS[rune.type]
+    let selectedTier = 'tier1'
+
+    if (this.hasHighHP()) {
+      selectedTier = this.selectHighestAvailableTier(runeData)
+    }
+
+    if (this.hasMediumHP()) {
+      rune = this.player.runes.find((rune) => rune.type === GAMES_RUNES.RUNE_TAWARET) || rune
+      runeData = GAME_RUNES_DESCRIPTIONS[rune.type]
+      selectedTier = this.selectHighestAvailableTier(runeData)
+    }
+
+    if (this.hasCritialHP()) {
+      rune = this.player.runes.find((rune) => rune.type === GAMES_RUNES.RUNE_TAWARET) || rune
+      runeData = GAME_RUNES_DESCRIPTIONS[rune.type]
+      selectedTier = this.selectHighestAvailableTier(runeData)
+    }
+
+    this.player.selectedRune = selectedTier
+      ? {
+          rune: rune,
+          type: rune.type,
+          tier: selectedTier /* `tier${Math.ceil(Math.random() * 3)}` */,
+        }
+      : null
+    rune.toggleRune(false, true)
+    this.player.trigger(GAMES_PHASES.FAITH_CASTING)
+  }
+
+  selectHighestAvailableTier(runeData) {
+    const faithTokenAmount = this.player.faithTokens.length
+    return Object.keys(runeData)
+      .filter((key) => key.includes('tier'))
+      .sort((a, b) => b.substring(4) - a.substring(4))
+      .find((tier) => faithTokenAmount >= +runeData[tier].cost.faith)
   }
 }

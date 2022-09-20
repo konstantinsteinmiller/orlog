@@ -20,7 +20,6 @@ export default class Rune {
     this.scale = 2.5
     this.isHighlighted = false
     this.isSelected = false
-    this.selectedTier = null
     this.rune = GAME_RUNES_DESCRIPTIONS[this.type]
     this.didPayTierPrice = false
 
@@ -57,7 +56,7 @@ export default class Rune {
 
     this.mesh.instance = this.instance
     this.mesh.castShadow = true
-    // this.mesh.receiveShadow = true
+    this.mesh.receiveShadow = true
   }
 
   toggleRune(doHighLight = false, isSelected) {
@@ -73,7 +72,7 @@ export default class Rune {
 
   payTierPrice() {
     const attackerPlayer = this.experience.world.getPlayerAtTurn()
-    const tier = this.rune[this.selectedTier]
+    const tier = this.rune[this.owner.selectedRune?.tier]
     if (attackerPlayer.faithTokens.length >= +tier.cost.faith) {
       attackerPlayer.destroyFaithTokens(+tier.cost.faith)
       this.didPayTierPrice = true

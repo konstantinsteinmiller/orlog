@@ -30,33 +30,30 @@ export default class GUI {
     }, 3000)
   }
 
-  showRuneOverlay(isVisible, type) {
-    console.log('type: ', type)
+  showRuneOverlay(isVisible, type, player, isPlayerRune = false, isFaithCastingPhase = false) {
     const rune = GAME_RUNES_DESCRIPTIONS[type]
     const typeDescription = RUNE_RESOLUTION_TYPES_DESCRIPTION[rune?.type]
+    if (!rune.name) {
+      console.log('type: ', type, rune.type)
+    }
     runeName.innerText = rune.name
+
     runeDescription.innerText = rune.description
+    runeInfo.dataset.visible = isVisible
 
-    let $tierCost = document.querySelector('#runeTier1 .tier-cost')
-    $tierCost.innerText = rune.tier1.cost.faith
-    let $tierCostImg = runeTier1.querySelector('.tier-cost-img')
-    $tierCostImg.src = faithTokenImage
-    let $tierText = runeTier1.querySelector('.tier-text')
-    $tierText.innerText = rune.tier1.text
-
-    $tierCost = runeTier2.querySelector('.tier-cost')
-    $tierCost.innerText = rune.tier2.cost.faith
-    $tierCostImg = runeTier2.querySelector('.tier-cost-img')
-    $tierCostImg.src = faithTokenImage
-    $tierText = runeTier2.querySelector('.tier-text')
-    $tierText.innerText = rune.tier2.text
-
-    $tierCost = runeTier3.querySelector('.tier-cost')
-    $tierCost.innerText = rune.tier3.cost.faith
-    $tierCostImg = runeTier3.querySelector('.tier-cost-img')
-    $tierCostImg.src = faithTokenImage
-    $tierText = runeTier3.querySelector('.tier-text')
-    $tierText.innerText = rune.tier3.text
+    let $runeTiers = document.querySelectorAll('.tier')
+    Array.prototype.forEach.call($runeTiers, (runeTier, index) => {
+      runeTier.dataset.owner = isPlayerRune ? 'sessionPlayer' : 'other'
+      /* is either player rune and selected or enemy rune and correctly selected tier */
+      runeTier.dataset.selected =
+        player.selectedRune?.type === type && player.selectedRune?.tier === `tier${index + 1}`
+      const $tierCost = runeTier.querySelector('.tier-cost')
+      $tierCost.innerText = rune[`tier${index + 1}`].cost.faith
+      runeTier.querySelector('.tier-cost-img').src = faithTokenImage
+      runeTier.querySelector('.tier-text').innerText = rune[`tier${index + 1}`].text
+      runeTier.dataset.castable = isPlayerRune && player.faithTokens.length >= parseInt($tierCost?.innerText)
+      runeTier.dataset.disabled = !isFaithCastingPhase && runeInfo.dataset.visible
+    })
 
     runeType.innerText = `When: ${typeDescription}`
     runeType.dataset.type = type

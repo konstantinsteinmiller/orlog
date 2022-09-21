@@ -12,16 +12,15 @@ export default class DiceResolver {
     this.world = this.experience.world
     this.sounds = this.experience.sounds
     this.scene = this.experience.scene
-    this.startingPlayer = this.world.getPlayers()[0]
-    this.secondTurnPlayer = this.world.getPlayers()[1]
+  }
+
+  setAllDicesList() {
+    this.startingPlayer = this.world.getStartingPlayer()
+    this.secondTurnPlayer = this.world.getStartingPlayer(false)
 
     this.allDicesList = this.startingPlayer.dicesHandler.dicesList.concat(
       this.secondTurnPlayer.dicesHandler.dicesList,
     )
-    // console.log(
-    //   'this.allDicesList: ',
-    //   this.allDicesList.map((dice) => dice.mesh.userData?.upwardSymbol),
-    // )
   }
 
   async createFaithTokens() {

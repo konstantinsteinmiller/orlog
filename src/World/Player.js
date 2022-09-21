@@ -104,7 +104,10 @@ export default class Player extends EventEmitter {
     this.lifeStones = [...Array(GAME_STARTING_LIFE_STONES).keys()].map(
       (id) => new LifeStone(this, this.isPlayer, id, id * 0.1),
     )
-    this.faithTokens = [...Array(12).keys()].map((id) => new FaithToken(this.isPlayer, id, id * 0.2))
+    const startFaithTokens = this.debug.isActive ? 12 : 0
+    this.faithTokens = [...Array().keys(startFaithTokens)].map(
+      (id) => new FaithToken(this.isPlayer, id, id * 0.2),
+    )
 
     this.dicesHandler.on('finished-moving-dices-to-enemy', () => {
       if (this.dicesHandler.dicesList.every((dice) => dice.highlightMesh?.isPlaced)) {

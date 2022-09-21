@@ -208,6 +208,7 @@ export default class World {
         if (this.diceResolver === null) {
           this.diceResolver = new DiceResolver()
         }
+        this.diceResolver.setAllDicesList()
         await this.runeResolver.resolveRunesBeforeDiceResolution()
       }
     })

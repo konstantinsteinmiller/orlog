@@ -111,6 +111,7 @@ export default class Rune {
             effectCallback(resolveInner, tier)
           })
           this.owner.selectedRune = null
+          this.owner.runes.forEach((rune) => rune.toggleRune(rune?.isHighlighted, false))
           this.didPayTierPrice = false
           resolve()
         } else {

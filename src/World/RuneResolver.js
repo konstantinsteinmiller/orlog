@@ -14,7 +14,6 @@ export default class RuneResolver {
     const [startingPlayer, secondPlayer] = this.world.getPlayers()
     await startingPlayer?.selectedRune?.rune?.beforeResolution()
     await secondPlayer?.selectedRune?.rune?.beforeResolution()
-    console.log('DONE WITH RUNES')
   }
 
   async resolveRunesAfterDiceResolution() {
@@ -22,5 +21,6 @@ export default class RuneResolver {
     await startingPlayer?.selectedRune?.rune?.afterResolution()
     await secondPlayer?.selectedRune?.rune?.afterResolution()
     console.log('DONE WITH ROUND')
+    this.world.finishRound()
   }
 }

@@ -67,29 +67,24 @@ export default [
     path: 'models/coin/coin.glb',
   },
   {
-    name: 'hitSound',
-    type: 'audio',
-    path: 'sounds/hit.mp3',
-  },
-  {
     name: 'diceShake',
-    type: 'audio',
-    path: 'sounds/dice_shake.mp3',
+    type: 'audioLoader',
+    path: 'sounds/dice_shake.ogg',
   },
   {
     name: 'diceHit1',
     type: 'audioLoader',
-    path: 'sounds/ground_hit_1.wav',
+    path: 'sounds/ground_hit_1.ogg',
   },
   {
     name: 'diceHit2',
     type: 'audioLoader',
-    path: 'sounds/ground_hit_2.wav',
+    path: 'sounds/ground_hit_2.ogg',
   },
   {
     name: 'diceHit3',
     type: 'audioLoader',
-    path: 'sounds/ground_hit_3.wav',
+    path: 'sounds/ground_hit_3.ogg',
   },
   {
     name: 'arrowHitTargetAndWobble',

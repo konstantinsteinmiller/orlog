@@ -95,7 +95,7 @@ export default class DicesHandler extends EventEmitter {
         this.playerId === playerIdAtTurn &&
         playerIdAtTurn === this.sessionPlayer
       ) {
-        this.debug.isActive && console.log('SOME DICES WERE SELECTED')
+        // this.debug.isActive && console.log('SOME DICES WERE SELECTED')
         this.didNotSelectAnyDices = false
         this.moveSelectedDicesToEnemy()
       }
@@ -104,12 +104,13 @@ export default class DicesHandler extends EventEmitter {
   }
 
   finishMovingDicesToEnemy() {
-    this.debug.isActive && console.log(this.playerId, 'didnt SELECT ANY DICES!!!')
+    // this.debug.isActive && console.log(this.playerId, 'didnt SELECT ANY DICES!!!')
     this.didNotSelectAnyDices = true
 
     !this.isWaitingToFinishRound &&
       (this.isWaitingToFinishRound = true) &&
       setTimeout(() => {
+        console.log(this.playerId, 'finishMovingDicesToEnemy availableThrows: ', this.availableThrows)
         if (this.availableThrows === 0) {
           this.dicesList.forEach((dice) => {
             const diceHighlightMesh = dice.group.getObjectByName('diceHighlight')
@@ -321,7 +322,9 @@ export default class DicesHandler extends EventEmitter {
   }
 
   rethrowDice(dice) {
-    this.sounds.playDiceShakeSound()
+    this.world.disableDiceCollisonSound = false
+    dice.isPlayingCollisionSound = false
+    this.sounds.playSound('diceShake')
     this.isThrowing = true
     setTimeout(() => {
       this.didStartThrowing = true
@@ -340,7 +343,7 @@ export default class DicesHandler extends EventEmitter {
       }
       setTimeout(() => {
         this.isThrowing = false
-      }, 1200)
+      }, 1400)
     })
   }
 
@@ -355,7 +358,8 @@ export default class DicesHandler extends EventEmitter {
     this.isThrowing = true
 
     this.world.disableDiceCollisonSound = false
-    this.sounds.playDiceShakeSound()
+    this.dicesList.forEach((die) => (die.isPlayingCollisionSound = false))
+    this.sounds.playSound('diceShake')
     setTimeout(() => {
       /* pickup all not selected dices to rethrow them */
       this.didStartThrowing = true
@@ -390,7 +394,7 @@ export default class DicesHandler extends EventEmitter {
       setTimeout(() => {
         this.isThrowing = false
       }, 1200)
-    }, 400)
+    }, 700)
   }
 
   setThrowVelocity(body, dice) {
@@ -481,7 +485,7 @@ export default class DicesHandler extends EventEmitter {
     if (intersections.length && !this.isThrowing) {
       this.currentIntersect = intersections[0].object
       this.dicesList.forEach((dice) => {
-        dice.group.getObjectByName('diceHighlight').isHighlighted =
+        dice.highlightMesh.isHighlighted =
           this.currentIntersect.name === dice?.mesh?.name && !dice.highlightMesh?.isPlaced
       })
       this.evaluateTopFace()
@@ -497,7 +501,7 @@ export default class DicesHandler extends EventEmitter {
     } else {
       if (this.currentIntersect) {
         if (this.previousIntersect?.name !== this.currentIntersect?.name) {
-          this.debug.isActive && console.log('NEW Intersect: ', this.currentIntersect)
+          // this.debug.isActive && console.log('NEW Intersect: ', this.currentIntersect)
         }
         if (this.currentIntersect.parent) {
           this.currentIntersect.parent.getObjectByName('diceHighlight').isHighlighted = false
@@ -629,6 +633,7 @@ export default class DicesHandler extends EventEmitter {
       this.didAllDicesStopMoving = true
       this.didStartThrowing = false
       this.world.disableDiceCollisonSound = true
+      this.dicesList.forEach((die) => (die.isPlayingCollisionSound = false))
       this.trigger('dices-stopped')
       setTimeout(() => {
         this.evaluateTopFace()

@@ -27,8 +27,8 @@ export default class Dice {
     this.inertia = 13
     this.isPlayingCollisionSound = false
 
-    // this.isHighlighted = false
-    // this.isSelected = false
+    this.isHighlighted = false
+    this.isSelected = false
 
     this.group = group
     this.modelNumber = model
@@ -149,7 +149,7 @@ export default class Dice {
   setCollisionHandler() {
     this.group.body.on.collision((otherObject, event) => {
       if (this.experience.world?.disableDiceCollisonSound === false && otherObject.name === 'bowl2') {
-        if (!this.isPlayingCollisionSound) {
+        if (this.isPlayingCollisionSound === false) {
           this.sounds.playSound(['diceHit1', 'diceHit2', 'diceHit3'], true, 0.2, 0.5)
           this.isPlayingCollisionSound = true
           setTimeout(() => {
@@ -170,7 +170,7 @@ export default class Dice {
             if (!isWithinRange(angularVelocity, -0.1, 0.1) && !isWithinRange(velocity, -0.1, 0.1)) {
               this.isPlayingCollisionSound = false
             }
-          }, 300)
+          }, 500)
         }
       }
     })

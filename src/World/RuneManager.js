@@ -113,7 +113,11 @@ export default class RuneManager {
     this.input.on('dblclick', (event) => {
       this.actionAfterDiceRollTimeout = Date.now()
       this.gui.showFaithControlsOverlay(false)
-      if (this.world.isSessionPlayerAtTurn() && !this.gui.isShowingRuneInfo) {
+      if (
+        this.world.isSessionPlayerAtTurn() &&
+        !this.gui.isShowingRuneInfo &&
+        this.world.isFaithCastingPhase()
+      ) {
         const sessionPlayer = this.world.getPlayerAtTurn()
         sessionPlayer.trigger(GAMES_PHASES.DICE_RESOLVE)
       }

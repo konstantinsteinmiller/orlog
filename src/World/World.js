@@ -94,6 +94,12 @@ export default class World {
       player.isPlayerAtTurn = !player.isPlayerAtTurn
     })
   }
+  switchStartingPlayer() {
+    Object.values(this.players).forEach((player) => {
+      player.isStartingPlayer = !player.isStartingPlayer
+      player.isPlayerAtTurn = !player.isStartingPlayer
+    })
+  }
 
   getPlayerAtTurn(isNotAtTurn) {
     return Object.values(this.players).find(
@@ -129,7 +135,7 @@ export default class World {
         player.dicesHandler.createDices()
         player.dicesHandler.randomDiceThrow()
       }
-      // this.debug.isActive && console.log(player.playerId, ' throws: ', player.dicesHandler.availableThrows)
+      this.debug.isActive && console.log(player.playerId, ' throws: ', player.dicesHandler.availableThrows)
 
       if (player.dicesHandler.availableThrows > 0) {
         player.dicesHandler.resetThrow()
@@ -140,12 +146,14 @@ export default class World {
         // this.debug.isActive && console.log('========= both players finished with  GAMES_PHASES.DICE_ROLL')
       }
     })
+
     player.on('dices-rebuild', () => {
       const player = this.getPlayerAtTurn()
       player.dicesHandler.randomDiceThrow()
     })
+
     player.on(GAMES_PHASES.FAITH_CASTING, () => {
-      // this.debug.isActive && console.log('FAITH_CASTING: ', player.playerId)
+      this.debug.isActive && console.log('FAITH_CASTING: ', player.playerId)
       if (++this.playerDoneWithRollingAmount === 2) {
         this.currentGamePhase = GAMES_PHASES.FAITH_CASTING
         this.gui.showPhaseOverlay(true)
@@ -219,6 +227,11 @@ export default class World {
 
   isFaithCastingPhase() {
     return this.currentGamePhase === GAMES_PHASES.FAITH_CASTING
+  }
+
+  finishRound() {
+    this.switchStartingPlayer()
+    this.currentGamePhase = GAMES_PHASES.DICE_ROLL
   }
 
   update() {

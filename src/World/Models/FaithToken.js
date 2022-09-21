@@ -2,7 +2,7 @@ import { disposeMeshAndRemoveFromScene } from '@/Utils/ThreeHelpers.js'
 import { gsap as g } from 'gsap'
 
 export default class FaithToken {
-  constructor(isPlayer, id = 0, timeoutInMs, position) {
+  constructor(isPlayer, id = 0, timeoutInMs, position, resolve = () => {}) {
     this.experience = experience
     this.physics = experience.physics
     this.scene = this.experience.scene
@@ -26,7 +26,7 @@ export default class FaithToken {
 
     this.setMesh()
 
-    this.moveCreatedFaithTokenToStack(timeoutInMs)
+    this.moveCreatedFaithTokenToStack(timeoutInMs, resolve)
   }
 
   destroyFaithToken(timeoutInMs) {
@@ -84,7 +84,7 @@ export default class FaithToken {
     })
   }
 
-  moveCreatedFaithTokenToStack() {
+  moveCreatedFaithTokenToStack(timeoutInMs, resolve = () => {}) {
     /* scale */
     g.fromTo(
       this.mesh.scale,
@@ -107,21 +107,24 @@ export default class FaithToken {
       y: this.position.y + 0.7,
       z: this.position.z,
       duration: 2.5,
-    }).then(() =>
-      g
-        .to(this.mesh.position, {
+    })
+      .then(() =>
+        g.to(this.mesh.position, {
           x: this.offsetDirection * (5.5 - Math.floor(this.id / 5) * 0.8 + Math.floor(this.id / 20) * 3.2),
           y: 1.5 + Math.floor(this.id % 5) * 0.13,
           z: this.offsetDirection * (this.midZOffset - 2 - Math.floor(this.id / 20) * 0.8),
           duration: 1,
-        })
-        .then(() =>
-          g.to(this.mesh.position, {
-            ...targetFaithTokenPosition(this.id, this.offsetDirection, this.midZOffset),
-            duration: 0.4,
-          }),
-        ),
-    )
+        }),
+      )
+      .then(() =>
+        g.to(this.mesh.position, {
+          ...targetFaithTokenPosition(this.id, this.offsetDirection, this.midZOffset),
+          duration: 0.4,
+        }),
+      )
+      .then(() => {
+        resolve()
+      })
   }
 
   setMesh() {

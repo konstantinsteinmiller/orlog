@@ -1,9 +1,6 @@
 import EventEmitter from '@/Utils/EventEmitter.js'
 import { getStorage, setStorage } from '@/Utils/storage.js'
-import {
-  GAME_BACKGROUND_VOLUME,
-  GAME_SOUND_EFFECT_VOLUME,
-} from '@/Utils/constants.js';
+import { GAME_BACKGROUND_VOLUME, GAME_SOUND_EFFECT_VOLUME } from '@/Utils/constants.js'
 
 export default class MainMenu extends EventEmitter {
   constructor(isLoadingPhysics) {

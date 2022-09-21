@@ -16,7 +16,7 @@ export default class {
   }
 
   setMesh() {
-    this.mesh = this.resources.items.coin.scene.children[0]
+    this.mesh = this.resources.items.coin.scene.children[0].clone(true)
     this.mesh.position.copy(new THREE.Vector3(-5, 6.1, 0))
     this.mesh.scale.set(1, 1, 1)
 
@@ -55,6 +55,38 @@ export default class {
     // sphere.body.applyForce(0, 6 * force, 0 * force)
   }
 
+  setTurnMesh() {
+    this.turnMesh = this.resources.items.coin.scene.children[0].clone(true)
+    this.turnMesh.position.copy(new THREE.Vector3(-6, 0, 0))
+    this.turnMesh.scale.set(0.3, 0.3, 0.3)
+
+    this.turnMesh.castShadow = true
+    this.turnMesh.receiveShadow = true
+    this.scene.add(this.turnMesh)
+  }
+
+  moveTurnCoinToPlayerAtTurn(playerAtTurn) {
+    return g
+      .to(this.turnMesh.position, {
+        x: -6,
+        y: 0.4,
+        z: 1 * playerAtTurn.isPlayer ? 1 : -1,
+        duration: 1,
+        ease: 'sine.out',
+        delay: 0,
+      })
+      .then(() => {
+        g.to(this.turnMesh.position, {
+          x: -6,
+          y: 0.1,
+          z: 3.2 * playerAtTurn.isPlayer ? 1 : -1,
+          duration: 1,
+          ease: 'sine.out',
+          delay: 0,
+        }).then(() => Promise.resolve())
+      })
+  }
+
   flipCoin() {
     const flipInterval = setInterval(() => {
       if (this.mesh.position.y < 0.5) {
@@ -68,18 +100,32 @@ export default class {
     }, 50)
   }
 
-  moveCoinToStartingPlayer() {
+  moveCoinToStartingPlayer(isTurnChange) {
+    let mesh = this.mesh.body
+    if (!this.mesh?.body) {
+      mesh = this.mesh
+    }
     let isAxesUp =
-      isWithinRange(this.mesh.body.rotation.x, -0.1, 0.1) ||
-      isWithinRange(this.mesh.body.rotation.x, Math.PI * 2 - 0.1, Math.PI * 2 + 0.1)
+      isWithinRange(mesh.rotation.x, -0.1, 0.1) ||
+      isWithinRange(mesh.rotation.x, Math.PI * 2 - 0.1, Math.PI * 2 + 0.1)
 
     // isAxesUp ? console.log('AXES UP - Player One starts') : console.log('ARROWS up - Player Two starts')
 
-    const direction = isAxesUp ? 1 : -1
-    const angularDirection = isAxesUp ? 1 : -2
+    let direction = isAxesUp ? 1 : -1
+    let angularDirection = isAxesUp ? 1 : -2
 
-    this.mesh.body.setCollisionFlags(2)
-    this.physics.destroy(this.mesh.body)
+    if (this.world.round > 1 && isAxesUp) {
+      direction = -1
+      angularDirection = -2
+    } else if (this.world.round > 1 && !isAxesUp) {
+      direction = 1
+      angularDirection = 1
+    }
+
+    if (this.mesh.body) {
+      this.mesh.body.setCollisionFlags(2)
+      this.physics.destroy(this.mesh.body)
+    }
 
     g.to(this.mesh.rotation, {
       x: (Math.PI + Math.PI * angularDirection) * direction,
@@ -97,7 +143,7 @@ export default class {
       ease: 'sine.out',
       delay: 0,
     })
-      .then(() => {
+      .then(() =>
         g.to(this.mesh.position, {
           x: -5,
           y: 0.1,
@@ -105,24 +151,25 @@ export default class {
           duration: 1,
           ease: 'sine.out',
           delay: 0,
-        })
-      })
+        }),
+      )
       .then(() => {
-        if (!this.experience.debug.isActive) {
-          this.defineStartingPlayerAndStartDiceRolls(isAxesUp)
-        }
+        // if (!this.experience.debug.isActive) {
+        !this.turnMesh && this.setTurnMesh()
+        this.defineStartingPlayerAndStartDiceRolls(this.world.round > 1 ? !isAxesUp : isAxesUp)
+        // }
       })
 
     /* this is just for development reasons,
      * clear and put into then block for live version */
-    if (this.experience.debug.isActive) {
-      this.defineStartingPlayerAndStartDiceRolls(isAxesUp, (firstPlayer, secondPlayer) => {
-        firstPlayer.isPlayerAtTurn = true
-        secondPlayer.isPlayerAtTurn = false
-        firstPlayer.isStartingPlayer = false
-        secondPlayer.isStartingPlayer = true
-      })
-    }
+    // if (this.experience.debug.isActive) {
+    //   this.defineStartingPlayerAndStartDiceRolls(isAxesUp, (firstPlayer, secondPlayer) => {
+    //     firstPlayer.isPlayerAtTurn = true
+    //     secondPlayer.isPlayerAtTurn = false
+    //     firstPlayer.isStartingPlayer = false
+    //     secondPlayer.isStartingPlayer = true
+    //   })
+    // }
   }
 
   defineStartingPlayerAndStartDiceRolls(isAxesUp, customStartCallback) {
@@ -139,6 +186,8 @@ export default class {
     }
 
     this.world.gui.showPhaseOverlay(true)
+    // firstPlayer?.isStartingPlayer && this.moveTurnCoinToPlayerAtTurn(firstPlayer)
+    // secondPlayer?.isStartingPlayer && this.moveTurnCoinToPlayerAtTurn(secondPlayer)
     !firstPlayer?.isStartingPlayer && firstPlayer.trigger(GAMES_PHASES.DICE_ROLL)
     !secondPlayer?.isStartingPlayer && secondPlayer.trigger(GAMES_PHASES.DICE_ROLL)
   }

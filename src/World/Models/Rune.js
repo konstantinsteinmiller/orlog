@@ -102,16 +102,19 @@ export default class Rune {
   }
 
   async resolution(effectCallback = () => {}) {
-    return new Promise((resolve) => {
+    return new Promise(async (resolve) => {
       if (this.owner.selectedRune) {
         const tier = this.rune[this.owner.selectedRune?.tier]
         this.payTierPrice()
         if (this.didPayTierPrice) {
-          console.log('this.didPayTierPrice: ', this.didPayTierPrice, tier)
-          effectCallback(resolve, tier)
-
+          await new Promise((resolveInner) => {
+            effectCallback(resolveInner, tier)
+          })
+          this.owner.selectedRune = null
           this.didPayTierPrice = false
+          resolve()
         } else {
+          this.owner.selectedRune = null
           resolve()
         }
       } else {

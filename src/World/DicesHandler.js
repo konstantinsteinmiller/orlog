@@ -79,7 +79,8 @@ export default class DicesHandler extends EventEmitter {
         !playerIdAtTurn === this.sessionPlayer ||
         !this.didAllDicesStopMoving ||
         this.availableThrows === 0 ||
-        this.currentIntersect !== null
+        this.currentIntersect !== null ||
+        this.isMovingDices
       ) {
         return
       }
@@ -110,7 +111,6 @@ export default class DicesHandler extends EventEmitter {
     !this.isWaitingToFinishRound &&
       (this.isWaitingToFinishRound = true) &&
       setTimeout(() => {
-        console.log(this.playerId, 'finishMovingDicesToEnemy availableThrows: ', this.availableThrows)
         if (this.availableThrows === 0) {
           this.dicesList.forEach((dice) => {
             const diceHighlightMesh = dice.group.getObjectByName('diceHighlight')
@@ -136,6 +136,7 @@ export default class DicesHandler extends EventEmitter {
   }
 
   moveSelectedDicesToEnemy() {
+    this.isMovingDices = true
     this.rearrangePlacedDices()
 
     const otherPlayer = this.world.getPlayerAtTurn(true)
@@ -154,7 +155,7 @@ export default class DicesHandler extends EventEmitter {
           ? -1
           : 1
 
-      if (highlightMesh.isSelected && !highlightMesh.isPlaced) {
+      if (highlightMesh.isSelected && !highlightMesh.isPlaced && dice.group.body) {
         this.physics.destroy(dice.group.body)
         highlightMesh.isPlaced = true
         this.hasDestroyedBodies = true
@@ -170,7 +171,6 @@ export default class DicesHandler extends EventEmitter {
         dice.group.rotation.set(rotationProps.x, rotationProps.y, rotationProps.z)
 
         const toRotation = dice.group.rotation
-        this.isMovingDices = true
         dice.isMovingToEnemy = true
 
         g.fromTo(
@@ -194,14 +194,14 @@ export default class DicesHandler extends EventEmitter {
 
         g.to(dice.group.position, {
           x: dice.group.position.x,
-          y: 2.5,
+          y: 1.5,
           z: dice.group.position.z,
           duration: 0.4,
           delay: index * 0.4,
         }).then(() => {
           g.to(dice.group.position, {
             x: offsetX,
-            y: 2.5,
+            y: 1.5,
             z: this.offsetDirection * ownerDirection * (this.midZOffset - 4),
             duration: 0.6,
           }).then(() => {
@@ -263,8 +263,9 @@ export default class DicesHandler extends EventEmitter {
     /* go to next phase with this diceHandler if all dices are placed */
     if (this.dicesList.every((dice) => dice.highlightMesh?.isPlaced)) {
       this.availableThrows = 0
+      this.world.faithReachedByPlayer[this.playerId] = true
       this.trigger(GAMES_PHASES.FAITH_CASTING)
-      this.trigger(GAMES_PHASES.DICE_ROLL)
+      Object.keys(this.world.faithReachedByPlayer).length < 2 && this.trigger(GAMES_PHASES.DICE_ROLL)
     }
 
     /* for some weird reason ammo breaks when even one body is destroyed,
@@ -294,9 +295,11 @@ export default class DicesHandler extends EventEmitter {
     let firstDiceRebuild = false
 
     this.dicesList.forEach((dice) => {
-      const highlightMesh = dice.group.getObjectByName('diceHighlight')
-      if (!highlightMesh.isSelected && !highlightMesh.isPlaced) {
-        this.physics.destroy(dice.group.body)
+      const highlightMesh = dice.highlightMesh
+      if (!highlightMesh?.isSelected && !highlightMesh?.isPlaced) {
+        if (dice.group.body) {
+          this.physics.destroy(dice.group.body)
+        }
         dice.group.clear()
         this.scene.remove(dice.group)
         setTimeout(() => {
@@ -538,50 +541,52 @@ export default class DicesHandler extends EventEmitter {
       const childRight = dice.group.getObjectByName('rightSideDetector')
 
       /* to get the current world position of the dice, we need to detach from the parent group */
-      this.scene.attach(childUp) // detach from parent and add to scene
-      this.scene.attach(childFront)
-      this.scene.attach(childRight)
-      dice.group.attach(childUp) // reattach to original parent
-      dice.group.attach(childFront)
-      dice.group.attach(childRight)
+      if (childUp?.parent && childFront?.parent && childRight?.parent) {
+        this.scene.attach(childUp) // detach from parent and add to scene
+        this.scene.attach(childFront)
+        this.scene.attach(childRight)
+        dice.group.attach(childUp) // reattach to original parent
+        dice.group.attach(childFront)
+        dice.group.attach(childRight)
 
-      var worldPosUp = new THREE.Vector3().applyMatrix4(childUp.matrixWorld)
-      var worldPosFront = new THREE.Vector3().applyMatrix4(childFront.matrixWorld)
-      var worldPosRight = new THREE.Vector3().applyMatrix4(childRight.matrixWorld)
+        const worldPosUp = new THREE.Vector3().applyMatrix4(childUp.matrixWorld)
+        const worldPosFront = new THREE.Vector3().applyMatrix4(childFront.matrixWorld)
+        const worldPosRight = new THREE.Vector3().applyMatrix4(childRight.matrixWorld)
 
-      const Uy = worldPosUp.y.toFixed(2)
-      const Fy = worldPosFront.y.toFixed(2)
-      const Ry = worldPosRight.y.toFixed(2)
+        const Uy = worldPosUp.y.toFixed(2)
+        const Fy = worldPosFront.y.toFixed(2)
+        const Ry = worldPosRight.y.toFixed(2)
 
-      this.setUpwardFace = (face, axis) => {
-        childMesh.userData.upwardFace = face
-        childMesh.userData.upwardSymbol = DICE_FACES_MAP[dI]?.[face].symbol
-        childMesh.userData.isGoldenSymbol = DICE_FACES_MAP[dI]?.[face].isGolden
-        // this.debug?.isActive &&
-        // console.error(
-        //   `${axis} ${face[0].toUpperCase()}${face.substring(1)} // ${DICE_FACES_MAP[dI]?.[face].symbol} ${
-        //     DICE_FACES_MAP[dI]?.[face].isGolden ? 'Golden' : ''
-        //   }`,
-        // )
-      }
+        this.setUpwardFace = (face, axis) => {
+          childMesh.userData.upwardFace = face
+          childMesh.userData.upwardSymbol = DICE_FACES_MAP[dI]?.[face].symbol
+          childMesh.userData.isGoldenSymbol = DICE_FACES_MAP[dI]?.[face].isGolden
+          // this.debug?.isActive &&
+          // console.error(
+          //   `${axis} ${face[0].toUpperCase()}${face.substring(1)} // ${DICE_FACES_MAP[dI]?.[face].symbol} ${
+          //     DICE_FACES_MAP[dI]?.[face].isGolden ? 'Golden' : ''
+          //   }`,
+          // )
+        }
 
-      if (Uy > Fy && Uy > Ry) {
-        this.setUpwardFace('top', 'Y')
-      }
-      if (Uy < Fy && Uy < Ry) {
-        this.setUpwardFace('bottom', '-Y')
-      }
-      if (Fy > Uy && Fy > Ry) {
-        this.setUpwardFace('front', 'Z')
-      }
-      if (Fy < Uy && Fy < Ry) {
-        this.setUpwardFace('back', '-Z')
-      }
-      if (Ry > Uy && Ry > Fy) {
-        this.setUpwardFace('right', 'X')
-      }
-      if (Ry < Uy && Ry < Fy) {
-        this.setUpwardFace('left', '-X')
+        if (Uy > Fy && Uy > Ry) {
+          this.setUpwardFace('top', 'Y')
+        }
+        if (Uy < Fy && Uy < Ry) {
+          this.setUpwardFace('bottom', '-Y')
+        }
+        if (Fy > Uy && Fy > Ry) {
+          this.setUpwardFace('front', 'Z')
+        }
+        if (Fy < Uy && Fy < Ry) {
+          this.setUpwardFace('back', '-Z')
+        }
+        if (Ry > Uy && Ry > Fy) {
+          this.setUpwardFace('right', 'X')
+        }
+        if (Ry < Uy && Ry < Fy) {
+          this.setUpwardFace('left', '-X')
+        }
       }
     })
   }
@@ -613,7 +618,7 @@ export default class DicesHandler extends EventEmitter {
         return
       }
 
-      const diceHighlightMesh = this.currentIntersect.parent.getObjectByName('diceHighlight')
+      const diceHighlightMesh = this.currentIntersect?.parent?.getObjectByName('diceHighlight')
       if (!diceHighlightMesh?.isPlaced) {
         this.dicesList.some((dice) => dice.mesh.name === this.currentIntersect.name && dice.toggleDice(true))
       }
@@ -740,7 +745,7 @@ export default class DicesHandler extends EventEmitter {
   reset() {
     this.dicesList = []
     this.diceMeshes = []
-    this.availableThrows = 3
+    this.availableThrows = MAX_DICE_THROWS
     this.isThrowing = false
     this.didAllDicesStopMoving = false
     this.didStartThrowing = false

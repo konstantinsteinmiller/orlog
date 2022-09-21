@@ -4,7 +4,6 @@ import DicesHandler from '@/World/DicesHandler.js'
 import Bowl from '@/World/Models/Bowl.js'
 import LifeStone from '@/World/Models/LifeStone.js'
 import FaithToken from '@/World/Models/FaithToken.js'
-import Rune from '@/World/Models/Rune.js'
 import BabiRune from '@/World/Models/Runes/BabiRune.js'
 import AnubisRune from '@/World/Models/Runes/AnubisRune.js'
 import TawaretRune from '@/World/Models/Runes/TawaretRune.js'
@@ -110,9 +109,10 @@ export default class Player extends EventEmitter {
     this.dicesHandler.on('finished-moving-dices-to-enemy', () => {
       if (this.dicesHandler.dicesList.every((dice) => dice.highlightMesh?.isPlaced)) {
         this.dicesHandler.availableThrows = 0
+        this.world.faithReachedByPlayer[this.playerId] = true
         this.trigger(GAMES_PHASES.FAITH_CASTING)
       }
-      this.trigger(GAMES_PHASES.DICE_ROLL)
+      Object.keys(this.world.faithReachedByPlayer).length < 2 && this.trigger(GAMES_PHASES.DICE_ROLL)
     })
 
     this.dicesHandler.on('dices-rebuild', () => {

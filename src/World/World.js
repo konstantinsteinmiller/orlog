@@ -23,7 +23,6 @@ export default class World {
     this.debug = experience.debug
     this.sounds = experience.sounds
     this.resources = experience.resources
-    this.bowls = []
     this.gui = null
     this.physics = experience.physics
     this.players = {}
@@ -31,10 +30,12 @@ export default class World {
 
     this.currentGamePhase = GAMES_PHASES.DICE_ROLL
     this.playerDoneWithRollingAmount = 0
+    this.faithReachedByPlayer = {}
     this.playerDoneWithFaithCastingAmount = 0
     this.playerDoneWithDiceResolveAmount = 0
     this.runeResolver = null
     this.diceResolver = null
+    this.round = 1
 
     // const axisHelper = new THREE.AxesHelper(3)
     // this.scene.add(axisHelper)
@@ -56,11 +57,15 @@ export default class World {
     this.playerDoneWithRollingAmount = 0
     this.playerDoneWithFaithCastingAmount = 0
     this.playerDoneWithDiceResolveAmount = 0
+    this.runeResolver = null
     this.diceResolver = null
+    this.round = 1
   }
 
   setupWorld() {
     // Setup
+    doGoToMainMenuId.addEventListener('click', (e) => this.onBackToMainClick(e, true))
+    doRestartGameId.addEventListener('click', (e) => this.onRestartGameClick(e, true))
     this.floor = new Floor()
     this.environment = new Environment()
     this.createPlayers()
@@ -68,6 +73,14 @@ export default class World {
     this.coin = new Coin()
     this.coin.flipCoin()
     this.runeManager = new RuneManager()
+  }
+
+  onBackToMainClick() {
+    console.log('onBackToMainClick: ')
+  }
+
+  onRestartGameClick() {
+    console.log('onRestartGameClick')
   }
 
   createPlayers() {
@@ -80,7 +93,7 @@ export default class World {
     } else if (this.experience.gameMode === GAME_TYPES.GAME_TYPE_MULTIPLAYER) {
       // setStorage(GAME_PLAYER_ID, client.sessionId..., true)
       // setStorage(GAME_PLAYER_ID, client.sessionId..., true)
-      const sessionPlayer = getStorage(GAME_PLAYER_ID, true)
+      const sessionPlayer = this.getSessionPlayerId()
       const remotePlayer = 'xxxxxxxx'
       this.createPlayer(sessionPlayer, true)
       this.createPlayer(remotePlayer)
@@ -89,16 +102,16 @@ export default class World {
   }
 
   // find the player that is not at turn and give turn to him
-  switchPlayerAtTurn() {
+  async switchPlayerAtTurn() {
     Object.values(this.players).forEach((player) => {
       player.isPlayerAtTurn = !player.isPlayerAtTurn
     })
+
+    return await this.coin.moveTurnCoinToPlayerAtTurn(this.getPlayerAtTurn())
   }
+
   switchStartingPlayer() {
-    Object.values(this.players).forEach((player) => {
-      player.isStartingPlayer = !player.isStartingPlayer
-      player.isPlayerAtTurn = !player.isStartingPlayer
-    })
+    this.coin.moveCoinToStartingPlayer(true)
   }
 
   getPlayerAtTurn(isNotAtTurn) {
@@ -128,22 +141,27 @@ export default class World {
     this.players[playerId] = player
     this.orderedPlayerIds.push(playerId)
 
-    player.on(GAMES_PHASES.DICE_ROLL, () => {
-      this.switchPlayerAtTurn()
+    player.on(GAMES_PHASES.DICE_ROLL, async () => {
+      await this.switchPlayerAtTurn()
       const player = this.getPlayerAtTurn()
+
       if (player.dicesHandler.availableThrows === MAX_DICE_THROWS) {
-        player.dicesHandler.createDices()
+        this.round === 1 && player.dicesHandler.createDices()
         player.dicesHandler.randomDiceThrow()
       }
-      this.debug.isActive && console.log(player.playerId, ' throws: ', player.dicesHandler.availableThrows)
+      // this.debug.isActive && console.log(player.playerId, ' throws: ', player.dicesHandler.availableThrows)
 
       if (player.dicesHandler.availableThrows > 0) {
         player.dicesHandler.resetThrow()
-      } else if (this.playerDoneWithRollingAmount === 1) {
+      } else if (!this.faithReachedByPlayer[player.playerId]) {
+        this.faithReachedByPlayer[player.playerId] = true
+        player.trigger(GAMES_PHASES.FAITH_CASTING)
+        this.playerDoneWithRollingAmount < 2 &&
+          setTimeout(() => {
+            player.trigger(GAMES_PHASES.DICE_ROLL)
+          }, 400)
+      } else if (this.playerDoneWithRollingAmount < 2) {
         player.trigger(GAMES_PHASES.DICE_ROLL)
-      } else {
-        //  both players finished with  GAMES_PHASES.DICE_ROLL
-        // this.debug.isActive && console.log('========= both players finished with  GAMES_PHASES.DICE_ROLL')
       }
     })
 
@@ -153,14 +171,17 @@ export default class World {
     })
 
     player.on(GAMES_PHASES.FAITH_CASTING, () => {
-      this.debug.isActive && console.log('FAITH_CASTING: ', player.playerId)
-      if (++this.playerDoneWithRollingAmount === 2) {
+      // this.debug.isActive && console.log('FAITH_CASTING: ', player.playerId)
+      if (++this.playerDoneWithRollingAmount >= 2 && Object.keys(this.faithReachedByPlayer).length === 2) {
+        const [firstPlayer, secondPlayer] = this.getPlayers()
+        // firstPlayer.dicesHandler.availableThrows = MAX_DICE_THROWS
+        // secondPlayer.dicesHandler.availableThrows = MAX_DICE_THROWS
         this.currentGamePhase = GAMES_PHASES.FAITH_CASTING
         this.gui.showPhaseOverlay(true)
         this.setPlayerAtTurnToStartingPlayer()
-        const startingPlayer = this.getStartingPlayer()
-        const secondPlayer = this.getStartingPlayer(true)
-        startingPlayer.startFaithSelection()
+        const playerAtTurn = this.getPlayerAtTurn()
+
+        playerAtTurn.startFaithSelection()
         // setTimeout(() => {
         // this.debug.isActive && startingPlayer.trigger(GAMES_PHASES.DICE_RESOLVE)
         // this.debug.isActive && secondPlayer.trigger(GAMES_PHASES.DICE_RESOLVE)
@@ -169,19 +190,25 @@ export default class World {
     })
 
     player.on(GAMES_PHASES.DICE_RESOLVE, async () => {
-      if (++this.playerDoneWithFaithCastingAmount === 2) {
+      ++this.playerDoneWithFaithCastingAmount
+      if (this.playerDoneWithFaithCastingAmount < 2) {
+        await this.switchPlayerAtTurn()
+        const playerAtTurn = this.getPlayerAtTurn()
+        playerAtTurn.startFaithSelection()
+      }
+      if (this.playerDoneWithFaithCastingAmount === 2) {
         this.currentGamePhase = GAMES_PHASES.DICE_RESOLVE
         this.gui.showPhaseOverlay(true)
         this.setPlayerAtTurnToStartingPlayer()
 
         if (this.runeResolver === null) {
           this.runeResolver = new RuneResolver()
-
-          await this.runeResolver.resolveRunesBeforeDiceResolution()
         }
+
         if (this.diceResolver === null) {
           this.diceResolver = new DiceResolver()
         }
+        await this.runeResolver.resolveRunesBeforeDiceResolution()
       }
     })
 
@@ -197,11 +224,34 @@ export default class World {
     return player
   }
 
-  setPlayerAtTurnToStartingPlayer() {
-    const [startingPlayer, secondPlayer] = this.getPlayers()
-    // const secondPlayer = this.getStartingPlayer(false)
+  async finishRound() {
+    this.round++
+    this.currentGamePhase = GAMES_PHASES.DICE_ROLL
+    this.gui.showPhaseOverlay(true)
+    this.faithReachedByPlayer = {}
+    this.playerDoneWithRollingAmount = 0
+    this.playerDoneWithFaithCastingAmount = 0
+    this.playerDoneWithDiceResolveAmount = 0
+
+    const firstPlayer = this.players[this.orderedPlayerIds[0]]
+    const secondPlayer = this.players[this.orderedPlayerIds[1]]
+    firstPlayer.dicesHandler.availableThrows = MAX_DICE_THROWS
+    secondPlayer.dicesHandler.availableThrows = MAX_DICE_THROWS
+    firstPlayer.dicesHandler.dicesList.forEach((die) => (die.highlightMesh.isPlaced = false))
+    secondPlayer.dicesHandler.dicesList.forEach((die) => (die.highlightMesh.isPlaced = false))
+
+    this.switchStartingPlayer()
+    // this.coin.moveCoinToStartingPlayer()
+    // !firstPlayer?.isStartingPlayer && firstPlayer.trigger(GAMES_PHASES.DICE_ROLL)
+    // !secondPlayer?.isStartingPlayer && secondPlayer.trigger(GAMES_PHASES.DICE_ROLL)
+  }
+
+  async setPlayerAtTurnToStartingPlayer() {
+    const startingPlayer = this.getStartingPlayer()
+    const secondPlayer = this.getStartingPlayer(true)
     startingPlayer.isPlayerAtTurn = true
     secondPlayer.isPlayerAtTurn = false
+    await this.coin.moveTurnCoinToPlayerAtTurn(startingPlayer)
   }
 
   getSessionPlayerId() {
@@ -213,7 +263,6 @@ export default class World {
   }
 
   getEnemyPlayer(playerId) {
-    // const sessionPlayerId = getStorage(GAME_PLAYER_ID, true)
     return Object.values(this.players).find((player) => player.playerId !== playerId)
   }
 
@@ -229,9 +278,14 @@ export default class World {
     return this.currentGamePhase === GAMES_PHASES.FAITH_CASTING
   }
 
-  finishRound() {
-    this.switchStartingPlayer()
-    this.currentGamePhase = GAMES_PHASES.DICE_ROLL
+  checkWinConditions(defenderPlayer) {
+    const attackerPlayer = this.getEnemyPlayer(defenderPlayer.playerId)
+    if (defenderPlayer.lifeStones.length === 0) {
+      const $winnerSpan = document.querySelector('#gameOverModal+.modal .winner')
+      $winnerSpan.innerText = `${attackerPlayer.playerId} won!!!`
+      gameOverModal.click()
+      alert(attackerPlayer.playerId, ' won!!!')
+    }
   }
 
   update() {

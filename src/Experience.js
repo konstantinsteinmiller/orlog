@@ -44,13 +44,13 @@ export default class Experience {
     this.renderer = new Renderer()
     this.world = new World()
     this.physics = new AmmoPhysics(this.scene)
-    this.debug.isActive && this.physics.debug.enable()
+    // this.debug.isActive && this.physics.debug.enable()
 
     if (location.hash.includes('game=')) {
       this.client = new Client()
     }
 
-    // Resize eventnpm ru
+    // Resize event
     this.sizes.on('resize', () => {
       this.resize()
     })

@@ -186,7 +186,7 @@ export default class StrategyManager {
   selectRune() {
     let rune = this.player.runes[Math.ceil(Math.random() * 3) - 1]
     let runeData = GAME_RUNES_DESCRIPTIONS[rune.type]
-    let selectedTier = 'tier1'
+    let selectedTier = null
 
     if (this.hasHighHP()) {
       selectedTier = this.selectHighestAvailableTier(runeData)
@@ -211,8 +211,10 @@ export default class StrategyManager {
           tier: selectedTier /* `tier${Math.ceil(Math.random() * 3)}` */,
         }
       : null
-    rune.toggleRune(false, true)
-    this.player.trigger(GAMES_PHASES.DICE_RESOLVE)
+    setTimeout(() => {
+      rune.toggleRune(false, true)
+      this.player.trigger(GAMES_PHASES.DICE_RESOLVE)
+    }, 1500)
   }
 
   selectHighestAvailableTier(runeData) {

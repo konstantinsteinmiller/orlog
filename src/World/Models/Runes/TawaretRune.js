@@ -9,13 +9,10 @@ export default class TawaretRune extends Rune {
   async beforeResolution() {
     return this.resolution((resolve, tier) => {
       setTimeout(async () => {
-        /* maybe make vfx here to show life stones are beeing destroyed */
         this.experience.sounds.playSound('fountain')
         await this.owner.addLifeStones(tier.value)
-        console.log('allresolved: ')
         resolve()
       }, 800)
-      this.didPayTierPrice = false
     })
   }
 

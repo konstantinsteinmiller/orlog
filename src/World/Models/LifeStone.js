@@ -5,6 +5,7 @@ export default class LifeStone {
   constructor(owner, isPlayer = false, id = 0, timeoutInMs = 0, resolve = () => {}) {
     this.experience = experience
     this.physics = experience.physics
+    this.world = this.experience.world
     this.scene = this.experience.scene
     this.resources = this.experience.resources
 
@@ -30,6 +31,11 @@ export default class LifeStone {
   destroyLifeStone(timeoutInMs, resolve = () => {}) {
     const timeout = timeoutInMs * 0.001
     const lifeStone = this.owner.lifeStones.pop()
+    if (!lifeStone || this.owner.lifeStones.length === 0) {
+      this.world.checkWinConditions(this.owner)
+      resolve()
+      return
+    }
     lifeStone.toggleHighlight()
     g.to(lifeStone.mesh.position, {
       x: lifeStone.offsetDirection * (-6 + 2.1),

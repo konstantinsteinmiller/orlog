@@ -1,5 +1,4 @@
 import Experience from '@/Experience.js'
-import Rune from '@/World/Models/Rune.js'
 import { GAMES_PHASES, GAMES_RUNES } from '@/Utils/constants.js'
 
 export default class RuneManager {
@@ -57,7 +56,7 @@ export default class RuneManager {
           tierBelongsSessionPlayer
         ) {
           /* unselect all runes and close the rune overlay */
-          const sessionPlayer = this.world.players[this.world.getSessionPlayerId()]
+          const sessionPlayer = this.world.getSessionPlayer()
           this.gui.toggleCursor(false)
           const rune = sessionPlayer.runes.find((rune) => rune?.type === runeType.dataset.type)
 
@@ -118,7 +117,7 @@ export default class RuneManager {
         !this.gui.isShowingRuneInfo &&
         this.world.isFaithCastingPhase()
       ) {
-        const sessionPlayer = this.world.getPlayerAtTurn()
+        const sessionPlayer = this.world.getSessionPlayer()
         sessionPlayer.trigger(GAMES_PHASES.DICE_RESOLVE)
       }
     })

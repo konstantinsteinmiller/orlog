@@ -14,13 +14,19 @@ export default class RuneResolver {
     const [startingPlayer, secondPlayer] = this.world.getPlayers()
     await startingPlayer?.selectedRune?.rune?.beforeResolution()
     await secondPlayer?.selectedRune?.rune?.beforeResolution()
+    await new Promise((resolve) => {
+      setTimeout(async () => {
+        this.world.diceResolver.createFaithTokens()
+        resolve()
+      }, 2000)
+    })
   }
 
   async resolveRunesAfterDiceResolution() {
     const [startingPlayer, secondPlayer] = this.world.getPlayers()
     await startingPlayer?.selectedRune?.rune?.afterResolution()
     await secondPlayer?.selectedRune?.rune?.afterResolution()
-    console.log('DONE WITH ROUND')
+    console.log('----- DONE WITH ROUND ', this.world.round, '-----')
     this.world.finishRound()
   }
 }

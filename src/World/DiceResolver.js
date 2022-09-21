@@ -22,16 +22,12 @@ export default class DiceResolver {
     //   'this.allDicesList: ',
     //   this.allDicesList.map((dice) => dice.mesh.userData?.upwardSymbol),
     // )
-
-    setTimeout(() => {
-      this.createFaithTokens()
-    }, 2000)
   }
 
-  createFaithTokens() {
+  async createFaithTokens() {
     const goldenDicesList = this.allDicesList.filter((dice) => dice.mesh.userData?.isGoldenSymbol)
 
-    goldenDicesList.forEach((dice) => {
+    const faithPromiseList = goldenDicesList.map((dice) => {
       const diceOwner = this.world.players[dice.mesh.userData?.playerId]
       const isPlayer = getStorage(GAME_PLAYER_ID, true) === diceOwner.playerId
 
@@ -40,12 +36,15 @@ export default class DiceResolver {
         dice.group.position.y + 0.2,
         dice.group.position.z,
       )
-      diceOwner.faithTokens.push(new FaithToken(isPlayer, diceOwner.faithTokens.length, 0, fromPosition))
+      return new Promise((resolve) => {
+        diceOwner.faithTokens.push(
+          new FaithToken(isPlayer, diceOwner.faithTokens.length, 0, fromPosition, resolve),
+        )
+      })
     })
+    await Promise.all(faithPromiseList)
 
-    setTimeout(() => {
-      this.resolveSymbols()
-    }, 3500)
+    this.resolveSymbols()
   }
 
   async resolveSymbols() {
@@ -129,7 +128,12 @@ export default class DiceResolver {
       true,
     )
 
-    await this.world.runeResolver.resolveRunesAfterDiceResolution()
+    await new Promise((resolve) => {
+      setTimeout(async () => {
+        await this.world.runeResolver.resolveRunesAfterDiceResolution()
+        resolve()
+      }, 1000)
+    })
   }
 
   resolveDiceSymbols(attackerDices, defenderDices, attackerPlayer, defenderPlayer, isHands) {
@@ -161,29 +165,15 @@ export default class DiceResolver {
                   dice.mesh.userData.upwardSymbol === GAME_SYMBOLS.AXE && this.sounds.playSound('axeHitMetal')
                   dice.mesh.userData.upwardSymbol === GAME_SYMBOLS.ARROW &&
                     this.sounds.playSound('arrowHitTargetAndWobble')
-                  g.to(defenderDie.group.scale, {
-                    x: 0,
-                    y: 0,
-                    z: 0,
-                    duration: 0.5,
-                    delay: 0.8 + index * 0.3,
-                  })
-                  g.to(dice.group.scale, {
-                    x: 0,
-                    y: 0,
-                    z: 0,
-                    duration: 0.5,
-                    delay: 0.8 + index * 0.3 /* 0.8sec wait: give the player some time to see what happens */,
-                  }).then(() => {
-                    this.moveDieBackToStart(defenderDie, defenderPlayer)
-                    this.moveDieBackToStart(dice, attackerPlayer)
-                    if (index === attackerDices.length - 1) {
-                      defenderDices.forEach((die) => {
-                        this.moveDieBackToStart(die, defenderPlayer)
-                      })
-                      return resolve()
-                    }
-                  })
+
+                  this.moveDieBackToStart(defenderDie, defenderPlayer)
+                  this.moveDieBackToStart(dice, attackerPlayer)
+                  if (index === attackerDices.length - 1) {
+                    defenderDices.forEach((die) => {
+                      this.moveDieBackToStart(die, defenderPlayer)
+                    })
+                    return resolve()
+                  }
                 })
             } else {
               const lifeStones = defenderPlayer.lifeStones
@@ -309,12 +299,6 @@ export default class DiceResolver {
 
   moveDieBackToStart(die, ownerPlayer) {
     setTimeout(() => {
-      g.to(die.group.scale, {
-        x: die.scale,
-        y: die.scale,
-        z: die.scale,
-        duration: 0.1,
-      })
       g.to(die.group.position, {
         y: 2,
         duration: 0.3,

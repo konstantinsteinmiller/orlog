@@ -105,11 +105,7 @@ export default class Debug {
     } else if (event.code === 'KeyT') {
       this.world = this.experience.world
       if (this.world.players) {
-        console.log(
-          'player turns',
-          this.world.players[this.world.orderedPlayerIds[0]].isPlayerAtTurn,
-          this.world.players[this.world.orderedPlayerIds[1]].isPlayerAtTurn,
-        )
+        console.log('Turn: ', this.world.getPlayerAtTurn()?.playerId, 'in', this.world.currentGamePhase)
       }
     }
   }
@@ -145,7 +141,7 @@ export default class Debug {
     this.physics = experience.physics
     if (this.isPhysicsDebugActive) {
       this.physics.debug.disable()
-      experience.world.players.forEach((player) => {
+      Object.values(this.world.players).forEach((player) => {
         player.dicesHandler.dicesList.forEach((dice) => {
           dice.group.getObjectByName('upSideDetector').scale.set(new THREE.Vector3(0, 0, 0))
           dice.group.getObjectByName('frontSideDetector').scale.set(new THREE.Vector3(0, 0, 0))

@@ -191,16 +191,27 @@ export default class DiceResolver {
               if (lifeStoneIndex >= 0) {
                 const lifeStone = lifeStones[lifeStoneIndex]
                 damageAmount++
+                const halfX = (lifeStone.mesh.position.x + dice.group.position.x) / 2
+                const halfZ = (lifeStone.mesh.position.z + dice.group.position.z) / 2
+
                 return g
                   .to(dice.group.position, {
-                    x: lifeStone.mesh.position.x,
-                    y: lifeStone.mesh.position.y + dice.scale,
-                    z:
-                      lifeStone.mesh.position.z -
-                      dice.scale * 1.5 * defenderPlayer.dicesHandler.offsetDirection,
-                    duration: 1.5,
+                    x: halfX,
+                    y: 1.5,
+                    z: halfZ,
+                    duration: 0.75,
                     delay: 0.8 + index * 0.3,
                   })
+                  .then(() =>
+                    g.to(dice.group.position, {
+                      x: lifeStone.mesh.position.x,
+                      y: lifeStone.mesh.position.y + dice.scale,
+                      z:
+                        lifeStone.mesh.position.z -
+                        dice.scale * 1.5 * defenderPlayer.dicesHandler.offsetDirection,
+                      duration: 0.75,
+                    }),
+                  )
                   .then(() => {
                     dice.mesh.userData.upwardSymbol === GAME_SYMBOLS.AXE &&
                       this.sounds.playSound('axeHitStoneBreak')

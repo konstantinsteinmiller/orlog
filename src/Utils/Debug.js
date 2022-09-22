@@ -12,6 +12,7 @@ export default class Debug {
     this.world = this.experience.world
     this.resources = this.experience.resources
     this.isActive = window.location.hash.includes('#debug')
+    this.useDebugThrows = window.location.hash.includes('throws=')
     this.useDebugLifes = window.location.hash.includes('lifes=')
     this.useDebugFaithTokens = window.location.hash.includes('tokens=')
     this.useDebugNpcRune = window.location.hash.includes('rune=')

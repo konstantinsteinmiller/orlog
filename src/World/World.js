@@ -145,7 +145,11 @@ export default class World {
       await this.switchPlayerAtTurn()
       const player = this.getPlayerAtTurn()
 
-      if (player.dicesHandler.availableThrows === MAX_DICE_THROWS) {
+      const MAX_THROWS =
+        this.debug.isActive && this.debug.useDebugThrows
+          ? +window.location.hash.split('throws=')[1].split('&')[0]
+          : MAX_DICE_THROWS
+      if (player.dicesHandler.availableThrows === MAX_THROWS) {
         this.round === 1 && player.dicesHandler.createDices()
         player.dicesHandler.randomDiceThrow()
       }
@@ -173,19 +177,12 @@ export default class World {
     player.on(GAMES_PHASES.FAITH_CASTING, () => {
       // this.debug.isActive && console.log('FAITH_CASTING: ', player.playerId)
       if (++this.playerDoneWithRollingAmount >= 2 && Object.keys(this.faithReachedByPlayer).length === 2) {
-        const [firstPlayer, secondPlayer] = this.getPlayers()
-        // firstPlayer.dicesHandler.availableThrows = MAX_DICE_THROWS
-        // secondPlayer.dicesHandler.availableThrows = MAX_DICE_THROWS
         this.currentGamePhase = GAMES_PHASES.FAITH_CASTING
         this.gui.showPhaseOverlay(true)
         this.setPlayerAtTurnToStartingPlayer()
         const playerAtTurn = this.getPlayerAtTurn()
 
         playerAtTurn.startFaithSelection()
-        // setTimeout(() => {
-        // this.debug.isActive && startingPlayer.trigger(GAMES_PHASES.DICE_RESOLVE)
-        // this.debug.isActive && secondPlayer.trigger(GAMES_PHASES.DICE_RESOLVE)
-        // }, 4000)
       }
     })
 
@@ -236,8 +233,13 @@ export default class World {
 
     const firstPlayer = this.players[this.orderedPlayerIds[0]]
     const secondPlayer = this.players[this.orderedPlayerIds[1]]
-    firstPlayer.dicesHandler.availableThrows = MAX_DICE_THROWS
-    secondPlayer.dicesHandler.availableThrows = MAX_DICE_THROWS
+    const MAX_THROWS =
+      this.debug.isActive && this.debug.useDebugThrows
+        ? +window.location.hash.split('throws=')[1].split('&')[0]
+        : MAX_DICE_THROWS
+
+    firstPlayer.dicesHandler.availableThrows = MAX_THROWS
+    secondPlayer.dicesHandler.availableThrows = MAX_THROWS
     firstPlayer.dicesHandler.dicesList.forEach((die) => (die.highlightMesh.isPlaced = false))
     secondPlayer.dicesHandler.dicesList.forEach((die) => (die.highlightMesh.isPlaced = false))
 

@@ -236,8 +236,107 @@ export default class StrategyManager {
       .sort((a, b) => 0.5 - Math.random())
       .slice(0, diceToSelectAmount)
 
+    const attackerDices = {
+      AXE: 0,
+      ARROW: 0,
+      HELM: 0,
+      SHIELD: 0,
+      HAND: 0,
+    }
+    const defenderDices = {
+      AXE: 0,
+      ARROW: 0,
+      HELM: 0,
+      SHIELD: 0,
+      HAND: 0,
+    }
+    defenderPlayer.dicesHandler.dicesList.forEach((die) => {
+      const symbol = die?.mesh?.userData?.upwardSymbol
+      defenderDices[symbol] = defenderDices[symbol]++
+    })
+    this.dicesHandler.dicesList.forEach((die) => {
+      const symbol = die?.mesh?.userData?.upwardSymbol
+      attackerDices[symbol] = attackerDices[symbol]++
+    })
+
+    let toRemoveDices = []
+    /* first prefer golden axes if enemy got more axes than you got helms */
+    if (attackerDices['HELM'] < defenderDices['AXE']) {
+      const times = defenderDices['AXE'] - attackerDices['HELM']
+      ;[...Array(times).keys()].forEach(() => {
+        toRemoveDices.push('AXE')
+      })
+    }
+    /* second prefer golden arrows if enemy got more axes than you got shield */
+    if (attackerDices['SHIELD'] < defenderDices['ARROW']) {
+      const times = defenderDices['ARROW'] - attackerDices['SHIELD']
+      ;[...Array(times).keys()].forEach(() => {
+        toRemoveDices.push('ARROW')
+      })
+    }
+    /* third prefer removing enemy shields(golden) if you got arrows */
+    if (defenderDices['SHIELD'] > 0 && attackerDices['ARROW'] > 0) {
+      ;[...Array(defenderDices['SHIELD']).keys()].forEach(() => {
+        toRemoveDices.push('SHIELD')
+      })
+    }
+
+    /* last prefer removing enemy hands(golden) */
+    const goldenHandsAmount = defenderPlayer.dicesHandler.dicesList.filter(
+      (die) => die?.mesh?.userData?.upwardSymbol && die?.mesh?.userData?.isGoldenSymbol,
+    ).length
+    if (goldenHandsAmount > 0) {
+      ;[...Array(goldenHandsAmount).keys()].forEach(() => {
+        toRemoveDices.push('HAND')
+      })
+    }
+
+    /* first remove golden, then normal */
+    let dicesToRemove = []
+    defenderPlayer.dicesHandler.dicesList
+      .filter((die) => {
+        const symbol = die?.mesh?.userData?.upwardSymbol
+        const isGolden = die?.mesh?.userData?.isGoldenSymbol
+        const foundIndex = toRemoveDices.findIndex((sym) => sym === symbol)
+        if (foundIndex >= 0 && isGolden) {
+          toRemoveDices.splice(foundIndex, 1)
+          dicesToRemove.push(die)
+          return false
+        }
+        return true
+      })
+      .filter((die) => {
+        const symbol = die?.mesh?.userData?.upwardSymbol
+        const foundIndex = toRemoveDices.findIndex((sym) => sym === symbol)
+        if (foundIndex >= 0) {
+          toRemoveDices.splice(foundIndex, 1)
+          dicesToRemove.push(die)
+          return false
+        }
+        return true
+      })
+      .filter((die) => {
+        toRemoveDices.push('HAND')
+        const symbol = die?.mesh?.userData?.upwardSymbol
+        const foundIndex = toRemoveDices.findIndex((sym) => sym === symbol)
+        if (foundIndex >= 0) {
+          toRemoveDices.splice(foundIndex, 1)
+          dicesToRemove.push(die)
+          return false
+        }
+        return true
+      })
+
+    /* to ensure there are enough selections we append the random selection at the
+     * beginning and slice for the required amount */
+    const totalToRemove = dicesToRemove
+      .concat(defenderPlayer.dicesHandler.dicesList.filter((die, index) => dicesToRemoveList.includes(index)))
+      .concat(defenderPlayer.dicesHandler.dicesList)
+      .slice(0, diceToSelectAmount)
+
+    /* then we toggle the marked for removal dices and let them move back to user dices stash */
     const markedDicesPromises = defenderPlayer.dicesHandler.dicesList.map((die, index) => {
-      if (dicesToRemoveList.includes(index)) {
+      if (totalToRemove.some((dice) => dice?.mesh.name === die?.mesh.name)) {
         die.toggleMarkForRemoval()
       }
 

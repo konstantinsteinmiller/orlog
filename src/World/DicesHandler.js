@@ -46,7 +46,13 @@ export default class DicesHandler extends EventEmitter {
 
     this.dicesList = []
     this.diceMeshes = []
-    this.availableThrows = MAX_DICE_THROWS
+
+    const MAX_THROWS =
+      this.debug.isActive && this.debug.useDebugThrows
+        ? +window.location.hash.split('throws=')[1].split('&')[0]
+        : MAX_DICE_THROWS
+
+    this.availableThrows = MAX_THROWS
     this.isThrowing = false
     this.didAllDicesStopMoving = false
     this.didStartThrowing = false

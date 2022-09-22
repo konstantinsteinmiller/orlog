@@ -6,7 +6,6 @@ import {
   ROTATION_FACE_MAP,
   GAMES_PHASES,
   GAME_PLAYER_TYPES,
-  GAME_SYMBOLS_ORDER,
   GAME_PLAYER_ID,
   MAX_DICE_THROWS,
 } from '@/Utils/constants'
@@ -59,6 +58,7 @@ export default class DicesHandler extends EventEmitter {
     this.previousIntersect = null
 
     this.isPlayerAtTurn = null
+    this.actionAfterDiceRollTimeout = 0
 
     // Debug
     if (this.debug.isActive && !this.isPlayer) {
@@ -502,19 +502,23 @@ export default class DicesHandler extends EventEmitter {
         this.gui.toggleCursor(true)
       }
     } else {
-      if (this.currentIntersect) {
-        if (this.previousIntersect?.name !== this.currentIntersect?.name) {
-          // this.debug.isActive && console.log('NEW Intersect: ', this.currentIntersect)
-        }
-        if (this.currentIntersect.parent) {
-          this.currentIntersect.parent.getObjectByName('diceHighlight').isHighlighted = false
-        }
-        this.gui.toggleCursor(false)
-        diceFacesLayout.style.opacity = 0
-      }
-      this.previousIntersect = { name: this.currentIntersect?.name }
-      this.currentIntersect = null
+      this.removeCurrentIntersect()
     }
+  }
+
+  removeCurrentIntersect() {
+    if (this.currentIntersect) {
+      if (this.previousIntersect?.name !== this.currentIntersect?.name) {
+        // this.debug.isActive && console.log('NEW Intersect: ', currentIntersect)
+      }
+      if (this.currentIntersect.parent) {
+        this.currentIntersect.parent.getObjectByName('diceHighlight').isHighlighted = false
+      }
+      this.gui.toggleCursor(false)
+      diceFacesLayout.style.opacity = 0
+    }
+    this.previousIntersect = { name: this.currentIntersect?.name }
+    this.currentIntersect = null
   }
 
   setDiceTopFaceHighlighter() {
@@ -646,7 +650,7 @@ export default class DicesHandler extends EventEmitter {
         this.trigger('faces-evaluated')
 
         if (this.availableThrows === 0) {
-          this.world.gui.showControlsOverlay(false)
+          this.gui.showControlsOverlay(false)
           this.dicesList.forEach((dice) => {
             const diceHighlightMesh = dice.group.getObjectByName('diceHighlight')
             if (!diceHighlightMesh.isSelected && !diceHighlightMesh.isPlaced) {
@@ -657,20 +661,7 @@ export default class DicesHandler extends EventEmitter {
         }
       }, 700)
 
-      /* show action input overlay */
-      const isSessionPlayerAtTurn =
-        this.world.getPlayerAtTurn()?.playerId === getStorage(GAME_PLAYER_ID, true)
-      this.actionAfterDiceRollTimeout = Date.now()
-
-      isSessionPlayerAtTurn &&
-        setTimeout(() => {
-          if (
-            Date.now() - this.actionAfterDiceRollTimeout > 7000 &&
-            this.world.currentGamePhase === GAMES_PHASES.DICE_ROLL
-          ) {
-            this.world.gui.showControlsOverlay(true)
-          }
-        }, 7000)
+      this.gui.showControlsOverlayDelayed(this.actionAfterDiceRollTimeout)
 
       return true
     }
@@ -739,7 +730,11 @@ export default class DicesHandler extends EventEmitter {
     this.detectIfDicesStoppedMoving()
 
     /* enable hovering over dices as all faces are evaluated */
-    this.dicesList.every((dice) => dice.mesh?.userData?.upwardFace !== undefined) && this.handleDiceHover()
+    if (this.world.isDiceRollPhase()) {
+      this.dicesList.every((dice) => dice.mesh?.userData?.upwardFace !== undefined) && this.handleDiceHover()
+    } else if (this.currentIntersect) {
+      this.removeCurrentIntersect()
+    }
   }
 
   reset() {

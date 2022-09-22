@@ -2,7 +2,6 @@ import * as gui from 'lil-gui'
 import Stats from 'stats.js'
 import { disposeMeshAndRemoveFromScene } from '@/Utils/ThreeHelpers.js'
 import Experience from '@/Experience.js'
-import { isWithinRange } from '@/Utils/math.js'
 import { isDicePlanarRotated } from '@/Utils/utils.js'
 
 export default class Debug {
@@ -12,7 +11,10 @@ export default class Debug {
     this.input = this.experience.input
     this.world = this.experience.world
     this.resources = this.experience.resources
-    this.isActive = window.location.hash === '#debug'
+    this.isActive = window.location.hash.includes('#debug')
+    this.useDebugLifes = window.location.hash.includes('lifes=')
+    this.useDebugFaithTokens = window.location.hash.includes('tokens=')
+    this.useDebugNpcRune = window.location.hash.includes('rune=')
     this.isPhysicsDebugActive = true
     this.rayCaster = new THREE.Raycaster()
 

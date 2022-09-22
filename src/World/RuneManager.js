@@ -1,5 +1,5 @@
 import Experience from '@/Experience.js'
-import { GAMES_PHASES, GAMES_RUNES } from '@/Utils/constants.js'
+import { GAME_RUNES_DESCRIPTIONS, GAMES_PHASES, GAMES_RUNES } from '@/Utils/constants.js'
 
 export default class RuneManager {
   constructor() {
@@ -14,7 +14,6 @@ export default class RuneManager {
     this.rayCaster = new THREE.Raycaster()
     this.currentIntersect = null
     this.previousIntersect = null
-    this.actionAfterDiceRollTimeout = null
 
     this.runes = [
       // new Rune(0, GAMES_RUNES.RUNE_ANUBIS, this.isPlayer, this),
@@ -23,7 +22,7 @@ export default class RuneManager {
       // new Rune(3, GAMES_RUNES.RUNE_ISIS, this.isPlayer, this),
       // new Rune(4, GAMES_RUNES.RUNE_SHU, this.isPlayer, this),
       // new Rune(5, GAMES_RUNES.RUNE_SERQET, this.isPlayer, this),
-      // new Rune(6, GAMES_RUNES.RUNE_SETH, this.isPlayer, this),
+      // new Rune(6, GAMES_RUNES.RUNE_SET, this.isPlayer, this),
       // new Rune(7, GAMES_RUNES.RUNE_RA, this.isPlayer, this),
       // new Rune(8, GAMES_RUNES.RUNE_OSIRIS, this.isPlayer, this),
       // new Rune(9, GAMES_RUNES.RUNE_TAWARET, this.isPlayer, this),
@@ -38,6 +37,7 @@ export default class RuneManager {
     )
 
     this.input.on('click', (event) => {
+      this.gui.noUserActionTimeout = Date.now()
       this.gui.showFaithControlsOverlay(false)
 
       const sessionPlayer = this.world.getSessionPlayer()
@@ -63,9 +63,11 @@ export default class RuneManager {
           if (tierNode.dataset.selected === 'true') {
             sessionPlayer.selectedRune = null
           } else {
+            const runeData = GAME_RUNES_DESCRIPTIONS[rune.type]
             sessionPlayer.selectedRune = {
               rune: rune,
               type: rune.type,
+              resolution: runeData.resolution,
               tier: `tier${tierNode.dataset.tier}`,
             }
           }
@@ -110,8 +112,9 @@ export default class RuneManager {
     })
 
     this.input.on('dblclick', (event) => {
-      this.actionAfterDiceRollTimeout = Date.now()
+      this.gui.noUserActionTimeout = Date.now()
       this.gui.showFaithControlsOverlay(false)
+
       if (
         this.world.isSessionPlayerAtTurn() &&
         !this.gui.isShowingRuneInfo &&
@@ -184,19 +187,7 @@ export default class RuneManager {
 
   showControlHint() {
     /* show action input overlay */
-    const isSessionPlayerAtTurn = this.world.isSessionPlayerAtTurn()
-    this.actionAfterDiceRollTimeout = Date.now()
-
-    isSessionPlayerAtTurn &&
-      setTimeout(() => {
-        if (
-          Date.now() - this.actionAfterDiceRollTimeout > 7000 &&
-          this.world.isFaithCastingPhase() &&
-          !this.gui.isShowingRuneInfo
-        ) {
-          this.gui.showFaithControlsOverlay(true)
-        }
-      }, 7000)
+    this.gui.showFaithControlsOverlayDelayed()
   }
 
   update() {

@@ -1,4 +1,5 @@
 import Experience from '@/Experience.js'
+import { RUNE_RESOLUTION_TYPES } from '@/Utils/constants.js'
 
 export default class RuneResolver {
   constructor() {
@@ -12,8 +13,22 @@ export default class RuneResolver {
 
   async resolveRunesBeforeDiceResolution() {
     const [startingPlayer, secondPlayer] = this.world.getPlayers()
+
+    const hasAnyPlayerABeginningResolution =
+      startingPlayer?.selectedRune?.resolution === RUNE_RESOLUTION_TYPES.BEGINNING_RESOLUTION ||
+      secondPlayer?.selectedRune?.resolution === RUNE_RESOLUTION_TYPES.BEGINNING_RESOLUTION
+
     await startingPlayer?.selectedRune?.rune?.beforeResolution()
+    if (hasAnyPlayerABeginningResolution) {
+      await this.world.switchPlayerAtTurn()
+    }
+
     await secondPlayer?.selectedRune?.rune?.beforeResolution()
+
+    if (hasAnyPlayerABeginningResolution) {
+      await this.world.switchPlayerAtTurn()
+    }
+
     await new Promise((resolve) => {
       setTimeout(async () => {
         this.world.diceResolver.createFaithTokens()

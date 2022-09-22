@@ -184,7 +184,11 @@ export default class StrategyManager {
   }
 
   selectRune() {
-    let rune = this.player.runes[Math.ceil(Math.random() * 3) - 1]
+    const randomRuneSelection =
+      this.experience.debug.isActive && this.experience.debug.useDebugNpcRune
+        ? +window.location.hash.split('rune=')[1].split('&')[0]
+        : Math.ceil(Math.random() * 3) - 1
+    let rune = this.player.runes[randomRuneSelection]
     let runeData = GAME_RUNES_DESCRIPTIONS[rune.type]
     let selectedTier = null
 
@@ -208,11 +212,12 @@ export default class StrategyManager {
       ? {
           rune: rune,
           type: rune.type,
+          resolution: runeData.resolution,
           tier: selectedTier /* `tier${Math.ceil(Math.random() * 3)}` */,
         }
       : null
     setTimeout(() => {
-      rune.toggleRune(false, true)
+      selectedTier && rune.toggleRune(false, true)
       this.player.trigger(GAMES_PHASES.DICE_RESOLVE)
     }, 1500)
   }
@@ -223,5 +228,30 @@ export default class StrategyManager {
       .filter((key) => key.includes('tier'))
       .sort((a, b) => b.substring(4) - a.substring(4))
       .find((tier) => faithTokenAmount >= +runeData[tier].cost.faith)
+  }
+
+  async selectEnemyDices(diceToSelectAmount) {
+    const defenderPlayer = this.world.getSessionPlayer()
+    const dicesToRemoveList = [...Array(defenderPlayer.dicesHandler.dicesList.length).keys()]
+      .sort((a, b) => 0.5 - Math.random())
+      .slice(0, diceToSelectAmount)
+
+    const markedDicesPromises = defenderPlayer.dicesHandler.dicesList.map((die, index) => {
+      if (dicesToRemoveList.includes(index)) {
+        die.toggleMarkForRemoval()
+      }
+
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          if (die.isMarkedForRemoval) {
+            this.world.diceResolver.moveDieBackToStart(die, defenderPlayer)
+            die.toggleDice(false, false)
+          }
+
+          resolve()
+        }, 1500)
+      })
+    })
+    return await Promise.all(markedDicesPromises)
   }
 }

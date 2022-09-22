@@ -17,7 +17,7 @@ export default class {
 
   setMesh() {
     this.mesh = this.resources.items.coin.scene.children[0].clone(true)
-    this.mesh.position.copy(new THREE.Vector3(-5, 6.1, 0))
+    this.mesh.position.copy(new THREE.Vector3(-6, 6.1, 0))
     this.mesh.scale.set(1, 1, 1)
 
     this.mesh.castShadow = true
@@ -68,7 +68,7 @@ export default class {
   moveTurnCoinToPlayerAtTurn(playerAtTurn) {
     return g
       .to(this.turnMesh.position, {
-        x: -6,
+        x: -7,
         y: 0.4,
         z: 1 * playerAtTurn.isPlayer ? 1 : -1,
         duration: 1,
@@ -77,7 +77,7 @@ export default class {
       })
       .then(() => {
         g.to(this.turnMesh.position, {
-          x: -6,
+          x: -7,
           y: 0.1,
           z: 3.2 * playerAtTurn.isPlayer ? 1 : -1,
           duration: 1,
@@ -136,7 +136,7 @@ export default class {
       delay: 0.3,
     })
     g.to(this.mesh.position, {
-      x: -5,
+      x: -6,
       y: 2.4,
       z: 1 * direction,
       duration: 1,
@@ -145,7 +145,7 @@ export default class {
     })
       .then(() =>
         g.to(this.mesh.position, {
-          x: -5,
+          x: -6,
           y: 0.1,
           z: 2 * direction,
           duration: 1,

@@ -19,6 +19,7 @@ export default class Dice {
 
     this.isPlayer = isPlayer
     this.playerId = playerId
+    this.owner = this.experience.world.players[playerId]
     this.midZOffset = this.isPlayer ? 5 : 5
     this.offsetDirection = this.isPlayer ? 1 : -1
 
@@ -29,6 +30,7 @@ export default class Dice {
 
     this.isHighlighted = false
     this.isSelected = false
+    this.isMarkedForRemoval = false
 
     this.group = group
     this.modelNumber = model
@@ -183,5 +185,10 @@ export default class Dice {
       this.highlightMesh.isSelected = !this.highlightMesh.isSelected
     }
     this.highlightMesh.isHighlighted = doHighLight
+  }
+
+  toggleMarkForRemoval() {
+    this.highlightMesh.isSelected = !this.highlightMesh.isSelected
+    this.isMarkedForRemoval = !this.isMarkedForRemoval
   }
 }

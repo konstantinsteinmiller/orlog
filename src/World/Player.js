@@ -6,6 +6,7 @@ import LifeStone from '@/World/Models/LifeStone.js'
 import FaithToken from '@/World/Models/FaithToken.js'
 import BabiRune from '@/World/Models/Runes/BabiRune.js'
 import AnubisRune from '@/World/Models/Runes/AnubisRune.js'
+import SetRune from '@/World/Models/Runes/SetRune.js'
 import TawaretRune from '@/World/Models/Runes/TawaretRune.js'
 import Experience from '@/Experience.js'
 import { GAME_PLAYER_TYPES, GAMES_PHASES, GAME_STARTING_LIFE_STONES, GAMES_RUNES } from '@/Utils/constants.js'
@@ -82,7 +83,7 @@ export default class Player extends EventEmitter {
         // new Rune(3, GAMES_RUNES.RUNE_ISIS, this),
         // new Rune(4, GAMES_RUNES.RUNE_SHU, this),
         // new Rune(5, GAMES_RUNES.RUNE_SERQET, this),
-        // new Rune(6, GAMES_RUNES.RUNE_SETH, this),
+        // new Rune(6, GAMES_RUNES.RUNE_SET, this),
         // new Rune(7, GAMES_RUNES.RUNE_RA, this),
         // new Rune(8, GAMES_RUNES.RUNE_OSIRIS, this),
         // new Rune(9, GAMES_RUNES.RUNE_TAWARET, this),
@@ -95,17 +96,27 @@ export default class Player extends EventEmitter {
     this.runes = [
       new BabiRune(0, this),
       // new Rune(0, GAMES_RUNES.RUNE_ANUBIS_BLACK, this),
-      new AnubisRune(1, this),
+      // new AnubisRune(1, this),
+      new SetRune(1, this),
       new TawaretRune(2, this),
       // new Rune(2, GAMES_RUNES.RUNE_ANUBIS_WHITE, this),
       // new Rune(2, GAMES_RUNES.RUNE_BAST, this),
       ...debugRunes,
     ]
-    this.lifeStones = [...Array(GAME_STARTING_LIFE_STONES).keys()].map(
-      (id) => new LifeStone(this, this.isPlayer, id, id * 0.1),
-    )
-    const startFaithTokens = this.debug.isActive ? 12 : 0
-    this.faithTokens = [...Array().keys(startFaithTokens)].map(
+
+    const lives =
+      this.debug.useDebugLifes && this.debug.isActive
+        ? +window.location.hash.split('lifes=')[1].split('&')[0]
+        : GAME_STARTING_LIFE_STONES
+
+    this.lifeStones = [...Array(lives).keys()].map((id) => new LifeStone(this, this.isPlayer, id, id * 0.1))
+
+    const startFaithTokens =
+      this.debug.useDebugFaithTokens && this.debug.isActive
+        ? +window.location.hash.split('tokens=')[1].split('&')[0]
+        : 0
+
+    this.faithTokens = [...Array(startFaithTokens).keys()].map(
       (id) => new FaithToken(this.isPlayer, id, id * 0.2),
     )
 

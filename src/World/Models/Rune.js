@@ -5,6 +5,7 @@ export default class Rune {
   constructor(id, type, player) {
     this.experience = experience
     this.physics = experience.physics
+    this.world = experience.world
     this.scene = this.experience.scene
     this.resources = this.experience.resources
 

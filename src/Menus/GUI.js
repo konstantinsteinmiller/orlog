@@ -10,6 +10,7 @@ export default class GUI {
   constructor() {
     this.experience = new Experience()
     this.world = this.experience.world
+    this.noUserActionTimeout = 0
 
     this.isShowingRuneInfo = false
   }
@@ -18,8 +19,36 @@ export default class GUI {
     $controlsInfo.style.opacity = isVisible ? 0.8 : 0
   }
 
+  showControlsOverlayDelayed(noUserActionTimeout) {
+    /* show action input overlay */
+    this.world.isSessionPlayerAtTurn() &&
+      setTimeout(() => {
+        const timeDiff = noUserActionTimeout
+          ? Date.now() - noUserActionTimeout
+          : Date.now() - this.noUserActionTimeout
+        if (timeDiff > 7000 && this.world.isDiceRollPhase()) {
+          this.showControlsOverlay(true)
+        }
+      }, 7000)
+  }
+
   showFaithControlsOverlay(isVisible) {
     $controlsFaithInfo.style.opacity = isVisible ? 0.8 : 0
+  }
+
+  showFaithControlsOverlayDelayed() {
+    this.noUserActionTimeout = Date.now()
+
+    this.world.isSessionPlayerAtTurn() &&
+      setTimeout(() => {
+        if (
+          Date.now() - this.noUserActionTimeout > 7000 &&
+          this.world.isFaithCastingPhase() &&
+          !this.isShowingRuneInfo
+        ) {
+          this.showFaithControlsOverlay(true)
+        }
+      }, 7000)
   }
 
   showPhaseOverlay(isVisible) {
@@ -32,8 +61,8 @@ export default class GUI {
 
   showRuneOverlay(isVisible, type, player, isPlayerRune = false, isFaithCastingPhase = false) {
     const rune = GAME_RUNES_DESCRIPTIONS[type]
-    const typeDescription = RUNE_RESOLUTION_TYPES_DESCRIPTION[rune?.type]
-    if (!rune?.type) {
+    const runeResolutionDescription = RUNE_RESOLUTION_TYPES_DESCRIPTION[rune?.resolution]
+    if (!rune?.resolution) {
       return
     }
     runeName.innerText = rune.name
@@ -55,7 +84,7 @@ export default class GUI {
       runeTier.dataset.disabled = !isFaithCastingPhase && runeInfo.dataset.visible
     })
 
-    runeType.innerText = `When: ${typeDescription}`
+    runeType.innerText = `When: ${runeResolutionDescription}`
     runeType.dataset.type = type
     runeInfo.style.opacity = isVisible ? 0.8 : 0
     this.isShowingRuneInfo = isVisible

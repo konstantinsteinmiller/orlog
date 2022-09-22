@@ -16,15 +16,17 @@ export default class DiceResolver {
 
   setAllDicesList() {
     this.startingPlayer = this.world.getStartingPlayer()
-    this.secondTurnPlayer = this.world.getStartingPlayer(false)
+    this.secondTurnPlayer = this.world.getStartingPlayer(true)
 
-    this.allDicesList = this.startingPlayer.dicesHandler.dicesList.concat(
-      this.secondTurnPlayer.dicesHandler.dicesList,
-    )
+    this.allDicesList = this.startingPlayer.dicesHandler.dicesList
+      .filter(() => (die) => !die.isMarkedForRemoval)
+      .concat(this.secondTurnPlayer.dicesHandler.dicesList.filter(() => (die) => !die.isMarkedForRemoval))
   }
 
   async createFaithTokens() {
-    const goldenDicesList = this.allDicesList.filter((dice) => dice.mesh.userData?.isGoldenSymbol)
+    const goldenDicesList = this.allDicesList.filter(
+      (die) => die.mesh.userData?.isGoldenSymbol && !die.isMarkedForRemoval,
+    )
 
     const faithPromiseList = goldenDicesList.map((dice) => {
       const diceOwner = this.world.players[dice.mesh.userData?.playerId]
@@ -59,22 +61,28 @@ export default class DiceResolver {
     const secondShieldsDices = []
     const secondHandsDices = []
 
-    this.startingPlayer.dicesHandler.dicesList.forEach((dice) => {
-      const upwardSymbol = dice.mesh.userData.upwardSymbol
-      upwardSymbol === GAME_SYMBOLS.AXE && startingAxesDices.push(dice)
-      upwardSymbol === GAME_SYMBOLS.ARROW && startingArrowsDices.push(dice)
-      upwardSymbol === GAME_SYMBOLS.HELM && startingHelmsDices.push(dice)
-      upwardSymbol === GAME_SYMBOLS.SHIELD && startingShieldsDices.push(dice)
-      upwardSymbol === GAME_SYMBOLS.HAND && startingHandsDices.push(dice)
+    this.startingPlayer.dicesHandler.dicesList.forEach((die) => {
+      if (die.isMarkedForRemoval) {
+        return
+      }
+      const upwardSymbol = die.mesh.userData.upwardSymbol
+      upwardSymbol === GAME_SYMBOLS.AXE && startingAxesDices.push(die)
+      upwardSymbol === GAME_SYMBOLS.ARROW && startingArrowsDices.push(die)
+      upwardSymbol === GAME_SYMBOLS.HELM && startingHelmsDices.push(die)
+      upwardSymbol === GAME_SYMBOLS.SHIELD && startingShieldsDices.push(die)
+      upwardSymbol === GAME_SYMBOLS.HAND && startingHandsDices.push(die)
     })
 
-    this.secondTurnPlayer.dicesHandler.dicesList.forEach((dice) => {
-      const upwardSymbol = dice.mesh.userData.upwardSymbol
-      upwardSymbol === GAME_SYMBOLS.AXE && secondAxesDices.push(dice)
-      upwardSymbol === GAME_SYMBOLS.ARROW && secondArrowsDices.push(dice)
-      upwardSymbol === GAME_SYMBOLS.HELM && secondHelmsDices.push(dice)
-      upwardSymbol === GAME_SYMBOLS.SHIELD && secondShieldsDices.push(dice)
-      upwardSymbol === GAME_SYMBOLS.HAND && secondHandsDices.push(dice)
+    this.secondTurnPlayer.dicesHandler.dicesList.forEach((die) => {
+      if (die.isMarkedForRemoval) {
+        return
+      }
+      const upwardSymbol = die.mesh.userData.upwardSymbol
+      upwardSymbol === GAME_SYMBOLS.AXE && secondAxesDices.push(die)
+      upwardSymbol === GAME_SYMBOLS.ARROW && secondArrowsDices.push(die)
+      upwardSymbol === GAME_SYMBOLS.HELM && secondHelmsDices.push(die)
+      upwardSymbol === GAME_SYMBOLS.SHIELD && secondShieldsDices.push(die)
+      upwardSymbol === GAME_SYMBOLS.HAND && secondHandsDices.push(die)
     })
 
     /* resolve axes of attacker */
@@ -137,6 +145,8 @@ export default class DiceResolver {
 
   resolveDiceSymbols(attackerDices, defenderDices, attackerPlayer, defenderPlayer, isHands) {
     let damageAmount = 0
+
+    attackerDices = attackerDices.filter((die) => !die.isMarkedForRemoval)
     return new Promise((resolve) => {
       if (!attackerDices.length) {
         !isHands &&

@@ -122,6 +122,11 @@ export default [
     path: 'sounds/fountain.ogg',
   },
   {
+    name: 'crazyLaugh',
+    type: 'audioLoader',
+    path: 'sounds/crazy-laugh.ogg',
+  },
+  {
     name: 'bowl',
     type: 'gltfModel',
     path: 'models/bowl/bowl.glb',
@@ -203,9 +208,9 @@ export default [
     path: 'models/runes/runeRa.glb',
   },
   {
-    name: 'runeSeth',
+    name: 'runeSet',
     type: 'gltfModel',
-    path: 'models/runes/runeSeth.glb',
+    path: 'models/runes/runeSet.glb',
   },
   {
     name: 'runeShu',

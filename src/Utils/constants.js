@@ -147,7 +147,7 @@ export const GAMES_PHASES = {
 export const GAMES_RUNES = {
   RUNE_SERQET: 'RUNE_SERQET',
   RUNE_SHU: 'RUNE_SHU',
-  RUNE_SETH: 'RUNE_SETH',
+  RUNE_SET: 'RUNE_SET',
   RUNE_RA: 'RUNE_RA',
   RUNE_OSIRIS: 'RUNE_OSIRIS',
   RUNE_NEKHBET: 'RUNE_NEKHBET',
@@ -164,7 +164,7 @@ export const GAMES_RUNES = {
 export const GAMES_RUNE_MODELS = {
   RUNE_SERQET: 'runeSerqet',
   RUNE_SHU: 'runeShu',
-  RUNE_SETH: 'runeSeth',
+  RUNE_SET: 'runeSet',
   RUNE_RA: 'runeRa',
   RUNE_OSIRIS: 'runeOsiris',
   RUNE_NEKHBET: 'runeNekhbet',
@@ -197,7 +197,7 @@ export const GAME_RUNES_DESCRIPTIONS = {
     tier2: { cost: { faith: '6', souls: '' }, text: '2x per die' },
     value: 2,
     tier3: { cost: { faith: '10', souls: '' }, text: '2.5x per die', value: 2.5 },
-    type: RUNE_RESOLUTION_TYPES.BEGINNING_RESOLUTION,
+    resolution: RUNE_RESOLUTION_TYPES.BEGINNING_RESOLUTION,
   },
   RUNE_SHU: {
     name: '\'s ',
@@ -205,15 +205,15 @@ export const GAME_RUNES_DESCRIPTIONS = {
     tier1: { cost: { faith: '0', souls: '' }, text: '+ 0 life stone', value: 0 },
     tier2: { cost: { faith: '0', souls: '' }, text: '+ 0 life stone', value: 0 },
     tier3: { cost: { faith: '0', souls: '' }, text: '+ 0 life stone', value: 0 },
-    type: RUNE_RESOLUTION_TYPES.END_RESOLUTION,
+    resolution: RUNE_RESOLUTION_TYPES.END_RESOLUTION,
   },
-  RUNE_SETH: {
+  RUNE_SET: {
     name: 'Set\'s trickery',
     description: 'Remove up to X dice from the enemies dice',
-    tier1: { cost: { faith: '3', souls: '' }, text: '+ 1 die', value: 1 },
-    tier2: { cost: { faith: '5', souls: '' }, text: '+ 2 dice', value: 2 },
-    tier3: { cost: { faith: '8', souls: '' }, text: '+ 3 dice', value: 3 },
-    type: RUNE_RESOLUTION_TYPES.BEGINNING_RESOLUTION,
+    tier1: { cost: { faith: '0', souls: '' }, text: '- 1 die', value: 1 },
+    tier2: { cost: { faith: '5', souls: '' }, text: '- 2 dice', value: 2 },
+    tier3: { cost: { faith: '8', souls: '' }, text: '- 3 dice', value: 3 },
+    resolution: RUNE_RESOLUTION_TYPES.BEGINNING_RESOLUTION,
   },
   RUNE_RA: {
     name: '\'s ',
@@ -221,7 +221,7 @@ export const GAME_RUNES_DESCRIPTIONS = {
     tier1: { cost: { faith: '0', souls: '' }, text: '+ 0 life stone', value: 0 },
     tier2: { cost: { faith: '0', souls: '' }, text: '+ 0 life stone', value: 0 },
     tier3: { cost: { faith: '0', souls: '' }, text: '+ 0 life stone', value: 0 },
-    type: RUNE_RESOLUTION_TYPES.END_RESOLUTION,
+    resolution: RUNE_RESOLUTION_TYPES.END_RESOLUTION,
   },
   RUNE_OSIRIS: {
     name: '\'s ',
@@ -229,7 +229,7 @@ export const GAME_RUNES_DESCRIPTIONS = {
     // tier1: { cost: { faith: '3', souls: '' }, text: '+ 1 die', value: 1 },
     // tier2: { cost: { faith: '5', souls: '' }, text: '+ 2 dice', value: 2 },
     // tier3: { cost: { faith: '8', souls: '' }, text: '+ 3 dice', value: 3 },
-    // type: RUNE_RESOLUTION_TYPES.BEGINNING_RESOLUTION,
+    // resolution: RUNE_RESOLUTION_TYPES.BEGINNING_RESOLUTION,
   },
   RUNE_NEKHBET: {
     name: '\'s ',
@@ -237,7 +237,7 @@ export const GAME_RUNES_DESCRIPTIONS = {
     tier1: { cost: { faith: '0', souls: '' }, text: '+ 0 life stone', value: 0 },
     tier2: { cost: { faith: '0', souls: '' }, text: '+ 0 life stone', value: 0 },
     tier3: { cost: { faith: '0', souls: '' }, text: '+ 0 life stone', value: 0 },
-    type: RUNE_RESOLUTION_TYPES.END_RESOLUTION,
+    resolution: RUNE_RESOLUTION_TYPES.END_RESOLUTION,
   },
   RUNE_ISIS: {
     name: '\'s ',
@@ -245,7 +245,7 @@ export const GAME_RUNES_DESCRIPTIONS = {
     tier1: { cost: { faith: '0', souls: '' }, text: '+ 0 life stone', value: 0 },
     tier2: { cost: { faith: '0', souls: '' }, text: '+ 0 life stone', value: 0 },
     tier3: { cost: { faith: '0', souls: '' }, text: '+ 0 life stone', value: 0 },
-    type: RUNE_RESOLUTION_TYPES.END_RESOLUTION,
+    resolution: RUNE_RESOLUTION_TYPES.END_RESOLUTION,
   },
   RUNE_HORUS: {
     name: '\'s ',
@@ -253,7 +253,7 @@ export const GAME_RUNES_DESCRIPTIONS = {
     tier1: { cost: { faith: '0', souls: '' }, text: '+ 0 life stone', value: 0 },
     tier2: { cost: { faith: '0', souls: '' }, text: '+ 0 life stone', value: 0 },
     tier3: { cost: { faith: '0', souls: '' }, text: '+ 0 life stone', value: 0 },
-    type: RUNE_RESOLUTION_TYPES.END_RESOLUTION,
+    resolution: RUNE_RESOLUTION_TYPES.END_RESOLUTION,
   },
   RUNE_BAST: {
     name: '\'s ',
@@ -261,7 +261,7 @@ export const GAME_RUNES_DESCRIPTIONS = {
     tier1: { cost: { faith: '0', souls: '' }, text: '+ 0 life stone', value: 0 },
     tier2: { cost: { faith: '0', souls: '' }, text: '+ 0 life stone', value: 0 },
     tier3: { cost: { faith: '0', souls: '' }, text: '+ 0 life stone', value: 0 },
-    type: RUNE_RESOLUTION_TYPES.END_RESOLUTION,
+    resolution: RUNE_RESOLUTION_TYPES.END_RESOLUTION,
   },
   RUNE_ANUBIS: {
     name: 'Anubis\'s ',
@@ -269,7 +269,7 @@ export const GAME_RUNES_DESCRIPTIONS = {
     tier1: { cost: { faith: '0', souls: '' }, text: '+ 0 life stone', value: 0 },
     tier2: { cost: { faith: '0', souls: '' }, text: '+ 0 life stone', value: 0 },
     tier3: { cost: { faith: '0', souls: '' }, text: '+ 0 life stone', value: 0 },
-    type: RUNE_RESOLUTION_TYPES.END_RESOLUTION,
+    resolution: RUNE_RESOLUTION_TYPES.END_RESOLUTION,
   },
   RUNE_TAWARET: {
     name: 'Tawaret\'s fertility',
@@ -277,7 +277,7 @@ export const GAME_RUNES_DESCRIPTIONS = {
     tier1: { cost: { faith: '2', souls: '' }, text: '+ 1 life stone', value: 1 },
     tier2: { cost: { faith: '6', souls: '' }, text: '+ 3 life stones', value: 3 },
     tier3: { cost: { faith: '11', souls: '' }, text: '+ 5 life stones', value: 5 },
-    type: RUNE_RESOLUTION_TYPES.BEGINNING_RESOLUTION,
+    resolution: RUNE_RESOLUTION_TYPES.BEGINNING_RESOLUTION,
   },
   RUNE_BABI: {
     name: 'Babi\'s bloodthirst',
@@ -285,7 +285,7 @@ export const GAME_RUNES_DESCRIPTIONS = {
     tier1: { cost: { faith: '2', souls: '' }, text: '- 1 life stone', value: 1 },
     tier2: { cost: { faith: '5', souls: '' }, text: '- 3 life stones', value: 3 },
     tier3: { cost: { faith: '11', souls: '' }, text: '- 5 life stones', value: 5 },
-    type: RUNE_RESOLUTION_TYPES.END_RESOLUTION,
+    resolution: RUNE_RESOLUTION_TYPES.END_RESOLUTION,
   },
   RUNE_NEPHTHYS: {
     name: 'Nephthys\'s rites',
@@ -293,6 +293,6 @@ export const GAME_RUNES_DESCRIPTIONS = {
     tier1: { cost: { faith: '2', souls: '' }, text: '+ 1 per life stone', value: 1 },
     tier2: { cost: { faith: '5', souls: '' }, text: '+ 2 per life stone', value: 2 },
     tier3: { cost: { faith: '9', souls: '' }, text: '+ 3 per life stone', value: 3 },
-    type: RUNE_RESOLUTION_TYPES.END_RESOLUTION,
+    resolution: RUNE_RESOLUTION_TYPES.END_RESOLUTION,
   },
 }

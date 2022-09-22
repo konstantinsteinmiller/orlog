@@ -279,6 +279,10 @@ export default class World {
     return this.currentGamePhase === GAMES_PHASES.FAITH_CASTING
   }
 
+  isDiceResolutionPhase() {
+    return this.currentGamePhase === GAMES_PHASES.DICE_RESOLVE
+  }
+
   checkWinConditions(defenderPlayer) {
     const attackerPlayer = this.getEnemyPlayer(defenderPlayer.playerId)
     if (defenderPlayer.lifeStones.length === 0) {

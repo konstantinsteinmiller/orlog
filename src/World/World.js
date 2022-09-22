@@ -240,8 +240,16 @@ export default class World {
 
     firstPlayer.dicesHandler.availableThrows = MAX_THROWS
     secondPlayer.dicesHandler.availableThrows = MAX_THROWS
-    firstPlayer.dicesHandler.dicesList.forEach((die) => (die.highlightMesh.isPlaced = false))
-    secondPlayer.dicesHandler.dicesList.forEach((die) => (die.highlightMesh.isPlaced = false))
+    firstPlayer.dicesHandler.dicesList.forEach((die) => {
+      die.highlightMesh.isPlaced = false
+      die.highlightMesh.isSelected = false
+      die.isMarkedForRemoval = false
+    })
+    secondPlayer.dicesHandler.dicesList.forEach((die) => {
+      die.highlightMesh.isPlaced = false
+      die.highlightMesh.isSelected = false
+      die.isMarkedForRemoval = false
+    })
 
     this.switchStartingPlayer()
     // this.coin.moveCoinToStartingPlayer()

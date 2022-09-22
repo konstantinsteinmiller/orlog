@@ -210,7 +210,7 @@ export const GAME_RUNES_DESCRIPTIONS = {
   RUNE_SET: {
     name: 'Set\'s trickery',
     description: 'Remove up to X dice from the enemies dice',
-    tier1: { cost: { faith: '0', souls: '' }, text: '- 1 die', value: 1 },
+    tier1: { cost: { faith: '3', souls: '' }, text: '- 1 die', value: 1 },
     tier2: { cost: { faith: '5', souls: '' }, text: '- 2 dice', value: 2 },
     tier3: { cost: { faith: '8', souls: '' }, text: '- 3 dice', value: 3 },
     resolution: RUNE_RESOLUTION_TYPES.BEGINNING_RESOLUTION,

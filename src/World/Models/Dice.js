@@ -1,5 +1,6 @@
 import Experience from '@/Experience'
 import { isWithinRange } from '@/Utils/math.js'
+import { gsap as g } from 'gsap'
 
 export default class Dice {
   constructor(
@@ -20,7 +21,8 @@ export default class Dice {
     this.isPlayer = isPlayer
     this.playerId = playerId
     this.owner = this.experience.world.players[playerId]
-    this.midZOffset = this.isPlayer ? 5 : 5
+    this.originalOwner = this.experience.world.players[playerId]
+    this.midZOffset = 5
     this.offsetDirection = this.isPlayer ? 1 : -1
 
     this.scale = 0.3
@@ -31,6 +33,7 @@ export default class Dice {
     this.isHighlighted = false
     this.isSelected = false
     this.isMarkedForRemoval = false
+    this.isMarkedForSteal = false
 
     this.group = group
     this.modelNumber = model
@@ -48,7 +51,7 @@ export default class Dice {
     this.setMesh(
       new THREE.Vector3(
         this.modelNumber * 2,
-        -this.modelNumber * 2 - 1000 /* place the dices out of visible sight */,
+        -this.modelNumber * 2 - 1000 /* place the dice out of visible sight */,
         this.offsetDirection * (this.modelNumber * 2 + 1),
       ),
     )
@@ -190,5 +193,32 @@ export default class Dice {
   toggleMarkForRemoval() {
     this.highlightMesh.isSelected = !this.highlightMesh.isSelected
     this.isMarkedForRemoval = !this.isMarkedForRemoval
+  }
+
+  toggleMarkForSteal() {
+    this.highlightMesh.isSelected = !this.highlightMesh.isSelected
+    this.isMarkedForSteal = !this.isMarkedForSteal
+  }
+
+  changeDieOwner(player) {
+    /* switch ownership here */
+    this.owner = player
+
+    this.isPlayer = this.owner.isPlayer
+    this.playerId = this.owner.playerId
+    this.offsetDirection = this.isPlayer ? 1 : -1
+    this.mesh.userData.playerId = this.playerId
+
+    this.owner.dicesHandler.dicesList.push(this)
+
+    this.highlightMesh.isPlaced = false
+  }
+
+  moveForward() {
+    const originalOffsetDirection = this.originalOwner.isPlayer ? -1 : 1
+    return g.to(this.group.position, {
+      z: this.group.position.z + this.scale * 2.5 * originalOffsetDirection,
+      duration: 0.3,
+    })
   }
 }

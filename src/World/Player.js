@@ -8,6 +8,10 @@ import BabiRune from '@/World/Models/Runes/BabiRune.js'
 import AnubisRune from '@/World/Models/Runes/AnubisRune.js'
 import SetRune from '@/World/Models/Runes/SetRune.js'
 import TawaretRune from '@/World/Models/Runes/TawaretRune.js'
+import NephthysRune from '@/World/Models/Runes/NephthysRune.js'
+import NekhbetRune from '@/World/Models/Runes/NekhbetRune.js'
+import BesRune from '@/World/Models/Runes/BesRune.js'
+import HorusRune from '@/World/Models/Runes/HorusRune.js'
 import Experience from '@/Experience.js'
 import { GAME_PLAYER_TYPES, GAMES_PHASES, GAME_STARTING_LIFE_STONES, GAMES_RUNES } from '@/Utils/constants.js'
 
@@ -26,6 +30,11 @@ export default class Player extends EventEmitter {
     this.isPlayerAtTurn = null
     this.isStartingPlayer = null
     this.selectedRune = null
+    this.roundDamageTaken = 0
+    this.roundDamageDealt = 0
+    this.roundCreatedFaithTokens = 0
+    this.roundUnblockedDices = 0
+    this.roundBlockedDices = 0
 
     this.init()
 
@@ -94,12 +103,14 @@ export default class Player extends EventEmitter {
     }
 
     this.runes = [
-      new BabiRune(0, this),
-      // new Rune(0, GAMES_RUNES.RUNE_ANUBIS_BLACK, this),
+      // new BabiRune(0, this),
+      new HorusRune(0, this),
       // new AnubisRune(1, this),
-      new SetRune(1, this),
-      new TawaretRune(2, this),
-      // new Rune(2, GAMES_RUNES.RUNE_ANUBIS_WHITE, this),
+      new BesRune(1, this),
+      // new SetRune(1, this),
+      // new TawaretRune(2, this),
+      new NekhbetRune(2, this),
+      // new NephthysRune(2, this),
       // new Rune(2, GAMES_RUNES.RUNE_BAST, this),
       ...debugRunes,
     ]
@@ -116,9 +127,7 @@ export default class Player extends EventEmitter {
         ? +window.location.hash.split('tokens=')[1].split('&')[0]
         : 0
 
-    this.faithTokens = [...Array(startFaithTokens).keys()].map(
-      (id) => new FaithToken(this.isPlayer, id, id * 0.2),
-    )
+    this.faithTokens = [...Array(startFaithTokens).keys()].map((id) => new FaithToken(this, id, id * 0.2))
 
     this.dicesHandler.on('finished-moving-dices-to-enemy', () => {
       if (this.dicesHandler.dicesList.every((dice) => dice.highlightMesh?.isPlaced)) {
@@ -180,6 +189,19 @@ export default class Player extends EventEmitter {
       faithToken?.destroyFaithToken(200 * index)
       faithToken = null
     })
+  }
+
+  addFaithTokens(amount, fromPosition) {
+    return Promise.all(
+      [...Array(amount).keys()].map(
+        (stone, index) =>
+          new Promise((resolve) => {
+            this.faithTokens.push(
+              new FaithToken(this, this.faithTokens.length, index * 100, fromPosition, resolve),
+            )
+          }),
+      ),
+    )
   }
 
   startFaithSelection() {

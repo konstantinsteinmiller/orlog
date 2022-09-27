@@ -102,6 +102,33 @@ export default class Rune {
     })
   }
 
+  setRuneBadHighlight() {
+    this.highlightMesh.material.opacity = 0.6
+    this.highlightMesh.material.color.set('#8A1209')
+    return this.enlargeRuneBadHighlight()
+  }
+
+  enlargeRuneBadHighlight() {
+    return g
+      .to(this.highlightMesh.scale, {
+        x: 1.01,
+        y: 1.01,
+        z: 1.01,
+        duration: 1.0,
+      })
+      .then(() =>
+        g.to(this.highlightMesh.scale, {
+          x: 1.1,
+          y: 1.1,
+          z: 1.1,
+          duration: 0.6,
+        }),
+      )
+      .then(() => {
+        this.toggleRune(this.isHighlighted, false)
+      })
+  }
+
   async resolution(effectCallback = () => {}) {
     return new Promise(async (resolve) => {
       if (this.owner.selectedRune) {

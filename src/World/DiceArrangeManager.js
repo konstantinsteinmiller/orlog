@@ -141,6 +141,7 @@ export default class DiceArrangeManager {
     //   startingPlayerSortedDicesList.map((dice) => dice.positionIndex),
     //   otherPlayerSortedDicesList.map((dice) => dice.positionIndex),
     // )
+    // console.log('startingPlayerSortedDicesList: ', startingPlayerSortedDicesList, otherPlayerSortedDicesList)
     this.world.maxPositionIndex = this.getSumOfObjectValues(this.startingIndecies)
   }
 

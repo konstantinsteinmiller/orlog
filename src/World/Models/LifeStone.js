@@ -31,10 +31,11 @@ export default class LifeStone {
   destroyLifeStone(timeoutInMs, resolve = () => {}) {
     const timeout = timeoutInMs * 0.001
     const lifeStone = this.owner.lifeStones.pop()
+    const enemyPlayer = this.world.getEnemyPlayer(this.owner.playerId)
+    this.owner.roundDamageTaken++
+    enemyPlayer.roundDamageDealt++
     if (!lifeStone || this.owner.lifeStones.length === 0) {
       this.world.checkWinConditions(this.owner)
-      resolve()
-      return
     }
     lifeStone.toggleHighlight()
     g.to(lifeStone.mesh.position, {
@@ -51,8 +52,14 @@ export default class LifeStone {
 
       disposeMeshAndRemoveFromScene(lifeStone.highlightMesh, lifeStone.mesh)
       disposeMeshAndRemoveFromScene(lifeStone.mesh, lifeStone.scene)
+
       resolve()
     })
+
+    if (!lifeStone || this.owner.lifeStones.length === 0) {
+      resolve()
+      return
+    }
   }
 
   moveLifeStoneToField(timeoutInMs, resolve = () => {}) {

@@ -145,8 +145,8 @@ export default class DicesHandler extends EventEmitter {
     this.isMovingDices = true
     this.rearrangePlacedDices()
 
-    const otherPlayer = this.world.getPlayerAtTurn(true)
     const playerAtTurn = this.world.getPlayerAtTurn(false)
+    const otherPlayer = this.world.getPlayerAtTurn(true)
     const sessionPlayerId = getStorage(GAME_PLAYER_ID, true)
 
     let firstDiceFinishedMoving = false
@@ -161,10 +161,12 @@ export default class DicesHandler extends EventEmitter {
           ? -1
           : 1
 
-      if (highlightMesh.isSelected && !highlightMesh.isPlaced && dice.group.body) {
-        this.physics.destroy(dice.group.body)
+      if (highlightMesh.isSelected && !highlightMesh.isPlaced) {
+        if (dice.group.body) {
+          this.physics.destroy(dice.group.body)
+          this.hasDestroyedBodies = true
+        }
         highlightMesh.isPlaced = true
-        this.hasDestroyedBodies = true
 
         const diceGap = 0.8
         const maxXOffset = (this.world.maxPositionIndex * diceGap) / 2
@@ -515,7 +517,7 @@ export default class DicesHandler extends EventEmitter {
   removeCurrentIntersect() {
     if (this.currentIntersect) {
       if (this.previousIntersect?.name !== this.currentIntersect?.name) {
-        // this.debug.isActive && console.log('NEW Intersect: ', currentIntersect)
+        this.debug.isActive && console.log('NEW Intersect: ', this.currentIntersect)
       }
       if (this.currentIntersect.parent) {
         this.currentIntersect.parent.getObjectByName('diceHighlight').isHighlighted = false
@@ -543,8 +545,8 @@ export default class DicesHandler extends EventEmitter {
   }
 
   evaluateTopFace = () => {
-    this.dicesList.forEach((dice, index) => {
-      const dI = index + 1
+    this.dicesList.forEach((dice) => {
+      const dI = dice.modelNumber
       const childMesh = dice.group.children[0]
       const childUp = dice.group.getObjectByName('upSideDetector')
       const childFront = dice.group.getObjectByName('frontSideDetector')
@@ -672,6 +674,22 @@ export default class DicesHandler extends EventEmitter {
       return true
     }
     return false
+  }
+
+  removeStolenDices(removeMark) {
+    const markedDices = this.dicesList
+      .filter((die) => die.isMarkedForSteal)
+      .forEach((die) => {
+        if (removeMark) {
+          die.isMarkedForSteal = false
+        }
+      })
+
+    this.dicesList = this.dicesList.filter((die) => die.owner.playerId === this.playerId)
+    console.log(
+      'this.dicesList: ',
+      this.dicesList.map((die) => `${die.mesh.name} ${die.owner.playerId} ${die.originalOwner.playerId}`),
+    )
   }
 
   update() {

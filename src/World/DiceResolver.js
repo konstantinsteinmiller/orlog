@@ -30,18 +30,13 @@ export default class DiceResolver {
 
     const faithPromiseList = goldenDicesList.map((dice) => {
       const diceOwner = this.world.players[dice.mesh.userData?.playerId]
-      const isPlayer = getStorage(GAME_PLAYER_ID, true) === diceOwner.playerId
 
       const fromPosition = new THREE.Vector3(
         dice.group.position.x,
         dice.group.position.y + 0.2,
         dice.group.position.z,
       )
-      return new Promise((resolve) => {
-        diceOwner.faithTokens.push(
-          new FaithToken(isPlayer, diceOwner.faithTokens.length, 0, fromPosition, resolve),
-        )
-      })
+      return diceOwner.addFaithTokens(1, fromPosition)
     })
     await Promise.all(faithPromiseList)
 
@@ -160,6 +155,7 @@ export default class DiceResolver {
           attackerDices.forEach((dice, index) => {
             const defenderDie = defenderDices.shift()
             if (defenderDie) {
+              attackerPlayer.roundBlockedDices++
               return g
                 .to(dice.group.position, {
                   x: defenderDie.group.position.x,
@@ -185,6 +181,8 @@ export default class DiceResolver {
                   }
                 })
             } else {
+              /* dice was not blocked */
+              attackerPlayer.roundUnblockedDices++
               const lifeStones = defenderPlayer.lifeStones
               const lifeStoneIndex = lifeStones.length - 1 - damageAmount
 
@@ -318,21 +316,27 @@ export default class DiceResolver {
   }
 
   moveDieBackToStart(die, ownerPlayer) {
+    if (die.isMarkedForSteal && die.originalOwner.playerId !== die.owner.playerId) {
+      die.changeDieOwner(die.originalOwner)
+    }
+
     setTimeout(() => {
       g.to(die.group.position, {
         y: 2,
         duration: 0.3,
       }).then(() => {
         g.to(die.group.position, {
-          x: ownerPlayer.dicesHandler.offsetDirection * (die.modelNumber * 0.7 + 2.5),
+          x: die.originalOwner.dicesHandler.offsetDirection * (die.modelNumber * 0.7 + 2.5),
           y: 2,
-          z: ownerPlayer.dicesHandler.offsetDirection * (ownerPlayer.dicesHandler.midZOffset + 3),
+          z: die.originalOwner.dicesHandler.offsetDirection * (die.originalOwner.dicesHandler.midZOffset + 3),
           duration: 0.5,
         }).then(() => {
           g.to(die.group.position, {
-            x: ownerPlayer.dicesHandler.offsetDirection * (die.modelNumber * 0.7 + 2.5),
+            x: die.originalOwner.dicesHandler.offsetDirection * (die.modelNumber * 0.7 + 2.5),
             y: die.scale,
-            z: ownerPlayer.dicesHandler.offsetDirection * (ownerPlayer.dicesHandler.midZOffset + 3),
+            z:
+              die.originalOwner.dicesHandler.offsetDirection *
+              (die.originalOwner.dicesHandler.midZOffset + 3),
             duration: 0.2,
           })
         })

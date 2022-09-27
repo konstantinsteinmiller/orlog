@@ -127,6 +127,26 @@ export default [
     path: 'sounds/crazy-laugh.ogg',
   },
   {
+    name: 'faith',
+    type: 'audioLoader',
+    path: 'sounds/faith.ogg',
+  },
+  {
+    name: 'revengeMale',
+    type: 'audioLoader',
+    path: 'sounds/revenge-male.ogg',
+  },
+  {
+    name: 'repel',
+    type: 'audioLoader',
+    path: 'sounds/repel.ogg',
+  },
+  {
+    name: 'laughEvil',
+    type: 'audioLoader',
+    path: 'sounds/laugh-evil.ogg',
+  },
+  {
     name: 'bowl',
     type: 'gltfModel',
     path: 'models/bowl/bowl.glb',
@@ -236,5 +256,10 @@ export default [
     name: 'runeBabi',
     type: 'gltfModel',
     path: 'models/runes/runeBabi.glb',
+  },
+  {
+    name: 'runeBes',
+    type: 'gltfModel',
+    path: 'models/runes/runeBes.glb',
   },
 ]

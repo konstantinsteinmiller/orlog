@@ -36,6 +36,7 @@ export default class World {
     this.runeResolver = null
     this.diceResolver = null
     this.round = 1
+    this.maxPositionIndex = 0
 
     // const axisHelper = new THREE.AxesHelper(3)
     // this.scene.add(axisHelper)
@@ -238,18 +239,49 @@ export default class World {
         ? +window.location.hash.split('throws=')[1].split('&')[0]
         : MAX_DICE_THROWS
 
-    firstPlayer.dicesHandler.availableThrows = MAX_THROWS
-    secondPlayer.dicesHandler.availableThrows = MAX_THROWS
-    firstPlayer.dicesHandler.dicesList.forEach((die) => {
-      die.highlightMesh.isPlaced = false
-      die.highlightMesh.isSelected = false
-      die.isMarkedForRemoval = false
+    /* reset player specific attributes */
+    ;[firstPlayer, secondPlayer].forEach((player) => {
+      player.dicesHandler.availableThrows = MAX_THROWS
+      player.roundDamageTaken = 0
+      player.roundDamageDealt = 0
+      player.roundCreatedFaithTokens = 0
+      player.roundUnblockedDices = 0
+      player.roundBlockedDices = 0
+
+      console.log('player.dicesHandler.dicesList: ', player.dicesHandler.dicesList)
+      player.dicesHandler.dicesList.forEach((die) => {
+        die.highlightMesh.isPlaced = false
+        die.highlightMesh.isSelected = false
+        die.isMarkedForRemoval = false
+
+        die.mesh.userData.upwardFace = undefined
+        die.mesh.userData.upwardSymbol = undefined
+        die.mesh.userData.isGoldenSymbol = undefined
+        die.originalOwner.playerId !== die.owner.playerId &&
+          console.log('switching stolen dice back', die.isMarkedForSteal)
+
+        if (die.isMarkedForSteal) {
+          console.log('isMarked', die.isMarkedForSteal, die.originalOwner.playerId, die.owner.playerId)
+        }
+        if (die.isMarkedForSteal) {
+          die.changeDieOwner(die.originalOwner)
+        }
+      })
     })
-    secondPlayer.dicesHandler.dicesList.forEach((die) => {
-      die.highlightMesh.isPlaced = false
-      die.highlightMesh.isSelected = false
-      die.isMarkedForRemoval = false
+    console.log(
+      'startingPlayer, secondPlayer: ',
+      firstPlayer.dicesHandler.dicesList,
+      secondPlayer.dicesHandler.dicesList,
+    )
+    ;[firstPlayer, secondPlayer].forEach((player) => {
+      player.dicesHandler.removeStolenDices(true)
     })
+
+    console.log(
+      'startingPlayer, secondPlayer: ',
+      firstPlayer.dicesHandler.dicesList,
+      secondPlayer.dicesHandler.dicesList,
+    )
 
     this.switchStartingPlayer()
     // this.coin.moveCoinToStartingPlayer()

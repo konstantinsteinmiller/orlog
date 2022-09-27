@@ -160,6 +160,7 @@ export const GAMES_RUNES = {
   RUNE_TAWARET: 'RUNE_TAWARET',
   RUNE_BABI: 'RUNE_BABI',
   RUNE_NEPHTHYS: 'RUNE_NEPHTHYS',
+  RUNE_BES: 'RUNE_BES',
 }
 export const GAMES_RUNE_MODELS = {
   RUNE_SERQET: 'runeSerqet',
@@ -177,6 +178,7 @@ export const GAMES_RUNE_MODELS = {
   RUNE_TAWARET: 'runeTawaret',
   RUNE_BABI: 'runeBabi',
   RUNE_NEPHTHYS: 'runeNephthys',
+  RUNE_BES: 'runeBes',
 }
 
 export const RUNE_RESOLUTION_TYPES = {
@@ -232,12 +234,12 @@ export const GAME_RUNES_DESCRIPTIONS = {
     // resolution: RUNE_RESOLUTION_TYPES.BEGINNING_RESOLUTION,
   },
   RUNE_NEKHBET: {
-    name: '\'s ',
-    description: '',
-    tier1: { cost: { faith: '0', souls: '' }, text: '+ 0 life stone', value: 0 },
-    tier2: { cost: { faith: '0', souls: '' }, text: '+ 0 life stone', value: 0 },
-    tier3: { cost: { faith: '0', souls: '' }, text: '+ 0 life stone', value: 0 },
-    resolution: RUNE_RESOLUTION_TYPES.END_RESOLUTION,
+    name: 'Nekhbet\'s theft',
+    description: 'Choose up to X dices from your enemy and take control of them for this round',
+    tier1: { cost: { faith: '4', souls: '' }, text: '1 die stolen', value: 1 },
+    tier2: { cost: { faith: '8', souls: '' }, text: '2 dice stolen', value: 2 },
+    tier3: { cost: { faith: '11', souls: '' }, text: '3 dice stolen', value: 3 },
+    resolution: RUNE_RESOLUTION_TYPES.BEGINNING_RESOLUTION,
   },
   RUNE_ISIS: {
     name: '\'s ',
@@ -248,11 +250,11 @@ export const GAME_RUNES_DESCRIPTIONS = {
     resolution: RUNE_RESOLUTION_TYPES.END_RESOLUTION,
   },
   RUNE_HORUS: {
-    name: '\'s ',
-    description: '',
-    tier1: { cost: { faith: '0', souls: '' }, text: '+ 0 life stone', value: 0 },
-    tier2: { cost: { faith: '0', souls: '' }, text: '+ 0 life stone', value: 0 },
-    tier3: { cost: { faith: '0', souls: '' }, text: '+ 0 life stone', value: 0 },
+    name: 'Horus\'s Rache',
+    description: 'Deal additional damage for each unblocked die (rounded up)',
+    tier1: { cost: { faith: '2', souls: '' }, text: '+ 0.5x additional damage', value: 0.5 },
+    tier2: { cost: { faith: '6', souls: '' }, text: '+ 1x additional damage', value: 1 },
+    tier3: { cost: { faith: '10', souls: '' }, text: '+ 1.5x additional damage', value: 1.5 },
     resolution: RUNE_RESOLUTION_TYPES.END_RESOLUTION,
   },
   RUNE_BAST: {
@@ -292,7 +294,15 @@ export const GAME_RUNES_DESCRIPTIONS = {
     description: 'Receive faith tokens for each destroyed life stone',
     tier1: { cost: { faith: '2', souls: '' }, text: '+ 1 per life stone', value: 1 },
     tier2: { cost: { faith: '5', souls: '' }, text: '+ 2 per life stone', value: 2 },
-    tier3: { cost: { faith: '9', souls: '' }, text: '+ 3 per life stone', value: 3 },
+    tier3: { cost: { faith: '8', souls: '' }, text: '+ 3 per life stone', value: 3 },
     resolution: RUNE_RESOLUTION_TYPES.END_RESOLUTION,
+  },
+  RUNE_BES: {
+    name: 'Bes\'s repel of evil',
+    description: 'Prevent enemies faith grant of tier X or lower from being casted',
+    tier1: { cost: { faith: '2', souls: '' }, text: 'repel tier 1 grant', value: 1 },
+    tier2: { cost: { faith: '4', souls: '' }, text: 'repel tier 2 grant', value: 2 },
+    tier3: { cost: { faith: '7', souls: '' }, text: 'repel tier 3 grant', value: 3 },
+    resolution: RUNE_RESOLUTION_TYPES.BEGINNING_RESOLUTION,
   },
 }

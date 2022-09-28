@@ -14,10 +14,12 @@ export default class HorusRune extends Rune {
     return this.resolution((resolve, tier) => {
       const enemyPlayer = this.world.getEnemyPlayer(this.owner.playerId)
       setTimeout(async () => {
-        this.experience.sounds.playSound('revengeMale')
         if (this.owner.roundUnblockedDices > 0) {
+          this.experience.sounds.playSound('revengeMale')
           const additionalDamageAmount = Math.ceil(this.owner.roundUnblockedDices * tier.value)
           await enemyPlayer.destroyLifeStones(additionalDamageAmount)
+        } else {
+          this.experience.sounds.playSound('fail')
         }
         resolve()
       }, 800)

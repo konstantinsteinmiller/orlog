@@ -157,6 +157,11 @@ export default [
     path: 'sounds/wind.ogg',
   },
   {
+    name: 'breakWood',
+    type: 'audioLoader',
+    path: 'sounds/break-wood.ogg',
+  },
+  {
     name: 'bowl',
     type: 'gltfModel',
     path: 'models/bowl/bowl.glb',
@@ -276,5 +281,15 @@ export default [
     name: 'runeSobek',
     type: 'gltfModel',
     path: 'models/runes/runeSobek.glb',
+  },
+  {
+    name: 'runeGeb',
+    type: 'gltfModel',
+    path: 'models/runes/runeGeb.glb',
+  },
+  {
+    name: 'runeNut',
+    type: 'gltfModel',
+    path: 'models/runes/runeNut.glb',
   },
 ]

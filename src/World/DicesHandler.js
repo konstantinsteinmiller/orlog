@@ -39,6 +39,7 @@ export default class DicesHandler extends EventEmitter {
     this.gui = null
 
     this.sessionPlayer = getStorage(GAME_PLAYER_ID, true)
+    this.owner = this.world.players[playerId]
     this.playerId = playerId
     this.isPlayer = isPlayer
     this.midZOffset = 5
@@ -760,5 +761,38 @@ export default class DicesHandler extends EventEmitter {
 
     this.currentIntersect = null
     this.previousIntersect = null
+  }
+
+  removeDice(symbol, amount) {
+    let maxDicesToRemove = amount
+    /* first remove golden dice */
+    this.dicesList.some((die) => {
+      if (maxDicesToRemove <= 0) {
+        return true
+      }
+
+      const currentSymbol = die.mesh.userData.upwardSymbol
+      const isGoldenSymbol = die.mesh.userData.isGoldenSymbol
+      if (currentSymbol === symbol && isGoldenSymbol) {
+        maxDicesToRemove--
+        die.isMarkedForRemoval = true
+        die.moveDieBackToStart()
+      }
+      return false
+    })
+    /* second regular*/
+    this.dicesList.some((die) => {
+      if (maxDicesToRemove <= 0) {
+        return true
+      }
+
+      const currentSymbol = die.mesh.userData.upwardSymbol
+      if (currentSymbol === symbol && !die.isMarkedForRemoval) {
+        maxDicesToRemove--
+        die.isMarkedForRemoval = true
+        die.moveDieBackToStart()
+      }
+      return false
+    })
   }
 }

@@ -144,7 +144,7 @@ export default class DiceResolver {
       if (!attackerDices.length) {
         !isHands &&
           defenderDices.forEach((die) => {
-            this.moveDieBackToStart(die, defenderPlayer)
+            die.moveDieBackToStart()
           })
         return resolve()
       } else {
@@ -169,11 +169,11 @@ export default class DiceResolver {
                   dice.mesh.userData.upwardSymbol === GAME_SYMBOLS.ARROW &&
                     this.sounds.playSound('arrowHitTargetAndWobble')
 
-                  this.moveDieBackToStart(defenderDie, defenderPlayer)
-                  this.moveDieBackToStart(dice, attackerPlayer)
+                  defenderDie.moveDieBackToStart()
+                  dice.moveDieBackToStart()
                   if (index === attackerDices.length - 1) {
                     defenderDices.forEach((die) => {
-                      this.moveDieBackToStart(die, defenderPlayer)
+                      die.moveDieBackToStart()
                     })
                     return resolve()
                   }
@@ -216,17 +216,17 @@ export default class DiceResolver {
 
                     /* add collision sound with lifeStone here */
                     lifeStone.destroyLifeStone()
-                    this.moveDieBackToStart(dice, attackerPlayer)
+                    dice.moveDieBackToStart()
                     if (index === attackerDices.length - 1) {
                       defenderDices.forEach((die) => {
-                        this.moveDieBackToStart(die, defenderPlayer)
+                        die.moveDieBackToStart()
                       })
                       return resolve()
                     }
                   })
               } else {
                 defenderDices.forEach((die) => {
-                  this.moveDieBackToStart(die, defenderPlayer)
+                  die.moveDieBackToStart()
                 })
                 return resolve()
               }
@@ -297,7 +297,7 @@ export default class DiceResolver {
 
                       defenderFaithToken.moveFaithTokenToStack()
                       /* add hand steal sound here */
-                      this.moveDieBackToStart(dice, attackerPlayer)
+                      dice.moveDieBackToStart()
                       if (index === attackerDices.length - 1) {
                         return resolve()
                       }
@@ -305,40 +305,11 @@ export default class DiceResolver {
                   })
                 })
             } else {
-              this.moveDieBackToStart(dice, attackerPlayer)
+              dice.moveDieBackToStart()
               return resolve()
             }
           })
       }
     })
-  }
-
-  moveDieBackToStart(die, ownerPlayer) {
-    if (die.isMarkedForSteal && die.originalOwner.playerId !== die.owner.playerId) {
-      die.changeDieOwner(die.originalOwner)
-    }
-
-    setTimeout(() => {
-      g.to(die.group.position, {
-        y: 2,
-        duration: 0.3,
-      }).then(() => {
-        g.to(die.group.position, {
-          x: die.originalOwner.dicesHandler.offsetDirection * (die.modelNumber * 0.7 + 2.5),
-          y: 2,
-          z: die.originalOwner.dicesHandler.offsetDirection * (die.originalOwner.dicesHandler.midZOffset + 3),
-          duration: 0.5,
-        }).then(() => {
-          g.to(die.group.position, {
-            x: die.originalOwner.dicesHandler.offsetDirection * (die.modelNumber * 0.7 + 2.5),
-            y: die.scale,
-            z:
-              die.originalOwner.dicesHandler.offsetDirection *
-              (die.originalOwner.dicesHandler.midZOffset + 3),
-            duration: 0.2,
-          })
-        })
-      })
-    }, 500)
   }
 }

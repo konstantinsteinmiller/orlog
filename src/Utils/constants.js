@@ -162,6 +162,8 @@ export const GAMES_RUNES = {
   RUNE_NEPHTHYS: 'RUNE_NEPHTHYS',
   RUNE_BES: 'RUNE_BES',
   RUNE_SOBEK: 'RUNE_SOBEK',
+  RUNE_GEB: 'RUNE_GEB',
+  RUNE_NUT: 'RUNE_NUT',
 }
 export const GAMES_RUNE_MODELS = {
   RUNE_SERQET: 'runeSerqet',
@@ -181,6 +183,8 @@ export const GAMES_RUNE_MODELS = {
   RUNE_NEPHTHYS: 'runeNephthys',
   RUNE_BES: 'runeBes',
   RUNE_SOBEK: 'runeSobek',
+  RUNE_GEB: 'runeGeb',
+  RUNE_NUT: 'runeNut',
 }
 
 export const RUNE_RESOLUTION_TYPES = {
@@ -288,7 +292,7 @@ export const GAME_RUNES_DESCRIPTIONS = {
     description: 'Destroy enemy\'s life stones',
     tier1: { cost: { faith: '2', souls: '' }, text: '- 1 life stone', value: 1 },
     tier2: { cost: { faith: '5', souls: '' }, text: '- 3 life stones', value: 3 },
-    tier3: { cost: { faith: '11', souls: '' }, text: '- 5 life stones', value: 5 },
+    tier3: { cost: { faith: '12', souls: '' }, text: '- 6 life stones', value: 5 },
     resolution: RUNE_RESOLUTION_TYPES.END_RESOLUTION,
   },
   RUNE_NEPHTHYS: {
@@ -314,5 +318,21 @@ export const GAME_RUNES_DESCRIPTIONS = {
     tier2: { cost: { faith: '4', souls: '' }, text: 'sacrifice 2 life stone', value: 2 },
     tier3: { cost: { faith: '8', souls: '' }, text: 'sacrifice 4 life stone', value: 4 },
     resolution: RUNE_RESOLUTION_TYPES.END_RESOLUTION,
+  },
+  RUNE_GEB: {
+    name: 'Geb\'s protection',
+    description: 'Remove helmet dice from the opponent',
+    tier1: { cost: { faith: '2', souls: '' }, text: '-2 helmet dice', value: 2 },
+    tier2: { cost: { faith: '5', souls: '' }, text: '-4 helmet dice', value: 4 },
+    tier3: { cost: { faith: '7', souls: '' }, text: '-6 helmet dice', value: 6 },
+    resolution: RUNE_RESOLUTION_TYPES.BEGINNING_RESOLUTION,
+  },
+  RUNE_NUT: {
+    name: 'Nut\'s shield',
+    description: 'Remove shield dice from the opponent',
+    tier1: { cost: { faith: '2', souls: '' }, text: '-2 shield dice', value: 2 },
+    tier2: { cost: { faith: '5', souls: '' }, text: '-4 shield dice', value: 4 },
+    tier3: { cost: { faith: '7', souls: '' }, text: '-6 shield dice', value: 6 },
+    resolution: RUNE_RESOLUTION_TYPES.BEGINNING_RESOLUTION,
   },
 }

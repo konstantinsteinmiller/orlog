@@ -11,7 +11,7 @@ export default class StrategyManager {
   constructor(player) {
     this.experience = new Experience()
     this.world = this.experience.world
-    this.player = player
+    this.owner = player
     this.dicesHandler = player.dicesHandler
     this.selectedDices = []
 
@@ -23,8 +23,8 @@ export default class StrategyManager {
 
   addAssessDices() {
     if (
-      this.player.isPlayerAtTurn &&
-      this.player.playerId === GAME_PLAYER_TYPES.GAME_PLAYER_TYPE_NPC &&
+      this.owner.isPlayerAtTurn &&
+      this.owner.playerId === GAME_PLAYER_TYPES.GAME_PLAYER_TYPE_NPC &&
       this.dicesHandler.availableThrows > 0
     ) {
       this.assessDiceSelection()
@@ -67,9 +67,7 @@ export default class StrategyManager {
     })
 
     const enemyPlayer =
-      this.world.players[
-        Object.keys(this.world.players).find((playerId) => playerId !== this.player.playerId)
-      ]
+      this.world.players[Object.keys(this.world.players).find((playerId) => playerId !== this.owner.playerId)]
 
     enemyPlayer.dicesHandler.dicesList.forEach((dice) => {
       if (dice.highlightMesh?.isPlaced) {
@@ -173,15 +171,15 @@ export default class StrategyManager {
   }
 
   hasHighHP() {
-    return this.player.lifeStones.length > 10
+    return this.owner.lifeStones.length > 10
   }
 
   hasMediumHP() {
-    return this.player.lifeStones.length <= 10 && this.player.lifeStones.length > 5
+    return this.owner.lifeStones.length <= 10 && this.owner.lifeStones.length > 5
   }
 
   hasCritialHP() {
-    return this.player.lifeStones.length <= 5
+    return this.owner.lifeStones.length <= 5
   }
 
   selectRune() {
@@ -189,27 +187,70 @@ export default class StrategyManager {
       this.experience.debug.isActive && this.experience.debug.useDebugNpcRune
         ? +window.location.hash.split('rune=')[1].split('&')[0]
         : Math.ceil(Math.random() * 3) - 1
-    let rune = this.player.runes[randomRuneSelection]
+    let rune = this.owner.runes[randomRuneSelection]
     let runeData = GAME_RUNES_DESCRIPTIONS[rune.type]
     let selectedTier = null
 
+    const enemyPlayer = this.world.getEnemyPlayer(this.owner.playerId)
+    const enemyHelmetAmount = enemyPlayer.dicesHandler.dicesList.filter(
+      (die) => die.mesh.userData.upwardSymbol === GAME_SYMBOLS.HELM,
+    ).length
+    const enemyShieldsAmount = enemyPlayer.dicesHandler.dicesList.filter(
+      (die) => die.mesh.userData.upwardSymbol === GAME_SYMBOLS.SHIELD,
+    ).length
+    const npcArrowAmount = this.owner.dicesHandler.dicesList.filter(
+      (die) => die.mesh.userData.upwardSymbol === GAME_SYMBOLS.ARROW,
+    ).length
+    const npcAxeAmount = this.owner.dicesHandler.dicesList.filter(
+      (die) => die.mesh.userData.upwardSymbol === GAME_SYMBOLS.AXE,
+    ).length
+
+    const runeGeb = this.owner.runes.find((rune) => rune.type === GAMES_RUNES.RUNE_GEB)
+    if (runeGeb && enemyHelmetAmount >= 2 && npcAxeAmount >= 2) {
+      rune = runeGeb
+      runeData = GAME_RUNES_DESCRIPTIONS[runeGeb.type]
+      selectedTier =
+        enemyHelmetAmount <= 2
+          ? 'tier1'
+          : enemyHelmetAmount <= 4 && npcAxeAmount >= 3
+          ? 'tier2'
+          : enemyHelmetAmount <= 6 && npcAxeAmount >= 4
+          ? 'tier3'
+          : 'tier1'
+    }
+
+    const runeNat = this.owner.runes.find((rune) => rune.type === GAMES_RUNES.RUNE_NUT)
+    if (runeNat && enemyShieldsAmount >= 2 && npcArrowAmount >= 2) {
+      rune = runeNat
+      runeData = GAME_RUNES_DESCRIPTIONS[runeNat.type]
+      selectedTier =
+        enemyShieldsAmount <= 2
+          ? 'tier1'
+          : enemyShieldsAmount <= 4 && npcArrowAmount >= 3
+          ? 'tier2'
+          : enemyShieldsAmount <= 6 && npcArrowAmount >= 4
+          ? 'tier3'
+          : 'tier1'
+    }
+
+    /* strategy based on remaining life stones */
     if (this.hasHighHP()) {
       selectedTier = this.selectHighestAvailableTier(runeData)
     }
 
     if (this.hasMediumHP()) {
-      rune = this.player.runes.find((rune) => rune.type === GAMES_RUNES.RUNE_TAWARET) || rune
+      rune = this.owner.runes.find((rune) => rune.type === GAMES_RUNES.RUNE_TAWARET) || rune
       runeData = GAME_RUNES_DESCRIPTIONS[rune.type]
       selectedTier = this.selectHighestAvailableTier(runeData)
     }
 
     if (this.hasCritialHP()) {
-      rune = this.player.runes.find((rune) => rune.type === GAMES_RUNES.RUNE_TAWARET) || rune
+      rune = this.owner.runes.find((rune) => rune.type === GAMES_RUNES.RUNE_TAWARET) || rune
       runeData = GAME_RUNES_DESCRIPTIONS[rune.type]
       selectedTier = this.selectHighestAvailableTier(runeData)
     }
 
-    this.player.selectedRune = selectedTier
+    this.owner.selectedRune = selectedTier
       ? {
           rune: rune,
           type: rune.type,
@@ -219,12 +260,12 @@ export default class StrategyManager {
       : null
     setTimeout(() => {
       selectedTier && rune.toggleRune(false, true)
-      this.player.trigger(GAMES_PHASES.DICE_RESOLVE)
+      this.owner.trigger(GAMES_PHASES.DICE_RESOLVE)
     }, 1500)
   }
 
   selectHighestAvailableTier(runeData) {
-    const faithTokenAmount = this.player.faithTokens.length
+    const faithTokenAmount = this.owner.faithTokens.length
     return Object.keys(runeData)
       .filter((key) => key.includes('tier'))
       .sort((a, b) => b.substring(4) - a.substring(4))
@@ -344,7 +385,7 @@ export default class StrategyManager {
       return new Promise((resolve) => {
         setTimeout(() => {
           if (die.isMarkedForRemoval) {
-            this.world.diceResolver.moveDieBackToStart(die, defenderPlayer)
+            die.moveDieBackToStart()
             die.toggleDice(false, false)
           }
 
@@ -480,7 +521,7 @@ export default class StrategyManager {
       if (totalToConvert.some((dice) => dice?.mesh.name === die?.mesh.name)) {
         die.toggleMarkForSteal()
         die.moveForward()
-        die.changeDieOwner(this.player)
+        die.changeDieOwner(this.owner)
       }
 
       return new Promise((resolve) => {

@@ -222,4 +222,35 @@ export default class Dice {
       duration: 0.3,
     })
   }
+
+  moveDieBackToStart() {
+    if (this.isMarkedForSteal && this.originalOwner.playerId !== this.owner.playerId) {
+      this.changeDieOwner(this.originalOwner)
+    }
+
+    setTimeout(() => {
+      g.to(this.group.position, {
+        y: 2,
+        duration: 0.3,
+      }).then(() => {
+        g.to(this.group.position, {
+          x: this.originalOwner.dicesHandler.offsetDirection * (this.modelNumber * 0.7 + 2.5),
+          y: 2,
+          z:
+            this.originalOwner.dicesHandler.offsetDirection *
+            (this.originalOwner.dicesHandler.midZOffset + 3),
+          duration: 0.5,
+        }).then(() => {
+          g.to(this.group.position, {
+            x: this.originalOwner.dicesHandler.offsetDirection * (this.modelNumber * 0.7 + 2.5),
+            y: this.scale,
+            z:
+              this.originalOwner.dicesHandler.offsetDirection *
+              (this.originalOwner.dicesHandler.midZOffset + 3),
+            duration: 0.2,
+          })
+        })
+      })
+    }, 500)
+  }
 }

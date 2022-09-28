@@ -36,7 +36,7 @@ export default class SetRune extends Rune {
         clearInterval(this.handleDiceHoverInterval)
         this.defenderPlayer.dicesHandler.dicesList.forEach((die) => {
           if (die?.isMarkedForRemoval) {
-            this.world.diceResolver.moveDieBackToStart(die, this.defenderPlayer)
+            die.moveDieBackToStart()
             die.toggleDice(false, false)
           }
         })

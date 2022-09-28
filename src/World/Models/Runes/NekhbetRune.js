@@ -31,7 +31,7 @@ export default class NekhbetRune extends Rune {
       }
     })
 
-    this.experience.input.on('dblclick', () => {
+    this.experience.input.on('dblclick', async () => {
       if (this.world.isDiceResolutionPhase() && this.startedSelection === true) {
         clearInterval(this.handleDiceHoverInterval)
 
@@ -45,7 +45,13 @@ export default class NekhbetRune extends Rune {
         this.defenderPlayer.dicesHandler.removeStolenDices()
 
         /* only move dice to enemy after all owner were adjusted */
-        this.owner.dicesHandler.moveSelectedDicesToEnemy()
+        await new Promise(async (resolve) => {
+          this.removeCurrentIntersect()
+          this.owner.dicesHandler.moveSelectedDicesToEnemy()
+          setTimeout(() => {
+            resolve()
+          }, 4500)
+        })
 
         this.experience.sounds.playSound('laughEvil')
         this.resolve()
@@ -97,7 +103,7 @@ export default class NekhbetRune extends Rune {
       this.currentIntersect = intersections[0].object
       this.defenderPlayer.dicesHandler.dicesList.forEach((dice) => {
         dice.highlightMesh.isHighlighted =
-          this.currentIntersect.name === dice?.mesh?.name && !dice.highlightMesh?.isPlaced
+          this.currentIntersect.name === dice?.mesh.name && !dice.highlightMesh?.isPlaced
       })
       this.owner.dicesHandler.evaluateTopFace()
       this.setDiceTopFaceHighlighter()

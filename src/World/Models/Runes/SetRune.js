@@ -86,7 +86,7 @@ export default class SetRune extends Rune {
       this.currentIntersect = intersections[0].object
       this.defenderPlayer.dicesHandler.dicesList.forEach((dice) => {
         dice.highlightMesh.isHighlighted =
-          this.currentIntersect.name === dice?.mesh?.name && !dice.highlightMesh?.isPlaced
+          this.currentIntersect.name === dice?.mesh.name && !dice.highlightMesh?.isPlaced
       })
       this.owner.dicesHandler.evaluateTopFace()
       this.setDiceTopFaceHighlighter()

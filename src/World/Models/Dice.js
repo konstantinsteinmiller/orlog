@@ -113,7 +113,7 @@ export default class Dice {
     this.mesh = this.resource.scene.children[0].clone(true)
     this.mesh.castShadow = true
     this.mesh.receiveShadow = true
-    this.mesh.name = `Dice${this.modelNumber}Mesh`
+    this.mesh.name = `Dice${this.modelNumber}Mesh-${this.owner.playerId}`
     this.mesh.identifier = 'mainMesh'
     this.mesh.userData.playerId = this.playerId
 
@@ -203,6 +203,7 @@ export default class Dice {
   changeDieOwner(player) {
     /* switch ownership here */
     this.owner = player
+    this.isMarkedForSteal = false
 
     this.isPlayer = this.owner.isPlayer
     this.playerId = this.owner.playerId
@@ -215,7 +216,7 @@ export default class Dice {
   }
 
   moveForward() {
-    const originalOffsetDirection = this.originalOwner.isPlayer ? -1 : 1
+    const originalOffsetDirection = this.owner.isPlayer ? -1 : 1
     return g.to(this.group.position, {
       z: this.group.position.z + this.scale * 2.5 * originalOffsetDirection,
       duration: 0.3,

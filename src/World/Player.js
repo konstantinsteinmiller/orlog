@@ -130,7 +130,10 @@ export default class Player extends EventEmitter {
     this.faithTokens = [...Array(startFaithTokens).keys()].map((id) => new FaithToken(this, id, id * 0.2))
 
     this.dicesHandler.on('finished-moving-dices-to-enemy', () => {
-      if (this.dicesHandler.dicesList.every((dice) => dice.highlightMesh?.isPlaced)) {
+      if (
+        this.world.isDiceRollPhase() &&
+        this.dicesHandler.dicesList.every((dice) => dice.highlightMesh?.isPlaced)
+      ) {
         this.dicesHandler.availableThrows = 0
         this.world.faithReachedByPlayer[this.playerId] = true
         this.trigger(GAMES_PHASES.FAITH_CASTING)

@@ -392,6 +392,19 @@ export default class StrategyManager {
         toRemoveDices.push('AXE')
       })
     }
+    /* */
+    if (attackerDices['AXE'] >= defenderDices['HELM'] && defenderDices['AXE'] > 0) {
+      const times = defenderDices['AXE']
+      ;[...Array(times).keys()].forEach(() => {
+        toRemoveDices.push('AXE')
+      })
+    }
+    if (attackerDices['ARROW'] >= defenderDices['SHIELD'] && defenderDices['ARROW'] > 0) {
+      const times = defenderDices['ARROW']
+      ;[...Array(times).keys()].forEach(() => {
+        toRemoveDices.push('ARROW')
+      })
+    }
     /* second prefer golden arrows if enemy got more axes than you got shield */
     if (attackerDices['SHIELD'] < defenderDices['ARROW']) {
       const times = defenderDices['ARROW'] - attackerDices['SHIELD']
@@ -405,6 +418,9 @@ export default class StrategyManager {
         toRemoveDices.push('SHIELD')
       })
     }
+    toRemoveDices.push('ARROW')
+    toRemoveDices.push('AXE')
+    toRemoveDices.push('HAND')
 
     /* last prefer removing enemy hands(golden) */
     const goldenHandsAmount = defenderPlayer.dicesHandler.dicesList.filter(
@@ -463,18 +479,13 @@ export default class StrategyManager {
     const markedDicesPromises = defenderPlayer.dicesHandler.dicesList.map((die, index) => {
       if (totalToConvert.some((dice) => dice?.mesh.name === die?.mesh.name)) {
         die.toggleMarkForSteal()
-        die.changeDieOwner(this.player)
         die.moveForward()
+        die.changeDieOwner(this.player)
       }
 
       return new Promise((resolve) => {
-        setTimeout(async () => {
-          if (die.isMarkedForSteal) {
-            console.log('selected: ', die.mesh.userData.upwardSymbol, die.mesh.name)
-            resolve()
-          } else {
-            resolve()
-          }
+        setTimeout(() => {
+          resolve()
         }, 1500)
       })
     })
@@ -482,7 +493,12 @@ export default class StrategyManager {
     defenderPlayer.dicesHandler.removeStolenDices()
 
     /* only move dice to enemy after all owner were adjusted */
-    this.dicesHandler.moveSelectedDicesToEnemy()
+    await new Promise((resolve) => {
+      this.dicesHandler.moveSelectedDicesToEnemy()
+      setTimeout(() => {
+        resolve()
+      }, 4500)
+    })
 
     return await Promise.all(markedDicesPromises)
   }

@@ -497,7 +497,7 @@ export default class DicesHandler extends EventEmitter {
       this.currentIntersect = intersections[0].object
       this.dicesList.forEach((dice) => {
         dice.highlightMesh.isHighlighted =
-          this.currentIntersect.name === dice?.mesh?.name && !dice.highlightMesh?.isPlaced
+          this.currentIntersect.name === dice?.mesh.name && !dice.highlightMesh?.isPlaced
       })
       this.evaluateTopFace()
       this.setDiceTopFaceHighlighter()
@@ -676,20 +676,8 @@ export default class DicesHandler extends EventEmitter {
     return false
   }
 
-  removeStolenDices(removeMark) {
-    const markedDices = this.dicesList
-      .filter((die) => die.isMarkedForSteal)
-      .forEach((die) => {
-        if (removeMark) {
-          die.isMarkedForSteal = false
-        }
-      })
-
+  removeStolenDices() {
     this.dicesList = this.dicesList.filter((die) => die.owner.playerId === this.playerId)
-    console.log(
-      'this.dicesList: ',
-      this.dicesList.map((die) => `${die.mesh.name} ${die.owner.playerId} ${die.originalOwner.playerId}`),
-    )
   }
 
   update() {

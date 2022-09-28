@@ -248,7 +248,6 @@ export default class World {
       player.roundUnblockedDices = 0
       player.roundBlockedDices = 0
 
-      console.log('player.dicesHandler.dicesList: ', player.dicesHandler.dicesList)
       player.dicesHandler.dicesList.forEach((die) => {
         die.highlightMesh.isPlaced = false
         die.highlightMesh.isSelected = false
@@ -257,31 +256,15 @@ export default class World {
         die.mesh.userData.upwardFace = undefined
         die.mesh.userData.upwardSymbol = undefined
         die.mesh.userData.isGoldenSymbol = undefined
-        die.originalOwner.playerId !== die.owner.playerId &&
-          console.log('switching stolen dice back', die.isMarkedForSteal)
 
-        if (die.isMarkedForSteal) {
-          console.log('isMarked', die.isMarkedForSteal, die.originalOwner.playerId, die.owner.playerId)
-        }
-        if (die.isMarkedForSteal) {
+        if (die.originalOwner.playerId !== die.owner.playerId) {
           die.changeDieOwner(die.originalOwner)
         }
       })
     })
-    console.log(
-      'startingPlayer, secondPlayer: ',
-      firstPlayer.dicesHandler.dicesList,
-      secondPlayer.dicesHandler.dicesList,
-    )
     ;[firstPlayer, secondPlayer].forEach((player) => {
-      player.dicesHandler.removeStolenDices(true)
+      player.dicesHandler.removeStolenDices()
     })
-
-    console.log(
-      'startingPlayer, secondPlayer: ',
-      firstPlayer.dicesHandler.dicesList,
-      secondPlayer.dicesHandler.dicesList,
-    )
 
     this.switchStartingPlayer()
     // this.coin.moveCoinToStartingPlayer()

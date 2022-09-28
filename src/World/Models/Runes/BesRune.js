@@ -10,8 +10,10 @@ export default class BesRune extends Rune {
     return this.resolution((resolve, tier) => {
       const enemyPlayer = this.world.getEnemyPlayer(this.owner.playerId)
       setTimeout(async () => {
-        this.experience.sounds.playSound('repel')
-        if (enemyPlayer.selectedRune && +enemyPlayer.selectedRune.tier.substring(4, 5) <= tier.value) {
+        const enemyRuneTier = +enemyPlayer.selectedRune.tier.substring(4, 5)
+        if (enemyPlayer.selectedRune && enemyRuneTier <= tier.value) {
+          this.experience.sounds.playSound('repel')
+
           await enemyPlayer.selectedRune.rune.setRuneBadHighlight()
           enemyPlayer.selectedRune = null
           resolve()

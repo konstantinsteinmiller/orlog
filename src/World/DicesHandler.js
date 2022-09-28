@@ -517,7 +517,7 @@ export default class DicesHandler extends EventEmitter {
   removeCurrentIntersect() {
     if (this.currentIntersect) {
       if (this.previousIntersect?.name !== this.currentIntersect?.name) {
-        this.debug.isActive && console.log('NEW Intersect: ', this.currentIntersect)
+        // this.debug.isActive && console.log('NEW Intersect: ', this.currentIntersect)
       }
       if (this.currentIntersect.parent) {
         this.currentIntersect.parent.getObjectByName('diceHighlight').isHighlighted = false

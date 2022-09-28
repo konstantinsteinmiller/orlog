@@ -224,11 +224,11 @@ export const GAME_RUNES_DESCRIPTIONS = {
     resolution: RUNE_RESOLUTION_TYPES.BEGINNING_RESOLUTION,
   },
   RUNE_RA: {
-    name: '\'s ',
-    description: '',
-    tier1: { cost: { faith: '0', souls: '' }, text: '+ 0 life stone', value: 0 },
-    tier2: { cost: { faith: '0', souls: '' }, text: '+ 0 life stone', value: 0 },
-    tier3: { cost: { faith: '0', souls: '' }, text: '+ 0 life stone', value: 0 },
+    name: 'Ra\'s blessing',
+    description: 'Get life stones for each attack you block',
+    tier1: { cost: { faith: '4', souls: '' }, text: '+ 1 life stone', value: 1 },
+    tier2: { cost: { faith: '9', souls: '' }, text: '+ 2 life stone', value: 2 },
+    tier3: { cost: { faith: '15', souls: '' }, text: '+ 3 life stone', value: 3 },
     resolution: RUNE_RESOLUTION_TYPES.END_RESOLUTION,
   },
   RUNE_OSIRIS: {

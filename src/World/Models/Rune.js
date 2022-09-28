@@ -18,14 +18,14 @@ export default class Rune {
     this.id = id
     this.model = GAMES_RUNE_MODELS[type]
     this.type = type
-    this.scale = 2
+    this.scale = 2.5
     this.isHighlighted = false
     this.isSelected = false
     this.rune = GAME_RUNES_DESCRIPTIONS[this.type]
     this.didPayTierPrice = false
 
     // const xPosition = 3.5 + this.id * 2.1
-    const xPosition = 3.1 + this.id * 1.75
+    const xPosition = 3.1 + this.id * 1.95
     const zPosition = this.midZOffset + 0.7
 
     this.position = new THREE.Vector3(this.offsetDirection * xPosition, 0, this.offsetDirection * zPosition)
@@ -37,7 +37,7 @@ export default class Rune {
   setMesh() {
     this.mesh = this.resources.items[this.model].scene.children[0].clone(true)
 
-    this.mesh.scale.set(this.scale, this.scale, this.scale * 1.3)
+    this.mesh.scale.set(this.scale * 0.9, this.scale, this.scale)
     this.mesh.position.copy(this.position)
     this.mesh.rotation.set(...this.rotation)
     this.mesh.name = `${this.type}`

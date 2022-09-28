@@ -153,7 +153,7 @@ export default class DiceResolver {
           attackerDices.forEach((dice, index) => {
             const defenderDie = defenderDices.shift()
             if (defenderDie) {
-              attackerPlayer.roundBlockedDices++
+              defenderPlayer.roundBlockedDices++
               return g
                 .to(dice.group.position, {
                   x: defenderDie.group.position.x,

@@ -161,6 +161,7 @@ export const GAMES_RUNES = {
   RUNE_BABI: 'RUNE_BABI',
   RUNE_NEPHTHYS: 'RUNE_NEPHTHYS',
   RUNE_BES: 'RUNE_BES',
+  RUNE_SOBEK: 'RUNE_SOBEK',
 }
 export const GAMES_RUNE_MODELS = {
   RUNE_SERQET: 'runeSerqet',
@@ -179,6 +180,7 @@ export const GAMES_RUNE_MODELS = {
   RUNE_BABI: 'runeBabi',
   RUNE_NEPHTHYS: 'runeNephthys',
   RUNE_BES: 'runeBes',
+  RUNE_SOBEK: 'runeSobek',
 }
 
 export const RUNE_RESOLUTION_TYPES = {
@@ -304,5 +306,13 @@ export const GAME_RUNES_DESCRIPTIONS = {
     tier2: { cost: { faith: '4', souls: '' }, text: 'repel tier 2 grant', value: 2 },
     tier3: { cost: { faith: '7', souls: '' }, text: 'repel tier 3 grant', value: 3 },
     resolution: RUNE_RESOLUTION_TYPES.BEGINNING_RESOLUTION,
+  },
+  RUNE_SOBEK: {
+    name: 'Sobek\'s sacrifice',
+    description: 'Sacrifice X life stones to deal 2X damage to your opponent',
+    tier1: { cost: { faith: '2', souls: '' }, text: 'sacrifice 1 life stone', value: 1 },
+    tier2: { cost: { faith: '4', souls: '' }, text: 'sacrifice 2 life stone', value: 2 },
+    tier3: { cost: { faith: '8', souls: '' }, text: 'sacrifice 4 life stone', value: 4 },
+    resolution: RUNE_RESOLUTION_TYPES.END_RESOLUTION,
   },
 }

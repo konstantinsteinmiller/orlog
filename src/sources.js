@@ -147,6 +147,11 @@ export default [
     path: 'sounds/laugh-evil.ogg',
   },
   {
+    name: 'knifeStab',
+    type: 'audioLoader',
+    path: 'sounds/knife-stab.ogg',
+  },
+  {
     name: 'bowl',
     type: 'gltfModel',
     path: 'models/bowl/bowl.glb',
@@ -261,5 +266,10 @@ export default [
     name: 'runeBes',
     type: 'gltfModel',
     path: 'models/runes/runeBes.glb',
+  },
+  {
+    name: 'runeSobek',
+    type: 'gltfModel',
+    path: 'models/runes/runeSobek.glb',
   },
 ]

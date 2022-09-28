@@ -12,6 +12,7 @@ import NephthysRune from '@/World/Models/Runes/NephthysRune.js'
 import NekhbetRune from '@/World/Models/Runes/NekhbetRune.js'
 import BesRune from '@/World/Models/Runes/BesRune.js'
 import HorusRune from '@/World/Models/Runes/HorusRune.js'
+import SobekRune from '@/World/Models/Runes/SobekRune.js'
 import Experience from '@/Experience.js'
 import { GAME_PLAYER_TYPES, GAMES_PHASES, GAME_STARTING_LIFE_STONES, GAMES_RUNES } from '@/Utils/constants.js'
 
@@ -104,7 +105,8 @@ export default class Player extends EventEmitter {
 
     this.runes = [
       // new BabiRune(0, this),
-      new HorusRune(0, this),
+      new SobekRune(0, this),
+      // new HorusRune(0, this),
       // new AnubisRune(1, this),
       new BesRune(1, this),
       // new SetRune(1, this),

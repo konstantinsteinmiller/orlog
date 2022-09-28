@@ -1,13 +1,10 @@
 import Experience from '@/Experience.js'
-import FaithToken, { targetFaithTokenPosition } from '@/World/Models/FaithToken.js'
-import { getStorage } from '@/Utils/storage.js'
-import { GAME_PLAYER_ID, GAME_SYMBOLS } from '@/Utils/constants.js'
+import { targetFaithTokenPosition } from '@/World/Models/FaithToken.js'
+import { GAME_SYMBOLS } from '@/Utils/constants.js'
 import { gsap as g } from 'gsap'
 
 export default class DiceResolver {
   constructor() {
-    // super();
-
     this.experience = new Experience()
     this.world = this.experience.world
     this.sounds = this.experience.sounds
@@ -36,6 +33,8 @@ export default class DiceResolver {
         dice.group.position.y + 0.2,
         dice.group.position.z,
       )
+
+      diceOwner.roundCreatedFaithTokens++
       return diceOwner.addFaithTokens(1, fromPosition)
     })
     await Promise.all(faithPromiseList)
@@ -44,7 +43,6 @@ export default class DiceResolver {
   }
 
   async resolveSymbols() {
-    // const starting ax
     const startingAxesDices = []
     const startingArrowsDices = []
     const startingHelmsDices = []

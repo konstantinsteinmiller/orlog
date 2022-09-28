@@ -79,11 +79,11 @@ export default class FaithToken {
     )
   }
 
-  moveFaithTokenToStack() {
-    this.owner.roundCreatedFaithTokens++
+  moveFaithTokenToStack(timeoutInSeconds) {
     g.to(this.mesh.position, {
       ...targetFaithTokenPosition(this.id, this.offsetDirection, this.midZOffset),
       duration: 0.4,
+      delay: timeoutInSeconds,
     })
   }
 
@@ -142,8 +142,9 @@ export default class FaithToken {
     this.mesh.receiveShadow = true
   }
 
-  setOwner(attackerPlayer, id) {
-    this.offsetDirection = attackerPlayer.isPlayer ? 1 : -1
+  setOwner(ownerPlayer, id) {
+    this.owner = ownerPlayer
+    this.offsetDirection = ownerPlayer.isPlayer ? 1 : -1
     this.id = id
   }
 

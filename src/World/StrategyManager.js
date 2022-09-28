@@ -492,7 +492,7 @@ export default class StrategyManager {
 
     defenderPlayer.dicesHandler.removeStolenDices()
 
-    /* only move dice to enemy after all owner were adjusted */
+    /* only move dice to enemy after all owners were adjusted */
     await new Promise((resolve) => {
       this.dicesHandler.moveSelectedDicesToEnemy()
       setTimeout(() => {

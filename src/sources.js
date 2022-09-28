@@ -152,6 +152,11 @@ export default [
     path: 'sounds/knife-stab.ogg',
   },
   {
+    name: 'wind',
+    type: 'audioLoader',
+    path: 'sounds/wind.ogg',
+  },
+  {
     name: 'bowl',
     type: 'gltfModel',
     path: 'models/bowl/bowl.glb',

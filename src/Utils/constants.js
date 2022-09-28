@@ -204,12 +204,12 @@ export const GAME_RUNES_DESCRIPTIONS = {
     resolution: RUNE_RESOLUTION_TYPES.BEGINNING_RESOLUTION,
   },
   RUNE_SHU: {
-    name: '\'s ',
-    description: '',
-    tier1: { cost: { faith: '0', souls: '' }, text: '+ 0 life stone', value: 0 },
-    tier2: { cost: { faith: '0', souls: '' }, text: '+ 0 life stone', value: 0 },
-    tier3: { cost: { faith: '0', souls: '' }, text: '+ 0 life stone', value: 0 },
-    resolution: RUNE_RESOLUTION_TYPES.END_RESOLUTION,
+    name: 'Shu\'s swift theft',
+    description: 'Steal enemies faith tokens and convert them to your own faith tokens',
+    tier1: { cost: { faith: '2', souls: '' }, text: 'steal up to 1 faith tokens', value: 1 },
+    tier2: { cost: { faith: '6', souls: '' }, text: 'steal up to 3 faith tokens', value: 3 },
+    tier3: { cost: { faith: '12', souls: '' }, text: 'steal up to 7 faith tokens', value: 7 },
+    resolution: RUNE_RESOLUTION_TYPES.BEGINNING_RESOLUTION,
   },
   RUNE_SET: {
     name: 'Set\'s trickery',

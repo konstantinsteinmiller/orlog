@@ -174,7 +174,7 @@ export default [
   {
     name: 'faithToken',
     type: 'gltfModel',
-    path: 'models/faith-token/faith_token.glb',
+    path: 'models/faith-token/faith_token_ankh.glb',
   },
   {
     name: 'xposDebugCube',

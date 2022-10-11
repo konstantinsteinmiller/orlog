@@ -18,6 +18,7 @@ import BastRune from '@/World/Models/Runes/BastRune.js'
 import GebRune from '@/World/Models/Runes/GebRune.js'
 import NutRune from '@/World/Models/Runes/NutRune.js'
 import RaRune from '@/World/Models/Runes/RaRune.js'
+import OsirisRune from '@/World/Models/Runes/OsirisRune.js'
 import Experience from '@/Experience.js'
 import { GAME_PLAYER_TYPES, GAMES_PHASES, GAME_STARTING_LIFE_STONES } from '@/Utils/constants.js'
 
@@ -116,11 +117,12 @@ export default class Player extends EventEmitter {
       // new AnubisRune(1, this),
       // new BesRune(1, this),
       // new ShuRune(1, this),
-      new RaRune(1, this),
+      // new RaRune(1, this),
       // new BastRune(1, this),
-      // new SetRune(1, this),
-      new TawaretRune(2, this),
-      // new NekhbetRune(2, this),
+      new SetRune(1, this),
+      // new OsirisRune(2, this),
+      // new TawaretRune(2, this),
+      new NekhbetRune(2, this),
       // new NutRune(2, this),
       // new NephthysRune(2, this),
       // new Rune(2, GAMES_RUNES.RUNE_BAST, this),

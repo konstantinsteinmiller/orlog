@@ -1,12 +1,5 @@
 import { GAME_PLAYER_TYPES, GAMES_RUNES, HIGHLIGHT_POSITION_MAP } from '@/Utils/constants.js'
 import Rune from '@/World/Models/Rune.js'
-import dice1Img from '/public/textures/dices/dice1.jpg'
-import dice2Img from '/public/textures/dices/dice2.jpg'
-import dice3Img from '/public/textures/dices/dice3.jpg'
-import dice4Img from '/public/textures/dices/dice4.jpg'
-import dice5Img from '/public/textures/dices/dice5.jpg'
-import dice6Img from '/public/textures/dices/dice6.jpg'
-const images = [dice1Img, dice2Img, dice3Img, dice4Img, dice5Img, dice6Img]
 
 export default class NekhbetRune extends Rune {
   constructor(id, player) {
@@ -106,7 +99,7 @@ export default class NekhbetRune extends Rune {
           this.currentIntersect.name === dice?.mesh.name && !dice.highlightMesh?.isPlaced
       })
       this.owner.dicesHandler.evaluateTopFace()
-      this.setDiceTopFaceHighlighter()
+      this.gui.setDiceTopFaceHighlighter(this.currentIntersect)
 
       if (
         this.owner.dicesHandler.isPlayer &&
@@ -121,30 +114,17 @@ export default class NekhbetRune extends Rune {
 
   removeCurrentIntersect() {
     if (this.currentIntersect) {
-      if (this.previousIntersect?.name !== this.currentIntersect?.name) {
+      // if (this.previousIntersect?.name !== this.currentIntersect?.name) {
         // this.experience.debug.isActive && console.log('NEW Intersect: ', this.currentIntersect)
-      }
+      // }
       if (this.currentIntersect.parent) {
         this.currentIntersect.parent.getObjectByName('diceHighlight').isHighlighted = false
       }
       this.gui.toggleCursor(false)
-      diceFacesLayout.style.opacity = 0
+      this.gui.hideDiceFaceLayout()
     }
     this.previousIntersect = { name: this.currentIntersect?.name }
     this.currentIntersect = null
-  }
-
-  setDiceTopFaceHighlighter() {
-    if (this.currentIntersect.name.substring(0, 4) === 'Dice') {
-      const diceModelNumber = this.currentIntersect.name.substring(4, 5)
-      diceFacesLayout.style.opacity = 0.8
-      const upwardFace = this.currentIntersect?.userData?.upwardFace
-      if (upwardFace) {
-        faceHighlight.style.top = HIGHLIGHT_POSITION_MAP?.[upwardFace].top
-        faceHighlight.style.right = HIGHLIGHT_POSITION_MAP?.[upwardFace].right
-      }
-      diceFaces.src = images[diceModelNumber - 1]
-    }
   }
 
   toggleDiceSelection() {

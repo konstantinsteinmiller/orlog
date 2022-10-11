@@ -232,12 +232,12 @@ export const GAME_RUNES_DESCRIPTIONS = {
     resolution: RUNE_RESOLUTION_TYPES.END_RESOLUTION,
   },
   RUNE_OSIRIS: {
-    name: '\'s ',
-    description: '',
-    // tier1: { cost: { faith: '3', souls: '' }, text: '+ 1 die', value: 1 },
-    // tier2: { cost: { faith: '5', souls: '' }, text: '+ 2 dice', value: 2 },
-    // tier3: { cost: { faith: '8', souls: '' }, text: '+ 3 dice', value: 3 },
-    // resolution: RUNE_RESOLUTION_TYPES.BEGINNING_RESOLUTION,
+    name: 'Osiris\'s spirituality',
+    description: 'Sacrifice a faith token to get a life stone',
+    tier1: { cost: { faith: '3', souls: '' }, text: 'up to 2 faith token', value: 2 },
+    tier2: { cost: { faith: '6', souls: '' }, text: 'up to 5 faith token', value: 5 },
+    tier3: { cost: { faith: '8', souls: '' }, text: 'up to 9 faith token', value: 9 },
+    resolution: RUNE_RESOLUTION_TYPES.END_RESOLUTION,
   },
   RUNE_NEKHBET: {
     name: 'Nekhbet\'s theft',
@@ -313,10 +313,10 @@ export const GAME_RUNES_DESCRIPTIONS = {
   },
   RUNE_SOBEK: {
     name: 'Sobek\'s sacrifice',
-    description: 'Sacrifice X life stones to deal 2X damage to your opponent',
-    tier1: { cost: { faith: '2', souls: '' }, text: 'sacrifice 1 life stone', value: 1 },
-    tier2: { cost: { faith: '4', souls: '' }, text: 'sacrifice 2 life stone', value: 2 },
-    tier3: { cost: { faith: '8', souls: '' }, text: 'sacrifice 4 life stone', value: 4 },
+    description: 'Deal 2X sacrificed life stones as damage to your opponent',
+    tier1: { cost: { faith: '2', souls: '' }, text: 'sacrifice 1 life stone, deal 2 damage', value: 1 },
+    tier2: { cost: { faith: '4', souls: '' }, text: 'sacrifice 2 life stone, deal 4 damage', value: 2 },
+    tier3: { cost: { faith: '8', souls: '' }, text: 'sacrifice 4 life stone, deal 8 damage', value: 4 },
     resolution: RUNE_RESOLUTION_TYPES.END_RESOLUTION,
   },
   RUNE_GEB: {

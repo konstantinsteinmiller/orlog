@@ -1,10 +1,17 @@
 import {
   GAMES_PHASES,
   GAME_RUNES_DESCRIPTIONS,
-  RUNE_RESOLUTION_TYPES_DESCRIPTION,
-} from '@/Utils/constants.js'
+  RUNE_RESOLUTION_TYPES_DESCRIPTION, HIGHLIGHT_POSITION_MAP,
+} from '@/Utils/constants.js';
 import Experience from '@/Experience.js'
-import faithTokenImage from '/public/textures/ui/faithToken.png'
+import faithTokenImage from '/public/textures/ui/faithTokenAnkh.png'
+import dice1Img from '/public/textures/dices/dice1.jpg'
+import dice2Img from '/public/textures/dices/dice2.jpg'
+import dice3Img from '/public/textures/dices/dice3.jpg'
+import dice4Img from '/public/textures/dices/dice4.jpg'
+import dice5Img from '/public/textures/dices/dice5.jpg'
+import dice6Img from '/public/textures/dices/dice6.jpg'
+const images = [dice1Img, dice2Img, dice3Img, dice4Img, dice5Img, dice6Img]
 
 export default class GUI {
   constructor() {
@@ -92,5 +99,24 @@ export default class GUI {
 
   toggleCursor(isPointer) {
     $gameWrapper.style.cursor = isPointer ? 'pointer' : 'default'
+  }
+
+  hideDiceFaceLayout() {
+    diceFacesLayout.style.opacity = 0
+  }
+
+  setDiceTopFaceHighlighter(currentIntersect) {
+    if (currentIntersect.name.substring(0, 4) === 'Dice' && !this.isShowingRuneInfo) {
+      const diceModelNumber = currentIntersect.name.substring(4, 5)
+      diceFacesLayout.style.opacity = 0.8
+      const upwardFace = currentIntersect?.userData?.upwardFace
+      if (upwardFace) {
+        faceHighlight.style.top = HIGHLIGHT_POSITION_MAP?.[upwardFace].top
+        faceHighlight.style.right = HIGHLIGHT_POSITION_MAP?.[upwardFace].right
+      }
+      diceFaces.src = images[diceModelNumber - 1]
+    } else {
+      console.error('wrong intersection')
+    }
   }
 }

@@ -12,16 +12,9 @@ import {
 import { isWithinRange } from '@/Utils/math'
 import { gsap as g } from 'gsap'
 import { MotionPathPlugin } from 'gsap/all'
-import dice1Img from '/public/textures/dices/dice1.jpg'
-import dice2Img from '/public/textures/dices/dice2.jpg'
-import dice3Img from '/public/textures/dices/dice3.jpg'
-import dice4Img from '/public/textures/dices/dice4.jpg'
-import dice5Img from '/public/textures/dices/dice5.jpg'
-import dice6Img from '/public/textures/dices/dice6.jpg'
 import Experience from '@/Experience.js'
 import { getStorage } from '@/Utils/storage.js'
 import { isDicePlanarRotated } from '@/Utils/utils.js'
-const images = [dice1Img, dice2Img, dice3Img, dice4Img, dice5Img, dice6Img]
 
 g.registerPlugin(MotionPathPlugin)
 
@@ -115,22 +108,24 @@ export default class DicesHandler extends EventEmitter {
     // this.debug.isActive && console.log(this.playerId, 'didnt SELECT ANY DICES!!!')
     this.didNotSelectAnyDices = true
 
-    !this.isWaitingToFinishRound &&
-      (this.isWaitingToFinishRound = true) &&
-      setTimeout(() => {
-        if (this.availableThrows === 0) {
-          this.dicesList.forEach((dice) => {
-            const diceHighlightMesh = dice.group.getObjectByName('diceHighlight')
-            if (!diceHighlightMesh.isSelected && !diceHighlightMesh.isPlaced) {
-              diceHighlightMesh.isSelected = true
-            }
-          })
-          this.moveSelectedDicesToEnemy()
-        } else {
-          this.trigger('finished-moving-dices-to-enemy')
-        }
-        this.isWaitingToFinishRound = false
-      }, 1000)
+    if (this.isWaitingToFinishRound) {
+        return
+    }
+    this.isWaitingToFinishRound = true
+    setTimeout(() => {
+      if (this.availableThrows === 0) {
+        this.dicesList.forEach((dice) => {
+          const diceHighlightMesh = dice.group.getObjectByName('diceHighlight')
+          if (!diceHighlightMesh.isSelected && !diceHighlightMesh.isPlaced) {
+            diceHighlightMesh.isSelected = true
+          }
+        })
+        this.moveSelectedDicesToEnemy()
+      } else {
+        this.trigger('finished-moving-dices-to-enemy')
+      }
+      this.isWaitingToFinishRound = false
+    }, 1000)
   }
 
   destroy() {
@@ -511,38 +506,27 @@ export default class DicesHandler extends EventEmitter {
         this.gui.toggleCursor(true)
       }
     } else {
-      this.removeCurrentIntersect()
+      this.removeCurrentIntersect(this.currentIntersect, this.previousIntersect)
     }
   }
 
-  removeCurrentIntersect() {
-    if (this.currentIntersect) {
-      if (this.previousIntersect?.name !== this.currentIntersect?.name) {
+  removeCurrentIntersect(currentIntersect, previousIntersect) {
+    if (currentIntersect) {
+      // if (previousIntersect?.name !== currentIntersect?.name) {
         // this.debug.isActive && console.log('NEW Intersect: ', this.currentIntersect)
-      }
-      if (this.currentIntersect.parent) {
-        this.currentIntersect.parent.getObjectByName('diceHighlight').isHighlighted = false
+      // }
+      if (currentIntersect.parent) {
+        currentIntersect.parent.getObjectByName('diceHighlight').isHighlighted = false
       }
       this.gui.toggleCursor(false)
-      diceFacesLayout.style.opacity = 0
+      this.gui.hideDiceFaceLayout()
     }
-    this.previousIntersect = { name: this.currentIntersect?.name }
-    this.currentIntersect = null
+    previousIntersect = { name: currentIntersect?.name }
+    currentIntersect = null
   }
 
   setDiceTopFaceHighlighter() {
-    if (this.currentIntersect.name.substring(0, 4) === 'Dice') {
-      const diceModelNumber = this.currentIntersect.name.substring(4, 5)
-      diceFacesLayout.style.opacity = 0.8
-      const upwardFace = this.currentIntersect?.userData?.upwardFace
-      if (upwardFace) {
-        faceHighlight.style.top = HIGHLIGHT_POSITION_MAP?.[upwardFace].top
-        faceHighlight.style.right = HIGHLIGHT_POSITION_MAP?.[upwardFace].right
-      }
-      diceFaces.src = images[diceModelNumber - 1]
-    } else {
-      console.error('wrong intersection')
-    }
+    this.world.gui.setDiceTopFaceHighlighter(this.currentIntersect)
   }
 
   evaluateTopFace = () => {
@@ -746,7 +730,7 @@ export default class DicesHandler extends EventEmitter {
     if (this.world.isDiceRollPhase()) {
       this.dicesList.every((dice) => dice.mesh?.userData?.upwardFace !== undefined) && this.handleDiceHover()
     } else if (this.currentIntersect) {
-      this.removeCurrentIntersect()
+      this.removeCurrentIntersect(this.currentIntersect, this.previousIntersect)
     }
   }
 

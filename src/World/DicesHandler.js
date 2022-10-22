@@ -1,7 +1,6 @@
 import Dice from '@/World/Models/Dice.js'
 import EventEmitter from '@/Utils/EventEmitter.js'
 import {
-  HIGHLIGHT_POSITION_MAP,
   DICE_FACES_MAP,
   ROTATION_FACE_MAP,
   GAMES_PHASES,
@@ -506,23 +505,23 @@ export default class DicesHandler extends EventEmitter {
         this.gui.toggleCursor(true)
       }
     } else {
-      this.removeCurrentIntersect(this.currentIntersect, this.previousIntersect)
+      this.removeCurrentIntersect()
     }
   }
 
-  removeCurrentIntersect(currentIntersect, previousIntersect) {
-    if (currentIntersect) {
+  removeCurrentIntersect() {
+    if (this.currentIntersect) {
       // if (previousIntersect?.name !== currentIntersect?.name) {
         // this.debug.isActive && console.log('NEW Intersect: ', this.currentIntersect)
       // }
-      if (currentIntersect.parent) {
-        currentIntersect.parent.getObjectByName('diceHighlight').isHighlighted = false
+      if (this.currentIntersect.parent) {
+        this.currentIntersect.parent.getObjectByName('diceHighlight').isHighlighted = false
       }
       this.gui.toggleCursor(false)
       this.gui.hideDiceFaceLayout()
     }
-    previousIntersect = { name: currentIntersect?.name }
-    currentIntersect = null
+    this.previousIntersect = { name: this.currentIntersect?.name }
+    this.currentIntersect = null
   }
 
   setDiceTopFaceHighlighter() {
@@ -730,7 +729,7 @@ export default class DicesHandler extends EventEmitter {
     if (this.world.isDiceRollPhase()) {
       this.dicesList.every((dice) => dice.mesh?.userData?.upwardFace !== undefined) && this.handleDiceHover()
     } else if (this.currentIntersect) {
-      this.removeCurrentIntersect(this.currentIntersect, this.previousIntersect)
+      this.removeCurrentIntersect()
     }
   }
 
